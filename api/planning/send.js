@@ -1,31 +1,45 @@
 /**
- * send.js — True Planning
- * Minimal Node handler to build the Planning conversation and call OpenAI.
+ * api/planning/send.js
+ * True Planning serverless handler
  *
- * Usage:
- * - Deploy as a serverless function or use in Express.
- * - Expects JSON body: { message: "<user text>", priorInsights: "<optional discovery summary text>" }
+ * Expects JSON body: { message: "<user text>", priorInsights: "<optional discovery summary text>" }
+ * Reads system prompt from '../../prompts/planning-prompt.txt'
  *
- * Notes:
- * - Replace process.env.OPENAI_API_KEY with your key.
- * - MODEL_NAME is a placeholder; set to your chosen model (e.g., "gpt-4" or "gpt-4.1-mini").
+ * Behavior:
+ *  - If priorInsights missing, returns needs_priorInsights + exact prompt
+ *  - Otherwise calls OpenAI and returns { ok, reply, outputs }
  */
 
+const fs = require('fs');
+const path = require('path');
 const fetch = (...args) => import('node-fetch').then(({ default: f }) => f(...args));
-const MODEL_NAME = process.env.MODEL_NAME || 'gpt-4';
 
-async function callOpenAI(messages) {
+const MODEL_NAME = process.env.MODEL_NAME || 'gpt-4';
+const PROMPT_PATH = path.join(__dirname, '../../prompts/planning-prompt.txt');
+
+function extractJsonLike(text) {
+  const match = text.match(/\{[\s\S]*\}/);
+  if (!match) return null;
+  try {
+    return JSON.parse(match[0]);
+  } catch (e) {
+    return null;
+  }
+}
+
+async function callOpenAIChat(messages) {
   const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
     },
     body: JSON.stringify({
       model: MODEL_NAME,
       messages,
-      max_tokens: 1200,
+      max_tokens: 1400,
       temperature: 0.6,
+      top_p: 1,
     }),
   });
 
@@ -33,17 +47,17 @@ async function callOpenAI(messages) {
     const txt = await res.text();
     throw new Error(`OpenAI error: ${res.status} ${txt}`);
   }
-
   const data = await res.json();
-  return data.choices[0].message.content;
+  return data.choices?.[0]?.message?.content ?? '';
 }
 
 module.exports = async function handlePlanning(req, res) {
   try {
-    const { message, priorInsights } = req.body || {};
+    const body = req.body || {};
+    const { message = '', priorInsights = '' } = body;
 
-    // If no priorInsights provided, prompt the user to paste their Discovery outputs.
-    if (!priorInsights) {
+    // If no priorInsights provided, prompt user to paste Discovery outputs
+    if (!priorInsights || String(priorInsights).trim() === '') {
       return res.json({
         needs_priorInsights: true,
         prompt:
@@ -51,26 +65,33 @@ module.exports = async function handlePlanning(req, res) {
       });
     }
 
-    // Build the conversation for the model
+    // Load system prompt
+    let systemPrompt = 'You are TRUE — the values-centred Planning AI.';
+    try {
+      if (fs.existsSync(PROMPT_PATH)) {
+        systemPrompt = fs.readFileSync(PROMPT_PATH, 'utf8');
+      }
+    } catch (e) {
+      // ignore, use fallback
+    }
+
     const messages = [
-      {
-        role: 'system',
-        content:
-          'You are TRUE — a focused planning AI. Use the provided Discovery outputs to create 1–3 prioritized goals and build micro-steps, obstacle strategies, accountability systems, and 7/14/30/90 day plans. Follow the prompt.txt output format.',
-      },
+      { role: 'system', content: systemPrompt },
       { role: 'user', content: `DISCOVERY_INSIGHTS:\n${priorInsights}` },
-      { role: 'user', content: `USER_MESSAGE:\n${message || ''}` },
+      { role: 'user', content: `USER_MESSAGE:\n${message}` },
       {
         role: 'assistant',
         content:
-          'Please produce the Planning outputs as a clearly labeled block: priority_goals, refined_goals, micro_steps, obstacle_strategies, accountability, plans, planning_summary, suggested_next_step. End with: Type "export" to save these planning outputs to your LifePrint, or "align" to move to Alignment.',
+          'Using the discovery inputs, produce a Planning output block with these keys (exact names): priority_goals, refined_goals, micro_steps, obstacle_strategies, accountability, plans, planning_summary, suggested_next_step. Plans should include 7_day, 14_day, 30_day, 90_day arrays. End with: Type "export" to save these planning outputs to your LifePrint, or "align" to move to Alignment.',
       },
     ];
 
-    const reply = await callOpenAI(messages);
-    return res.json({ ok: true, reply });
+    const reply = await callOpenAIChat(messages);
+    const outputs = extractJsonLike(reply);
+
+    return res.json({ ok: true, reply, outputs });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ ok: false, error: err.message });
+    console.error('Planning handler error:', err);
+    return res.status(500).json({ ok: false, error: err.message || String(err) });
   }
 };
