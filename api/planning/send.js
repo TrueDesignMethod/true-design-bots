@@ -1,78 +1,68 @@
-/**
- * api/planning/send.js
- * True Planning serverless handler
- *
- * Expects JSON body: { message: "<user text>", priorInsights: "<optional discovery summary text>" }
- * Reads system prompt from '../../prompts/planning-prompt.txt'
- *
- * Behavior:
- *  - If priorInsights missing, returns needs_priorInsights + exact prompt
- *  - Otherwise calls OpenAI and returns { ok, reply, outputs }
- */
-
-const fs = require('fs');
-const path = require('path');
-const fetch = (...args) => import('node-fetch').then(({ default: f }) => f(...args));
+// api/planning/send.js
+import fs from 'fs/promises';
+import path from 'path';
 
 const MODEL_NAME = process.env.MODEL_NAME || 'gpt-4';
-const PROMPT_PATH = path.join(__dirname, '../../prompts/planning-prompt.txt');
+const PROMPT_FILE = path.join(process.cwd(), 'prompts', 'planning-prompt.txt');
 
 function extractJsonLike(text) {
+  if (!text) return null;
   const match = text.match(/\{[\s\S]*\}/);
   if (!match) return null;
   try {
     return JSON.parse(match[0]);
-  } catch (e) {
+  } catch {
     return null;
   }
 }
 
-async function callOpenAIChat(messages) {
-  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+async function callOpenAI(messages) {
+  const resp = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
     },
     body: JSON.stringify({
       model: MODEL_NAME,
       messages,
       max_tokens: 1400,
       temperature: 0.6,
-      top_p: 1,
-    }),
+      top_p: 1
+    })
   });
 
-  if (!res.ok) {
-    const txt = await res.text();
-    throw new Error(`OpenAI error: ${res.status} ${txt}`);
+  if (!resp.ok) {
+    const txt = await resp.text();
+    throw new Error(`OpenAI error ${resp.status}: ${txt}`);
   }
-  const data = await res.json();
+
+  const data = await resp.json();
   return data.choices?.[0]?.message?.content ?? '';
 }
 
-module.exports = async function handlePlanning(req, res) {
-  try {
-    const body = req.body || {};
-    const { message = '', priorInsights = '' } = body;
+export default async function handler(req, res) {
+  if (req.method !== 'POST') return res.status(405).json({ ok: false, error: 'Method not allowed' });
 
-    // If no priorInsights provided, prompt user to paste Discovery outputs
+  try {
+    const { message = '', priorInsights = '' } = req.body || {};
+
+    // If no priorInsights provided, prompt the user to paste their Discovery outputs.
     if (!priorInsights || String(priorInsights).trim() === '') {
-      return res.json({
+      return res.status(200).json({
         needs_priorInsights: true,
         prompt:
-          "I don’t yet have your previous session information. Could you paste (or briefly summarize) the outputs from your True Discovery session so I can build on them? For example: your Top 10 values, Motivation Map, Goal Seeds, and Advantages/Disadvantages — or your full Discovery Summary.",
+          "I don’t yet have your previous session information. Could you paste (or briefly summarize) the outputs from your True Discovery session so I can build on them? For example: your Top 10 values, Motivation Map, Goal Seeds, and Advantages/Disadvantages — or your full Discovery Summary."
       });
     }
 
-    // Load system prompt
-    let systemPrompt = 'You are TRUE — the values-centred Planning AI.';
+    // Load system prompt from file (fallback to concise prompt if file missing)
+    let systemPrompt = 'You are TRUE — the values-centered Planning AI.';
     try {
-      if (fs.existsSync(PROMPT_PATH)) {
-        systemPrompt = fs.readFileSync(PROMPT_PATH, 'utf8');
-      }
-    } catch (e) {
-      // ignore, use fallback
+      const txt = await fs.readFile(PROMPT_FILE, 'utf8');
+      if (txt && txt.trim()) systemPrompt = txt;
+    } catch {
+      /* ignore and use fallback */
     }
 
     const messages = [
@@ -82,16 +72,16 @@ module.exports = async function handlePlanning(req, res) {
       {
         role: 'assistant',
         content:
-          'Using the discovery inputs, produce a Planning output block with these keys (exact names): priority_goals, refined_goals, micro_steps, obstacle_strategies, accountability, plans, planning_summary, suggested_next_step. Plans should include 7_day, 14_day, 30_day, 90_day arrays. End with: Type "export" to save these planning outputs to your LifePrint, or "align" to move to Alignment.',
-      },
+          'Using the discovery inputs, produce a Planning output block with these exact keys: priority_goals, refined_goals, micro_steps, obstacle_strategies, accountability, plans, planning_summary, suggested_next_step. Ensure plans include 7_day, 14_day, 30_day, and 90_day arrays. End with: Type "export" to save these planning outputs to your LifePrint, or "align" to move to Alignment.'
+      }
     ];
 
-    const reply = await callOpenAIChat(messages);
+    const reply = await callOpenAI(messages);
     const outputs = extractJsonLike(reply);
 
-    return res.json({ ok: true, reply, outputs });
+    return res.status(200).json({ ok: true, reply, outputs });
   } catch (err) {
     console.error('Planning handler error:', err);
-    return res.status(500).json({ ok: false, error: err.message || String(err) });
+    return res.status(500).json({ ok: false, error: String(err.message || err) });
   }
-};
+}
