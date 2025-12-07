@@ -5,10 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>True Discovery — TRUE</title>
 
-<!-- Montserrat -->
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
-
-<!-- html2pdf -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
@@ -16,102 +13,30 @@
     --bg:#fbf9f6;
     --card:#ffffff;
     --muted:#666;
-    --accent:#ff7a59; /* warm accent */
+    --accent:#ff7a59;
     --btnbg:#000;
     --btnfg:#fff;
     --radius:16px;
   }
-  body{
-    font-family: 'Montserrat', sans-serif;
-    background: linear-gradient(180deg,#fbf9f6 0%, #fff 100%);
-    margin:0;
-    padding:32px;
-    color:#222;
-  }
-  .container{
-    max-width:920px;
-    margin:24px auto;
-    background:var(--card);
-    border-radius:var(--radius);
-    box-shadow: 0 10px 30px rgba(15,20,30,0.06);
-    padding:28px;
-  }
-  .header{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    margin-bottom:8px;
-  }
-  .brand{
-    font-weight:700;
-    font-size:20px;
-  }
-  .title{
-    color:var(--muted);
-    font-size:14px;
-    margin-bottom:18px;
-  }
+  body{ font-family:'Montserrat',sans-serif; background:linear-gradient(180deg,#fbf9f6 0%, #fff 100%); margin:0; padding:32px; color:#222; }
+  .container{ max-width:920px; margin:24px auto; background:var(--card); border-radius:var(--radius); box-shadow:0 10px 30px rgba(15,20,30,0.06); padding:28px; }
+  .header{ display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+  .brand{ font-weight:700; font-size:20px; }
+  .title{ color:var(--muted); font-size:14px; margin-bottom:18px; }
   .row{ display:flex; gap:12px; }
   .col{ flex:1; }
   label{ display:block; font-size:13px; margin-bottom:6px; color:#333; }
-  textarea, input[type="text"], pre {
-    width:100%;
-    border-radius:10px;
-    border:1px solid #eee;
-    padding:12px;
-    font-family: inherit;
-    font-size:14px;
-    resize:vertical;
-    background:#fbfbfb;
-    box-shadow: inset 0 1px 0 rgba(0,0,0,0.02);
-  }
-  .btn {
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-    background:var(--btnbg);
-    color:var(--btnfg);
-    border:none;
-    padding:10px 14px;
-    border-radius:10px;
-    font-weight:600;
-    cursor:pointer;
-  }
+  textarea, pre { width:100%; border-radius:10px; border:1px solid #eee; padding:12px; font-family: inherit; font-size:14px; resize:vertical; background:#fbfbfb; box-shadow: inset 0 1px 0 rgba(0,0,0,0.02); }
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; background:var(--btnbg); color:var(--btnfg); border:none; padding:10px 14px; border-radius:10px; font-weight:600; cursor:pointer; }
   .actions { margin-top:14px; display:flex; gap:10px; align-items:center; }
-  .export-btn {
-    position: fixed;
-    left: 18px;
-    bottom: 18px;
-    background: #000;
-    color: #fff;
-    border: none;
-    padding: 10px 14px;
-    border-radius: 12px;
-    font-weight:600;
-    cursor: pointer;
-    box-shadow: 0 8px 22px rgba(0,0,0,0.15);
-    z-index: 9999;
-  }
-  .lifepprint {
-    width: 800px;
-    padding: 28px;
-    background: #fff;
-    border-radius: 12px;
-    color:#111;
-  }
+  .export-btn { position: fixed; left: 18px; bottom: 18px; background: #000; color: #fff; border: none; padding: 10px 14px; border-radius: 12px; font-weight:600; cursor: pointer; box-shadow: 0 8px 22px rgba(0,0,0,0.15); z-index: 9999; }
+  .lifepprint { width: 800px; padding: 28px; background: #fff; border-radius: 12px; color:#111; }
   .lp-header { text-align:center; font-weight:700; font-size:26px; margin-bottom:2px;}
   .lp-sub { text-align:center; color:var(--muted); margin-bottom:18px;}
   .section { margin-bottom:14px; }
-  .section h3 { margin:0 0 8px 0; font-size:15px; }
   .muted { color:var(--muted); font-size:13px; }
   footer.note { text-align:center; color:var(--muted); margin-top:22px; font-size:12px; }
-
-  /* mobile */
-  @media (max-width:720px){
-    .container{ padding:18px; margin:12px; }
-    .lifepprint{ width:100%; padding:18px; }
-  }
+  @media (max-width:720px){ .container{ padding:18px; margin:12px; } .lifepprint{ width:100%; padding:18px; } }
 </style>
 </head>
 <body>
@@ -121,6 +46,7 @@
     <div class="brand">TrueDesign</div>
     <div class="muted">— True Discovery</div>
   </div>
+
   <div class="title">A gentle discovery guide. Paste prior Discovery outputs here if you have them (Top 10 values, Motivation Map, Goal Seeds, Advantages/Disadvantages).</div>
 
   <label for="prior">Prior Insights (optional)</label>
@@ -139,22 +65,13 @@
     </div>
 
     <div class="col">
-      <label>Bot Outputs (demo) — this will show the JSON the bot returns</label>
-      <pre id="outputs" style="height:250px;overflow:auto;">{
-  "top_values": ["Compassion","Curiosity","Courage"...],
-  "motivation_map": {"drives":["..."], "drains":["..."]},
-  "life_snapshot": {"career":6,"health":7,"relationships":5},
-  "goal_seeds": ["..."],
-  "advantages": ["..."],
-  "disadvantages": ["..."],
-  "discovery_summary": "Short summary here...",
-  "suggested_next_step": "A single actionable step."
-}</pre>
+      <label>Bot Outputs (live) — the response will appear here</label>
+      <pre id="outputs" style="height:250px;overflow:auto;">{ "awaiting": "send to populate" }</pre>
     </div>
   </div>
 
   <div style="margin-top:12px;">
-    <div class="muted">Once you have real outputs from your server (send.js), paste them into the Bot Outputs area or wire this UI to call your /true-discovery/send endpoint and fill the outputs field automatically.</div>
+    <div class="muted">Once the bot returns outputs, the LifePrint export will populate automatically with structured fields (Top Values, Motivation Map, etc.).</div>
   </div>
 
   <footer class="note">Tip: Save your Discovery Summary to your LifePrint by exporting the PDF (button bottom-left).</footer>
@@ -201,85 +118,91 @@
     <div id="lp-next"></div>
   </div>
 
-  <div style="margin-top:18px;font-size:12px;color:#666;text-align:center">
-    Generated by TRUE • TrueDesign LifePrint
-  </div>
+  <div style="margin-top:18px;font-size:12px;color:#666;text-align:center">Generated by TRUE • TrueDesign LifePrint</div>
 </div>
 
 <button id="export-btn" class="export-btn">Export LifePrint</button>
 
 <script>
-  // Simple demo wiring. Replace with real API calls to your send.js if desired.
-  const sendBtn = document.getElementById('sendBtn');
-  const outputsEl = document.getElementById('outputs');
-  const priorEl = document.getElementById('prior');
-  const userInputEl = document.getElementById('userInput');
+const sendBtn = document.getElementById('sendBtn');
+const clearBtn = document.getElementById('clearBtn');
+const outputsEl = document.getElementById('outputs');
+const priorEl = document.getElementById('prior');
+const userInputEl = document.getElementById('userInput');
+const exportBtn = document.getElementById('export-btn');
 
-  sendBtn.addEventListener('click', async () => {
-    // In production, call your /true-discovery/send endpoint with { message, priorInsights }.
-    // For this demo, we'll simulate by reading the outputs pre block unchanged.
-    alert('Demo mode: this UI is ready to be wired to your send.js endpoint. Paste real outputs into the "Bot Outputs" box to export a real LifePrint.');
-  });
+sendBtn.addEventListener('click', async () => {
+  const message = userInputEl.value.trim();
+  const prior = priorEl.value.trim();
 
-  // Export button logic
-  document.getElementById('export-btn').addEventListener('click', () => {
-    // read demo JSON from outputsEl. In production, replace with the actual outputs object.
-    let outputs;
-    try {
-      outputs = JSON.parse(outputsEl.textContent);
-    } catch(e) {
-      // If not valid JSON, attempt minimal mapping from fields
-      outputs = {
-        discovery_summary: outputsEl.textContent.slice(0,500),
-        top_values: ["Compassion","Curiosity","Courage"],
-        motivation_map: { drives:["Meaning"], drains:["Overwork"] },
-        life_snapshot: { career:6, health:7, relationships:5 },
-        goal_seeds: ["Find a new role", "Improve sleep"],
-        advantages: ["Strong network"], disadvantages: ["Time constraints"],
-        suggested_next_step: "Schedule a 30-minute discovery session this week."
-      };
-    }
-    populateLifePrint('discovery', outputs);
-    exportLifePrintPDF('True Discovery LifePrint');
-  });
-
-  // Populate template function
-  function populateLifePrint(botName, outputs) {
-    document.getElementById('lp-title').textContent = botName === 'discovery' ? 'True Discovery LifePrint' : 'TrueDesign LifePrint';
-    document.getElementById('lp-summary').textContent = outputs.discovery_summary || '';
-    const vals = outputs.top_values || [];
-    document.getElementById('lp-values').innerHTML = vals.length ? '<ol>' + vals.map(v=>`<li>${escapeHtml(v)}</li>`).join('') + '</ol>' : '—';
-    const mm = outputs.motivation_map || {};
-    document.getElementById('lp-motivation').innerHTML = `<strong>Drives:</strong> ${mm.drives?escapeHtml(mm.drives.join(', ')):'—'}<br><strong>Drains:</strong> ${mm.drains?escapeHtml(mm.drains.join(', ')):'—'}`;
-    const ls = outputs.life_snapshot || {};
-    document.getElementById('lp-snapshot').innerHTML = Object.keys(ls).length ? '<ul>' + Object.entries(ls).map(([k,v])=>`<li>${escapeHtml(k)}: ${escapeHtml(String(v))}</li>`).join('') + '</ul>' : '—';
-    const goals = outputs.goal_seeds || [];
-    document.getElementById('lp-goals').innerHTML = goals.length ? '<ol>' + goals.map(g=>`<li>${escapeHtml(g)}</li>`).join('') + '</ol>' : '—';
-    document.getElementById('lp-advantages').innerHTML = '<strong>Advantages:</strong> ' + (outputs.advantages?escapeHtml(outputs.advantages.join(', ')):'—');
-    document.getElementById('lp-disadvantages').innerHTML = '<strong>Disadvantages:</strong> ' + (outputs.disadvantages?escapeHtml(outputs.disadvantages.join(', ')):'—');
-    document.getElementById('lp-next').textContent = outputs.suggested_next_step || '';
-    // show template briefly so html2pdf picks up fonts/styles
-    document.getElementById('lifepprint-template').style.display = 'block';
+  // Basic guard
+  if (!message && !prior) {
+    if (!confirm('You haven’t added a message. Send with only priorInsights?')) return;
   }
 
-  function exportLifePrintPDF(filenameTitle) {
-    const element = document.getElementById('lifepprint-template');
-    const opt = {
-      margin:       10,
-      filename:     (filenameTitle || 'TrueDesign_LifePrint') .replace(/\s+/g,'_') + '.pdf',
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true },
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-    html2pdf().set(opt).from(element).save().then(()=>{
-      // hide template after save to keep UI clean
-      document.getElementById('lifepprint-template').style.display = 'none';
+  // POST to server
+  try {
+    const res = await fetch('/api/discovery/send', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ message, priorInsights: prior })
     });
+
+    const data = await res.json();
+
+    if (data.needs_priorInsights) {
+      // Prompt user to paste Discovery outputs
+      outputsEl.textContent = data.prompt;
+      // Show prompt in the prior box for convenience
+      priorEl.placeholder = data.prompt;
+      return;
+    }
+
+    if (!data.ok) {
+      outputsEl.textContent = 'Error: ' + (data.error || 'Unknown error');
+      return;
+    }
+
+    // Show raw reply
+    outputsEl.textContent = data.reply || JSON.stringify(data.outputs || {}, null, 2);
+
+    // If structured outputs were parsed by server, autopopulate LifePrint
+    if (data.outputs) {
+      populateLifePrint('discovery', data.outputs);
+      // reveal template so html2pdf will render it
+      document.getElementById('lifepprint-template').style.display = 'block';
+      // scroll to show preview
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+  } catch (err) {
+    console.error(err);
+    outputsEl.textContent = 'Network or server error — check console.';
+  }
+});
+
+clearBtn.addEventListener('click', () => {
+  userInputEl.value = '';
+  outputsEl.textContent = '{ "awaiting": "send to populate" }';
+});
+
+exportBtn.addEventListener('click', () => {
+  // If template hidden but outputs area contains JSON, attempt populate
+  let outputs = null;
+  try { outputs = JSON.parse(outputsEl.textContent); } catch(e){ /* ignore */ }
+
+  if (!document.getElementById('lifepprint-template').style.display || document.getElementById('lifepprint-template').style.display === 'none') {
+    if (outputs) {
+      populateLifePrint('discovery', outputs);
+      document.getElementById('lifepprint-template').style.display = 'block';
+    } else {
+      // copy raw reply into summary
+      document.getElementById('lp-summary').textContent = outputsEl.textContent.slice(0,2000);
+      document.getElementById('lifepprint-template').style.display = 'block';
+    }
   }
 
-  function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]); }
-</script>
-</body>
-</html>
+  exportLifePrintPDF('True Discovery LifePrint');
+});
 
-
+function populateLifePrint(botName, outputs) {
+  document.getElementById('lp-title').textContent = 'True Discovery LifeP
