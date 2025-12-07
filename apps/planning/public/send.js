@@ -1,57 +1,67 @@
-// send.js — TRUE Planning (client-side)
-// Place at apps/planning/public/send.js
-const API_ENDPOINT = window.TRUE_API_ENDPOINT || '/api/chat'
-const BOT_NAME = 'planning'
-const MAX_RETRIES = 2
-const RETRY_DELAY_BASE = 400
-
-async function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
-
-async function safeFetch(url, opts, retries = MAX_RETRIES){
-  try {
-    const res = await fetch(url, opts)
-    if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`)
-    return res
-  } catch (err) {
-    if (retries > 0) {
-      await sleep(RETRY_DELAY_BASE * (MAX_RETRIES - retries + 1))
-      return safeFetch(url, opts, retries - 1)
-    }
-    throw err
-  }
-}
-
 /**
- * sendToBot for Planning
- * returns assistant text
+ * send.js — True Planning
+ * Expects JSON body: { message: "<user text>", priorInsights: "<optional discovery summary text>" }
+ *
+ * If priorInsights is missing, returns a prompt instructing the user to paste their Discovery outputs.
  */
-export async function sendToBot(message, userId, onProgress){
-  if (!message) throw new Error('Message required')
-  if (!userId) console.warn('No userId provided')
 
-  const payload = { bot: BOT_NAME, message, user_id: userId }
+const fetch = (...args) => import('node-fetch').then(({default: f}) => f(...args));
+const MODEL_NAME = process.env.MODEL_NAME || 'gpt-4';
 
-  const opts = {
+async function callOpenAI(messages) {
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  }
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: MODEL_NAME,
+      messages,
+      max_tokens: 1200,
+      temperature: 0.6,
+    }),
+  });
 
-  try {
-    const res = await safeFetch(API_ENDPOINT, opts)
-    const contentType = res.headers.get('content-type') || ''
-    if (contentType.includes('application/json')) {
-      const json = await res.json()
-      if (json.error) throw new Error(json.error)
-      return json.assistant ?? ''
-    } else {
-      // fallback to text
-      const text = await res.text()
-      if (onProgress) onProgress(text)
-      return text
-    }
-  } catch (err) {
-    console.error('sendToBot (planning) failed:', err)
-    throw err
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(`OpenAI error: ${res.status} ${txt}`);
   }
+  const data = await res.json();
+  return data.choices[0].message.content;
 }
+
+module.exports = async function handlePlanning(req, res) {
+  try {
+    const { message, priorInsights } = req.body || {};
+
+    if (!priorInsights) {
+      return res.json({
+        needs_priorInsights: true,
+        prompt:
+          "I don’t yet have your previous session information. Could you paste (or briefly summarize) the outputs from your True Discovery session so I can build on them? For example: your Top 10 values, Motivation Map, Goal Seeds, and Advantages/Disadvantages — or your full Discovery Summary.",
+      });
+    }
+
+    const messages = [
+      {
+        role: 'system',
+        content:
+          'You are TRUE — a focused planning AI. Use the provided Discovery outputs to create 1–3 prioritized goals and build micro-steps, obstacle strategies, accountability systems, and 7/14/30/90 day plans. Follow the prompt.txt output format.',
+      },
+      { role: 'user', content: `DISCOVERY_INSIGHTS:\n${priorInsights}` },
+      { role: 'user', content: `USER_MESSAGE:\n${message || ''}` },
+      {
+        role: 'assistant',
+        content:
+          'Please produce the Planning outputs as a clearly labeled block (priority_goals, refined_goals, micro_steps, obstacle_strategies, accountability, plans, planning_summary, suggested_next_step). Finish with: Type "export" to save these planning outputs to your LifePrint, or "align" to move to Alignment.',
+      },
+    ];
+
+    const reply = await callOpenAI(messages);
+    return res.json({ ok: true, reply });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ ok: false, error: err.message });
+  }
+};
