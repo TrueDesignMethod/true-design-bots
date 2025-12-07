@@ -1,79 +1,77 @@
-// send.js — TRUE Discovery (client-side)
-// Place at apps/discovery/public/send.js
-// Usage: import or include this file in the discovery index.html and call sendToBot(message)
-
-const API_ENDPOINT = window.TRUE_API_ENDPOINT || '/api/chat' // replace with your deployed endpoint if needed
-const BOT_NAME = 'discovery'
-const MAX_RETRIES = 2
-const RETRY_DELAY_BASE = 400 // ms
-
-async function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
-
-async function safeFetch(url, opts, retries = MAX_RETRIES){
-  try {
-    const res = await fetch(url, opts)
-    if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`)
-    return res
-  } catch (err) {
-    if (retries > 0) {
-      await sleep(RETRY_DELAY_BASE * (MAX_RETRIES - retries + 1))
-      return safeFetch(url, opts, retries - 1)
-    }
-    throw err
-  }
-}
-
 /**
- * sendToBot
- * @param {string} message - user message
- * @param {string} userId - logged-in user's ID (replace with auth id)
- * @param {function} onProgress - optional callback to stream tokens / partial responses
+ * send.js — True Discovery
+ * Minimal Node handler to build the Discovery conversation and call OpenAI.
+ *
+ * Usage:
+ * - Deploy as a serverless function or use in Express.
+ * - Expects JSON body: { message: "<user text>", priorInsights: "<optional discovery summary text>" }
+ *
+ * Notes:
+ * - Replace process.env.OPENAI_API_KEY with your key.
+ * - MODEL_NAME is a placeholder; set to your chosen model (e.g., "gpt-4" or other).
  */
-export async function sendToBot(message, userId, onProgress){
-  if (!message || typeof message !== 'string') throw new Error('Invalid message')
-  if (!userId) console.warn('No userId provided — use placeholder or wire up auth')
 
-  const payload = { bot: BOT_NAME, message, user_id: userId }
+const fetch = (...args) => import('node-fetch').then(({default: f}) => f(...args));
 
-  const opts = {
+const MODEL_NAME = process.env.MODEL_NAME || 'gpt-4';
+
+async function callOpenAI(messages) {
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  }
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: MODEL_NAME,
+      messages,
+      max_tokens: 1000,
+      temperature: 0.7,
+      top_p: 1,
+    }),
+  });
 
-  // Attempt streaming first (server must support streaming)
-  try {
-    const res = await safeFetch(API_ENDPOINT, { ...opts })
-    // If server returns SSE/stream, you can detect and stream; fallback to JSON
-    const contentType = res.headers.get('content-type') || ''
-    if (contentType.includes('text/event-stream') || contentType.includes('stream')) {
-      // example SSE parsing (very small minimal parser)
-      const reader = res.body.getReader()
-      const decoder = new TextDecoder()
-      let done = false
-      let accumulated = ''
-      while (!done) {
-        const { value, done: streamDone } = await reader.read()
-        if (value) {
-          const chunk = decoder.decode(value, { stream: true })
-          accumulated += chunk
-          if (typeof onProgress === 'function') onProgress(chunk, accumulated)
-        }
-        done = streamDone
-      }
-      return accumulated
-    } else {
-      const json = await res.json()
-      if (json.error) throw new Error(json.error)
-      return json.assistant ?? json.reply ?? json.output ?? ''
-    }
-  } catch (err) {
-    // If streaming or direct fetch fails, attempt a final non-stream fallback
-    console.error('Primary send failed, attempting fallback:', err)
-    // try one final fetch (no streaming expectations)
-    const res2 = await safeFetch(API_ENDPOINT, opts, 0)
-    const json2 = await res2.json()
-    if (json2.error) throw new Error(json2.error)
-    return json2.assistant ?? json2.reply ?? json2.output ?? ''
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(`OpenAI error: ${res.status} ${txt}`);
   }
+  const data = await res.json();
+  return data.choices[0].message.content;
 }
+
+module.exports = async function handleDiscovery(req, res) {
+  try {
+    const { message, priorInsights } = req.body || {};
+
+    // If no priorInsights provided, prompt the user to paste their Discovery outputs.
+    if (!priorInsights) {
+      return res.json({
+        needs_priorInsights: true,
+        prompt:
+          "I don’t yet have your previous session information. Could you paste (or briefly summarize) the outputs from your True Discovery session so I can build on them? For example: your Top 10 values, Motivation Map, Goal Seeds, and Advantages/Disadvantages — or your full Discovery Summary.",
+      });
+    }
+
+    // Build the conversation for the model: system + user-provided priorInsights + user's current message
+    const messages = [
+      {
+        role: 'system',
+        content:
+          'You are TRUE — a compassionate values-centered AI mentor focused on True Discovery. Produce a Clarity Bundle from the provided priorInsights and any new input the user gives. See prompt.txt for exact output structure.',
+      },
+      { role: 'user', content: `PRIOR_INSIGHTS:\n${priorInsights}` },
+      { role: 'user', content: `USER_MESSAGE:\n${message || ''}` },
+      {
+        role: 'assistant',
+        content:
+          'Please synthesize the prior insights and current user message, then output the Clarity Bundle as JSON-like bullets (top_values, motivation_map, life_snapshot, goal_seeds, advantages, disadvantages, alignment_logic, discovery_summary, suggested_next_step). End with: Type "export" to save this Discovery Summary to your LifePrint, or "continue" to proceed to Planning.',
+      },
+    ];
+
+    const reply = await callOpenAI(messages);
+    return res.json({ ok: true, reply });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ ok: false, error: err.message });
+  }
+};
