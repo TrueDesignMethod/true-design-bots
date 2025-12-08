@@ -1,0 +1,78 @@
+<!doctype html>
+<button class="stage-btn" data-stage="Alignment">Alignment</button>
+</div>
+</header>
+
+
+<section id="chat">
+<div><strong>Selected stage:</strong> <span id="stage-label">Discovery</span></div>
+<div id="messages" aria-live="polite"></div>
+
+
+<form id="send-form">
+<textarea id="user-input" rows="3" style="width:100%" placeholder="Type your reply..." required></textarea>
+<div style="display:flex; gap:8px; margin-top:8px">
+<button type="submit">Send</button>
+<button type="button" id="export-btn">Export LifePrint</button>
+</div>
+</form>
+</section>
+
+
+<script type="module">
+import { sendUserMessage } from './send.js';
+
+
+let currentStage = 'Discovery';
+const messagesEl = document.getElementById('messages');
+const stageLabel = document.getElementById('stage-label');
+
+
+document.querySelectorAll('.stage-btn').forEach(btn => {
+btn.addEventListener('click', () => {
+currentStage = btn.dataset.stage;
+stageLabel.textContent = currentStage;
+addBotMessage(`Welcome to True ${currentStage}. Ready to begin?`);
+// Reset any stage-specific state in your real app
+});
+});
+
+
+function addBotMessage(text) {
+const d = document.createElement('div'); d.className = 'msg bot'; d.textContent = text; messagesEl.appendChild(d);
+}
+function addUserMessage(text) {
+const d = document.createElement('div'); d.className = 'msg user'; d.textContent = text; messagesEl.appendChild(d);
+}
+
+
+document.getElementById('send-form').addEventListener('submit', async (e) => {
+e.preventDefault();
+const input = document.getElementById('user-input');
+const text = input.value.trim();
+if (!text) return;
+addUserMessage(text);
+input.value = '';
+
+
+try {
+// For demo, conversation history is not persisted; pass [] or collect messages in real use
+const res = await sendUserMessage(currentStage, text, []);
+// Expecting res.reply
+addBotMessage(res.reply || JSON.stringify(res));
+} catch (err) {
+addBotMessage('Error: ' + err.message);
+}
+});
+
+
+document.getElementById('export-btn').addEventListener('click', () => {
+addBotMessage('When you hit export in a real deployment, the app will bundle the LifePrint JSON and provide a download.');
+});
+
+
+// Initial greeting
+addBotMessage('Welcome to True Discovery. We’ll explore what matters most to you, one step at a time. Are you ready to begin with Targeting what’s truly important right now?');
+</script>
+</body>
+</html>
