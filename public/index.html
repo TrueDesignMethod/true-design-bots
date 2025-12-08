@@ -1,78 +1,283 @@
 <!doctype html>
-<button class="stage-btn" data-stage="Alignment">Alignment</button>
-</div>
-</header>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TRUE — Life Design</title>
+  <style>
+    :root {
+      --bg: #fbfbfc;
+      --panel: #fff;
+      --muted: #65737e;
+      --accent: #0b6bf0;
+      --round: 12px;
+    }
+    body { font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial; margin: 0; background: var(--bg); color: #111; }
+    .wrap { max-width: 920px; margin: 28px auto; padding: 20px; }
+    header { display:flex; justify-content:space-between; align-items:center; gap:16px; }
+    h1 { margin:0; font-size:20px; }
+    .stage-controls { display:flex; gap:8px; }
+    .stage-btn { padding:8px 12px; border-radius:10px; background:var(--panel); border:1px solid #e6e9ee; cursor:pointer; }
+    .stage-btn.active { background: linear-gradient(180deg,#f0f7ff,#ecf6ff); border-color: #bfe0ff; box-shadow: 0 4px 18px rgba(11,107,240,0.08); }
+    main { margin-top:18px; display:grid; grid-template-columns: 1fr 360px; gap:18px; }
+    .chat-panel { background:var(--panel); border-radius:var(--round); padding:14px; min-height:520px; border:1px solid #eee; }
+    .sidebar { background:var(--panel); border-radius:var(--round); padding:14px; border:1px solid #eee; height:520px; overflow:auto; }
+    #messages { height:410px; overflow:auto; padding:8px; display:flex; flex-direction:column; gap:8px; }
+    .bubble { max-width:78%; padding:10px 12px; border-radius:12px; }
+    .bubble.bot { background:#f7fbff; align-self:flex-start; border:1px solid #e1f0ff; }
+    .bubble.user { background:#111; color:#fff; align-self:flex-end; }
+    .meta { font-size:12px; color:var(--muted); margin-top:6px; }
+    .input-area { display:flex; gap:8px; margin-top:10px; align-items:flex-end; }
+    textarea { width:100%; border-radius:10px; padding:10px; border:1px solid #e6e9ee; min-height:72px; resize:vertical; }
+    button.primary { background:var(--accent); color:#fff; border:none; padding:10px 14px; border-radius:10px; cursor:pointer; }
+    .options { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
+    .option-btn { background:#fff; border:1px solid #e6e9ee; padding:8px 10px; border-radius:8px; cursor:pointer; }
+    .loading { font-size:13px; color:var(--muted); }
+    .small { font-size:13px; color:var(--muted); }
+    .export-btn { display:block; margin-top:14px; border-radius:8px; padding:8px; border:1px dashed #dfe6ef; background:transparent; cursor:pointer; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>TRUE — Life Design AI</h1>
+        <div class="small">Discovery → Planning → Alignment — guided, action-focused, and exportable.</div>
+      </div>
+      <div class="stage-controls" role="tablist" aria-label="Stages">
+        <button class="stage-btn active" data-stage="Discovery">Discovery</button>
+        <button class="stage-btn" data-stage="Planning">Planning</button>
+        <button class="stage-btn" data-stage="Alignment">Alignment</button>
+      </div>
+    </header>
 
+    <main>
+      <section class="chat-panel" aria-live="polite">
+        <div id="messages" aria-label="Conversation"></div>
 
-<section id="chat">
-<div><strong>Selected stage:</strong> <span id="stage-label">Discovery</span></div>
-<div id="messages" aria-live="polite"></div>
+        <div class="input-area">
+          <textarea id="user-input" placeholder="Type your reply or click one of the suggested options above..."></textarea>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <button id="send-btn" class="primary">Send</button>
+            <button id="export-btn" class="export-btn">Export LifePrint</button>
+          </div>
+        </div>
+        <div class="meta small">Tip: Use the suggested options to move faster and save costs. Pick "Custom/Expand" for a full AI reply.</div>
+      </section>
 
+      <aside class="sidebar">
+        <div><strong>Stage Info</strong></div>
+        <div id="stage-desc" style="margin-top:8px" class="small">
+          TRUE Discovery: We'll explore what matters most — values, motivations, starting point, and goal seeds.
+        </div>
 
-<form id="send-form">
-<textarea id="user-input" rows="3" style="width:100%" placeholder="Type your reply..." required></textarea>
-<div style="display:flex; gap:8px; margin-top:8px">
-<button type="submit">Send</button>
-<button type="button" id="export-btn">Export LifePrint</button>
-</div>
-</form>
-</section>
+        <hr style="margin:14px 0">
 
+        <div><strong>Session Snapshot</strong></div>
+        <div id="snapshot" style="margin-top:8px" class="small">No data yet.</div>
 
-<script type="module">
-import { sendUserMessage } from './send.js';
+        <hr style="margin:14px 0">
 
+        <div><strong>Quick actions</strong></div>
+        <div style="margin-top:8px">
+          <button class="option-btn" id="restart-btn">Start Over</button>
+          <button class="option-btn" id="summary-btn">Get Discovery Summary (export)</button>
+        </div>
+      </aside>
+    </main>
+  </div>
 
-let currentStage = 'Discovery';
-const messagesEl = document.getElementById('messages');
-const stageLabel = document.getElementById('stage-label');
+  <script type="module">
+    import { fetchOptions, expandOption, sendFull } from "./send.js";
 
+    // State
+    let currentStage = "Discovery";
+    let conversation = []; // array of {role, content}
+    const messagesEl = document.getElementById("messages");
+    const userInput = document.getElementById("user-input");
+    const sendBtn = document.getElementById("send-btn");
+    const exportBtn = document.getElementById("export-btn");
+    const snapshotEl = document.getElementById("snapshot");
+    const stageDesc = document.getElementById("stage-desc");
 
-document.querySelectorAll('.stage-btn').forEach(btn => {
-btn.addEventListener('click', () => {
-currentStage = btn.dataset.stage;
-stageLabel.textContent = currentStage;
-addBotMessage(`Welcome to True ${currentStage}. Ready to begin?`);
-// Reset any stage-specific state in your real app
-});
-});
+    function setStage(stage) {
+      currentStage = stage;
+      document.querySelectorAll(".stage-btn").forEach(b => b.classList.toggle("active", b.dataset.stage === stage));
+      stageDesc.textContent = {
+        "Discovery": "TRUE Discovery: We'll explore what matters most — values, motivations, starting point, and goal seeds.",
+        "Planning": "TRUE Planning: We'll turn insights into clear, sustainable plans (7/14/30/90 day blueprints).",
+        "Alignment": "TRUE Alignment: We'll create systems to maintain progress — simplification, growth, resilience, rituals."
+      }[stage] || "";
+      addBotMessage(`Switched to ${stage}. Ready to continue?`);
+      // Ask initial options for this stage
+      requestOptions();
+    }
 
+    // UI helpers
+    function appendBubble(text, who = "bot") {
+      const d = document.createElement("div");
+      d.className = "bubble " + (who === "bot" ? "bot" : "user");
+      d.textContent = text;
+      messagesEl.appendChild(d);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+    function clearOptions() {
+      const existing = document.querySelectorAll(".option-row");
+      existing.forEach(e => e.remove());
+    }
+    function addOptions(options) {
+      clearOptions();
+      const container = document.createElement("div");
+      container.className = "option-row options";
+      options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.textContent = opt.label;
+        btn.addEventListener("click", async () => {
+          // show as user choice
+          appendBubble(opt.label, "user");
+          // If payload indicates expansion or custom, call expand; else send as lightweight payload
+          if (opt.payload && opt.payload.startsWith("expand")) {
+            appendBubble("Generating full response…", "bot");
+            const res = await expandOption(currentStage, conversation, opt.payload);
+            // Remove last 'generating...' bubble and show reply
+            messagesEl.lastChild?.remove();
+            appendBubble(res.reply || "No reply from server", "bot");
+            // push to conversation history
+            conversation.push({ role: "user", content: opt.label });
+            conversation.push({ role: "assistant", content: res.reply || "" });
+            updateSnapshot(res);
+            if (res.followUps && res.followUps.length) {
+              addOptions(res.followUps.map((f, i) => ({ id: `fu-${i}`, label: f, payload: `expand:followup-${i}` })));
+            } else {
+              requestOptions(); // fetch next options
+            }
+          } else if (opt.payload && opt.payload.startsWith("custom:")) {
+            // open text area prefilled
+            userInput.value = opt.label + " ";
+            userInput.focus();
+          } else {
+            // lightweight path: send the label as a user message, then request next options
+            conversation.push({ role: "user", content: opt.label });
+            appendBubble("…", "bot");
+            const opts = await fetchOptions(currentStage, conversation);
+            // remove the '…' placeholder
+            messagesEl.lastChild?.remove();
+            appendBubble(`Okay — here are a few next steps:`, "bot");
+            if (opts.options) addOptions(opts.options);
+            conversation.push({ role: "assistant", content: opts.options.map(o => o.label).join(" | ") });
+            updateSnapshot(opts);
+          }
+        });
+        container.appendChild(btn);
+      });
+      messagesEl.appendChild(container);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
 
-function addBotMessage(text) {
-const d = document.createElement('div'); d.className = 'msg bot'; d.textContent = text; messagesEl.appendChild(d);
-}
-function addUserMessage(text) {
-const d = document.createElement('div'); d.className = 'msg user'; d.textContent = text; messagesEl.appendChild(d);
-}
+    function addBotMessage(text) {
+      appendBubble(text, "bot");
+      conversation.push({ role: "assistant", content: text });
+    }
 
+    function addUserMessage(text) {
+      appendBubble(text, "user");
+      conversation.push({ role: "user", content: text });
+    }
 
-document.getElementById('send-form').addEventListener('submit', async (e) => {
-e.preventDefault();
-const input = document.getElementById('user-input');
-const text = input.value.trim();
-if (!text) return;
-addUserMessage(text);
-input.value = '';
+    function updateSnapshot(data) {
+      // Lightweight snapshot for sidebar: show last stage and timestamp
+      snapshotEl.textContent = `Stage: ${currentStage}\nLast action: ${new Date().toLocaleString()}\nRecent: ${Array.isArray(data.options) ? data.options.map(o => o.label).slice(0,3).join("; ") : (data.reply || "").slice(0,80)}`;
+    }
 
+    // Interactions
+    async function requestOptions() {
+      try {
+        addBotMessage("Thinking of a few quick options — one moment...");
+        const resp = await fetchOptions(currentStage, conversation);
+        // remove last thinking bot message
+        messagesEl.lastChild?.remove();
+        addBotMessage(`${currentStage} options:`);
+        if (resp.options) addOptions(resp.options);
+        updateSnapshot(resp);
+      } catch (err) {
+        console.error(err);
+        addBotMessage("Sorry — I couldn't fetch options. Try again.");
+      }
+    }
 
-try {
-// For demo, conversation history is not persisted; pass [] or collect messages in real use
-const res = await sendUserMessage(currentStage, text, []);
-// Expecting res.reply
-addBotMessage(res.reply || JSON.stringify(res));
-} catch (err) {
-addBotMessage('Error: ' + err.message);
-}
-});
+    // Send free-text custom message (uses full generation)
+    sendBtn.addEventListener("click", async () => {
+      const text = userInput.value.trim();
+      if (!text) return;
+      addUserMessage(text);
+      userInput.value = "";
+      try {
+        addBotMessage("Generating a full response...");
+        const res = await sendFull(currentStage, conversation.concat([{ role: "user", content: text }]));
+        // Remove the generating message
+        messagesEl.lastChild?.remove();
+        addBotMessage(res.reply || "No reply from server.");
+        conversation.push({ role: "user", content: text });
+        conversation.push({ role: "assistant", content: res.reply || "" });
+        updateSnapshot(res);
+        // After a full reply, fetch options for next step
+        requestOptions();
+      } catch (err) {
+        console.error(err);
+        addBotMessage("Error generating response: " + err.message);
+      }
+    });
 
+    // Export LifePrint (requests full generation mode to produce a bundled summary)
+    exportBtn.addEventListener("click", async () => {
+      addBotMessage("Compiling your LifePrint summary — this may take a moment.");
+      try {
+        // Build a prompt that asks for a stage or full LifePrint. Here we request a Discovery summary if in Discovery.
+        const messages = conversation.concat([{ role: "user", content: `Please compile a ${currentStage} summary / export for my LifePrint.` }]);
+        const res = await sendFull("Export", messages);
+        // show and allow download
+        addBotMessage("LifePrint ready. Click the button below to download.");
+        const blob = new Blob([res.reply], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `TrueLifePrint-${currentStage}-${new Date().toISOString().slice(0,10)}.json`;
+        a.textContent = `Download LifePrint (${currentStage})`;
+        a.style.display = "inline-block";
+        a.style.marginTop = "8px";
+        a.className = "option-btn";
+        messagesEl.appendChild(a);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      } catch (err) {
+        console.error(err);
+        addBotMessage("Failed to compile LifePrint: " + err.message);
+      }
+    });
 
-document.getElementById('export-btn').addEventListener('click', () => {
-addBotMessage('When you hit export in a real deployment, the app will bundle the LifePrint JSON and provide a download.');
-});
+    // Stage buttons
+    document.querySelectorAll(".stage-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        setStage(btn.dataset.stage);
+      });
+    });
 
+    // Quick actions
+    document.getElementById("restart-btn").addEventListener("click", () => {
+      conversation = [];
+      messagesEl.innerHTML = "";
+      userInput.value = "";
+      addBotMessage("Session restarted. Are you ready to start Discovery?");
+      requestOptions();
+    });
+    document.getElementById("summary-btn").addEventListener("click", async () => {
+      exportBtn.click();
+    });
 
-// Initial greeting
-addBotMessage('Welcome to True Discovery. We’ll explore what matters most to you, one step at a time. Are you ready to begin with Targeting what’s truly important right now?');
-</script>
+    // Initial kick-off
+    addBotMessage("Welcome to TRUE Discovery. We'll explore what matters most to you, one step at a time.");
+    requestOptions();
+
+  </script>
 </body>
 </html>
