@@ -3,45 +3,119 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <!-- Montserrat -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
   <title>TRUE — Life Design</title>
   <style>
     :root{
-      --bg: #fff7f3;           /* warm cream */
-      --panel: #fff9f7;        /* soft panel */
-      --muted: #6b5b50;        /* warm muted brown */
-      --accent: #d9734a;       /* warm orange accent */
-      --accent-2: #f2b880;     /* lighter warm accent */
-      --round: 12px;
-    }
-    body { font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial; margin: 0; background: var(--bg); color: #2c2a28; }
-    .wrap { max-width: 920px; margin: 28px auto; padding: 20px; }
-    header { display:flex; justify-content:space-between; align-items:center; gap:16px; }
-    h1 { margin:0; font-size:20px; color: #2c2a28; }
-    .stage-controls { display:flex; gap:8px; }
-    .stage-btn { padding:8px 12px; border-radius:10px; background:linear-gradient(180deg,#fff6f2,#fff3ef); border:1px solid #f1d6c4; cursor:pointer; color:var(--muted); }
-    .stage-btn.active { background: linear-gradient(180deg,#ffd9bf,#ffd0a8); border-color: #f6b587; box-shadow: 0 6px 22px rgba(217,115,74,0.12); color:#3a2f2a; }
-    main { margin-top:18px; display:grid; grid-template-columns: 1fr 360px; gap:18px; }
-    .chat-panel { background:var(--panel); border-radius:var(--round); padding:14px; min-height:520px; border:1px solid #f2e5dd; }
-    .sidebar { background:var(--panel); border-radius:var(--round); padding:14px; border:1px solid #f2e5dd; height:520px; overflow:auto; }
-    #messages { height:360px; overflow:auto; padding:8px; display:flex; flex-direction:column; gap:8px; }
-    .bubble { max-width:78%; padding:10px 12px; border-radius:12px; line-height:1.35; }
-    .bubble.bot { background:#fff3ee; align-self:flex-start; border:1px solid #f6d7c8; color:#3b2f2c; }
-    .bubble.user { background:var(--accent); color:#fff; align-self:flex-end; }
-    .meta { font-size:12px; color:var(--muted); margin-top:6px; }
-    .input-area { display:flex; gap:8px; margin-top:10px; align-items:flex-end; flex-direction:column; }
-    .input-row { display:flex; gap:8px; width:100%; align-items:flex-end; }
-    textarea { width:100%; border-radius:10px; padding:10px; border:1px solid #f1d6c4; min-height:72px; resize:vertical; background:#fffaf7; color:#2c2a28; }
-    button.primary { background:var(--accent); color:#fff; border:none; padding:10px 14px; border-radius:10px; cursor:pointer; box-shadow: 0 6px 20px rgba(217,115,74,0.12); }
-    .options { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
-    .option-btn { background:#fff; border:1px solid #f1d6c4; padding:8px 10px; border-radius:8px; cursor:pointer; color:#3b2f2c; }
-    .loading { font-size:13px; color:var(--muted); }
-    .small { font-size:13px; color:var(--muted); }
-    .export-btn { display:block; margin-top:14px; border-radius:8px; padding:8px; border:1px dashed #f1d6c4; background:transparent; cursor:pointer; color:var(--muted); }
-    a.download-link { display:inline-block; margin-top:8px; color:var(--accent-2); background:#fff6f2; padding:8px; border-radius:8px; border:1px solid #f1d6c4; text-decoration:none; }
-    pre.snapshot { white-space:pre-wrap; font-family:inherit; color:var(--muted); }
-    select#starter-select { width:100%; padding:10px; border-radius:8px; border:1px solid #f1d6c4; background:#fffaf7; color:#2c2a28; }
-    .privacy { margin-top:10px; font-size:13px; }
-    .privacy a { color:var(--accent); text-decoration:none; }
+  --bg: #FBFDFF;            /* page background – airy almost-white */
+  --panel: #FFFFFF;         /* cards / panels */
+  --text: #222629;          /* primary text (deep charcoal) */
+  --muted: #6B7376;         /* muted helper text */
+  --line: #E8EEF0;          /* subtle borders / dividers */
+  --accent: #2AB7A9;        /* TRUE primary (teal) */
+  --accent-2: #22A79B;      /* accent hover/darker teal */
+  --highlight: #F6C85F;     /* warm highlight (sparingly) */
+  --shadow: 0 8px 24px rgba(16,24,32,0.06);
+  --round: 12px;
+}
+body {
+  font-family: 'Montserrat', Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* panels */
+.chat-panel, .sidebar {
+  background: var(--panel);
+  border-radius: var(--round);
+  padding: 14px;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+/* bubbles */
+.bubble { max-width:78%; padding:10px 12px; border-radius:12px; line-height:1.35; }
+.bubble.bot {
+  background: linear-gradient(180deg,#FFFFFF,#FAFCFD); /* subtle tonal surface */
+  border: 1px solid #F1F6F6;
+  color: var(--text);
+  align-self: flex-start;
+  box-shadow: 0 2px 8px rgba(16,24,32,0.04);
+}
+.bubble.user {
+  background: var(--accent);
+  color: #FFFFFF;
+  align-self: flex-end;
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 6px 20px rgba(42,183,169,0.12);
+}
+
+/* textarea */
+textarea {
+  width:100%;
+  border-radius:10px;
+  padding:10px;
+  border:1px solid var(--line);
+  min-height:72px;
+  resize:vertical;
+  background: #FBFFFF; /* slightly brighter */
+  color: var(--text);
+}
+
+/* primary button (Send) */
+button.primary {
+  background: var(--accent);
+  color: #fff;
+  border:none;
+  padding:10px 14px;
+  border-radius:10px;
+  cursor:pointer;
+  box-shadow: 0 8px 20px rgba(42,183,169,0.12);
+  transition: background .12s ease, transform .06s ease;
+}
+button.primary:hover{ background: var(--accent-2); transform: translateY(-1px); }
+button.primary:active{ transform: translateY(0); }
+
+/* option buttons (tertiary / quick choices) */
+.option-btn {
+  background: linear-gradient(180deg,#FFFFFF,#FAFBFB);
+  border:1px solid var(--line);
+  padding:8px 10px;
+  border-radius:8px;
+  cursor:pointer;
+  color: var(--text);
+  transition: box-shadow .12s ease, border-color .12s ease;
+}
+.option-btn:hover {
+  border-color: var(--accent-2);
+  box-shadow: 0 6px 18px rgba(34,167,155,0.06);
+}
+
+/* export / secondary */
+.export-btn {
+  display:block;
+  margin-top:14px;
+  border-radius:8px;
+  padding:8px;
+  border:1px dashed #E6EDEB;
+  background: transparent;
+  cursor:pointer;
+  color: var(--muted);
+}
+a.download-link {
+  display:inline-block;
+  margin-top:8px;
+  color: var(--text);
+  background: linear-gradient(180deg,#FFFDF7,#FFFFFF);
+  padding:8px;
+  border-radius:8px;
+  border:1px solid #FAF3E6;
+}
+
   </style>
 </head>
 <body>
