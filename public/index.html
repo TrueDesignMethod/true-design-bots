@@ -49,7 +49,6 @@
     <header>
       <div>
         <h1>TRUE — Life Design AI</h1>
-        <!-- removed tagline as requested -->
       </div>
       <div class="stage-controls" role="tablist" aria-label="Stages">
         <button class="stage-btn active" data-stage="Discovery">Discovery</button>
@@ -62,11 +61,11 @@
       <section class="chat-panel" aria-live="polite">
         <div id="messages" aria-label="Conversation"></div>
 
-        <!-- Startup prompt + dropdown selector -->
+        <!-- Startup prompt + dropdown selector (options only here) -->
         <div style="margin-top:8px;">
           <div id="startup-prompt" class="meta">Let's explore what matters most to you. Select one of the options below to get started:</div>
           <select id="starter-select" aria-label="Select an action">
-            <!-- options will be populated by JS -->
+            <!-- populated by JS -->
           </select>
         </div>
 
@@ -79,7 +78,6 @@
             </div>
           </div>
 
-          <!-- privacy policy link replaces the old tip -->
           <div class="privacy">
             <a href="https://example.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
           </div>
@@ -122,7 +120,7 @@
     const stageDesc = document.getElementById("stage-desc");
     const starterSelect = document.getElementById("starter-select");
 
-    // Curated options used both for dropdown and immediate UI
+    // Curated options (used to populate dropdown and as fallback)
     function curatedOptions() {
       return {
         "Discovery": [
@@ -157,30 +155,12 @@
       };
     }
 
-    // UI helpers
+    // UI helpers for message bubbles
     function appendBubble(text, who = "bot") {
       const d = document.createElement("div");
       d.className = "bubble " + (who === "bot" ? "bot" : "user");
       d.textContent = text;
       messagesEl.appendChild(d);
-      messagesEl.scrollTop = messagesEl.scrollHeight;
-    }
-    function clearOptions() {
-      const existing = document.querySelectorAll(".option-row");
-      existing.forEach(e => e.remove());
-    }
-    function addOptions(options) {
-      clearOptions();
-      const container = document.createElement("div");
-      container.className = "option-row options";
-      options.forEach(opt => {
-        const btn = document.createElement("button");
-        btn.className = "option-btn";
-        btn.textContent = opt.label;
-        btn.addEventListener("click", () => handleOptionSelect(opt));
-        container.appendChild(btn);
-      });
-      messagesEl.appendChild(container);
       messagesEl.scrollTop = messagesEl.scrollHeight;
     }
     function addBotMessage(text) {
@@ -191,198 +171,185 @@
       appendBubble(text, "user");
       conversation.push({ role: "user", content: text });
     }
-    function updateSnapshot(data) {
-      snapshotEl.textContent = `Stage: ${currentStage}\nLast action: ${new Date().toLocaleString()}\nRecent: ${Array.isArray(data.options) ? data.options.map(o => o.label).slice(0,3).join("; ") : (data.reply || "").slice(0,80)}`;
-    }
 
-    // Populate dropdown based on currentStage
-    function populateDropdown() {
-      const curated = curatedOptions();
-      const list = curated[currentStage] || curated["Discovery"];
-      starterSelect.innerHTML = ""; // clear
+    // Populate dropdown with a list of options (array of {id,label,payload})
+    function setDropdownOptions(list) {
+      starterSelect.innerHTML = "";
       const placeholder = document.createElement("option");
       placeholder.value = "";
       placeholder.textContent = `Choose an action (${currentStage})...`;
       placeholder.disabled = true;
       placeholder.selected = true;
       starterSelect.appendChild(placeholder);
-      list.forEach(opt => {
+      (list || []).forEach(opt => {
         const o = document.createElement("option");
         o.value = opt.payload;
         o.textContent = opt.label;
+        o.dataset.optId = opt.id || "";
         starterSelect.appendChild(o);
       });
     }
 
-    // Handle dropdown selection: route similarly to clicking an option
-    starterSelect.addEventListener("change", (e) => {
+    // When dropdown is used
+    starterSelect.addEventListener("change", async (e) => {
       const payload = e.target.value;
-      // find full option object in curated list
-      const curated = curatedOptions();
-      const list = curated[currentStage] || curated["Discovery"];
-      const found = list.find(it => it.payload === payload);
-      if (found) {
-        // visually append user choice and then handle it
-        addUserMessage(found.label);
-        handleOptionSelect(found);
-      }
-      // reset dropdown selection to placeholder
+      const optId = e.target.selectedOptions?.[0]?.dataset?.optId || "";
+      const list = (curatedOptions()[currentStage] || curatedOptions().Discovery);
+      const found = list.find(it => it.payload === payload) || { label: e.target.selectedOptions[0].textContent, payload, id: optId };
+      // add user bubble for the chosen label
+      addUserMessage(found.label);
+      // route selection
+      await handleOptionSelect(found);
+      // reset select
       setTimeout(() => { starterSelect.selectedIndex = 0; }, 250);
     });
 
-    // Core handler for options (both dropdown and buttons)
+    // Core option selection handler
     async function handleOptionSelect(opt) {
-      // Discovery scripted client-side
+      // Discovery scripted flows: ask client-side follow-up questions and populate dropdown for next steps
       if (opt.payload && opt.payload.startsWith("discover:")) {
-        handleDiscoverPayload(opt.payload);
-        conversation.push({ role: "user", content: opt.label });
-        return;
+        switch (opt.payload) {
+          case "discover:values":
+            // Ask the follow-up as a bot message (user sees the question)
+            addBotMessage("Great — let's find your core values. Tell me one area of life that feels important to you right now (career, wellness, relationships, creativity, or something else).");
+            setDropdownOptions([
+              { id: "v-career", label: "Career", payload: "discover:value_area:career" },
+              { id: "v-well", label: "Wellness", payload: "discover:value_area:wellness" },
+              { id: "v-relationships", label: "Relationships", payload: "discover:value_area:relationships" },
+              { id: "v-creativity", label: "Creativity", payload: "discover:value_area:creativity" },
+              { id: "v-other", label: "Other — I'll type it", payload: "discover:value_area:other" }
+            ]);
+            return;
+          case "discover:motivations":
+            addBotMessage("What energizes you most these days? What gives you a sense of purpose or momentum?");
+            setDropdownOptions([
+              { id: "m-1", label: "Connection & relationships", payload: "discover:motivation:connection" },
+              { id: "m-2", label: "Career growth & challenge", payload: "discover:motivation:career" },
+              { id: "m-3", label: "Health & energy", payload: "discover:motivation:health" },
+              { id: "m-4", label: "I'll type my own", payload: "discover:motivation:other" }
+            ]);
+            return;
+          case "discover:advantages_disadvantages":
+            addBotMessage("Let's map strengths and challenges. What skills, supports, or resources help you? (then we'll ask about obstacles)");
+            setDropdownOptions([
+              { id: "s-1", label: "Skills & knowledge", payload: "discover:strength:skills" },
+              { id: "s-2", label: "People & relationships", payload: "discover:strength:people" },
+              { id: "s-3", label: "Time & routines", payload: "discover:strength:routines" },
+              { id: "s-4", label: "I'll describe my own", payload: "discover:strength:other" }
+            ]);
+            return;
+          case "discover:goal_seeds":
+            addBotMessage("What would you love to improve or move toward in the next chapter of your life? Try listing 1–3 short aspirations (examples: 'feel healthier', 'shift career').");
+            setDropdownOptions([
+              { id: "g-1", label: "I want to feel healthier", payload: "discover:goal:health" },
+              { id: "g-2", label: "I want a career shift", payload: "discover:goal:career" },
+              { id: "g-3", label: "I want stronger boundaries", payload: "discover:goal:boundaries" },
+              { id: "g-4", label: "I'll type my own", payload: "discover:goal:other" }
+            ]);
+            return;
+          case "discover:obstacles":
+            addBotMessage("What tends to get in your way? List obstacles, fears, or limitations (time, confidence, resources, support).");
+            setDropdownOptions([
+              { id: "o-1", label: "Time & scheduling", payload: "discover:obstacle:time" },
+              { id: "o-2", label: "Confidence & motivation", payload: "discover:obstacle:motivation" },
+              { id: "o-3", label: "Resources & money", payload: "discover:obstacle:resources" },
+              { id: "o-4", label: "Other — I'll type", payload: "discover:obstacle:other" }
+            ]);
+            return;
+          case "discover:strengths":
+            addBotMessage("Tell me about strengths, resources, people, or routines that support you.");
+            setDropdownOptions([
+              { id: "str-1", label: "Supportive people", payload: "discover:strengths:people" },
+              { id: "str-2", label: "Skills & training", payload: "discover:strengths:skills" },
+              { id: "str-3", label: "Stable routines/habits", payload: "discover:strengths:routines" },
+              { id: "str-4", label: "I'll type my own", payload: "discover:strengths:other" }
+            ]);
+            return;
+          case "discover:updated_story":
+            addBotMessage("If there's one belief or story that no longer fits who you're becoming, what is it? Or: what new story would you like to try on?");
+            setDropdownOptions([
+              { id: "st-1", label: "I'm not enough → I'm learning & growing", payload: "discover:story:example1" },
+              { id: "st-2", label: "I don't deserve rest → I prioritize renewal", payload: "discover:story:example2" },
+              { id: "st-3", label: "I'll type my own", payload: "discover:story:other" }
+            ]);
+            return;
+          case "discover:starting_snapshot":
+            addBotMessage("Quick snapshot: On a scale of 1–10, how aligned do you feel in each area? (We'll ask a few areas). First: Career (1–10).");
+            setDropdownOptions([
+              { id: "snap-1", label: "1–3 (low)", payload: "discover:snapshot:career_low" },
+              { id: "snap-2", label: "4–7 (somewhat)", payload: "discover:snapshot:career_mid" },
+              { id: "snap-3", label: "8–10 (high)", payload: "discover:snapshot:career_high" },
+              { id: "snap-4", label: "I'll type a number", payload: "discover:snapshot:career_custom" }
+            ]);
+            return;
+          default:
+            addBotMessage("Thanks — tell me more (or choose another area).");
+            setDropdownOptions(curatedOptions()[currentStage] || curatedOptions().Discovery);
+            return;
+        }
       }
 
-      // Planning/Alignment -> server expand
+      // Planning/Alignment -> server expand (use expand to generate a helpful reply)
       if (opt.payload && (opt.payload.startsWith("planning:") || opt.payload.startsWith("alignment:"))) {
-        appendBubble("Working on that — a moment please...", "bot");
+        addBotMessage("Working on that — one moment...");
         try {
           const res = await expandOption(currentStage, conversation, `expand:${opt.id}`);
+          // remove the "Working..." bubble and replace with server reply
           messagesEl.lastChild?.remove();
-          appendBubble(res.reply || "No reply from server", "bot");
+          addBotMessage(res.reply || "No reply from server");
           conversation.push({ role: "user", content: opt.label });
           conversation.push({ role: "assistant", content: res.reply || "" });
-          if (res.followUps && res.followUps.length) {
-            addOptions(res.followUps.map((f, i) => ({ id: `fu-${i}`, label: f, payload: `expand:followup-${i}` })));
+          // if followUps provided by server, set them in dropdown
+          if (res.followUps && Array.isArray(res.followUps) && res.followUps.length) {
+            const fuList = res.followUps.map((f, i) => ({ id: `fu-${i}`, label: f, payload: `expand:fu-${i}` }));
+            setDropdownOptions(fuList);
           } else {
-            requestOptions();
+            setDropdownOptions(curatedOptions()[currentStage] || curatedOptions().Discovery);
           }
           updateSnapshot(res);
         } catch (err) {
           messagesEl.lastChild?.remove();
-          appendBubble("Sorry — couldn't get details from server.", "bot");
+          addBotMessage("Sorry — couldn't get details from server.");
           console.error(err);
         }
         return;
       }
 
-      // Fallback: ask server for next options
-      conversation.push({ role: "user", content: opt.label });
-      appendBubble("…", "bot");
+      // If it's a follow-up payload like discover:motivation:career, and it's an "other" prompt, ask user to type
+      if (opt.payload && opt.payload.includes("discover:") && opt.payload.endsWith(":other")) {
+        addBotMessage("Please type your response in the box and click Send.");
+        setDropdownOptions([]); // empty dropdown until they type
+        return;
+      }
+
+      // Default fallback: ask server for next options (and populate dropdown)
       try {
-        const opts = await fetchOptions(currentStage, conversation);
-        messagesEl.lastChild?.remove();
-        appendBubble(`Okay — here are a few next steps:`, "bot");
-        if (opts.options) addOptions(opts.options);
-        conversation.push({ role: "assistant", content: opts.options.map(o => o.label).join(" | ") });
-        updateSnapshot(opts);
+        const resp = await fetchOptions(currentStage, conversation.concat([{ role: "user", content: opt.label }]));
+        if (resp && resp.options) {
+          const list = resp.options.map(o => ({ id: o.id || "", label: o.label, payload: o.payload || "" }));
+          setDropdownOptions(list);
+        } else {
+          setDropdownOptions(curatedOptions()[currentStage] || curatedOptions().Discovery);
+        }
       } catch (err) {
-        messagesEl.lastChild?.remove();
-        appendBubble("Sorry — failed to fetch options.", "bot");
         console.error(err);
+        setDropdownOptions(curatedOptions()[currentStage] || curatedOptions().Discovery);
       }
     }
 
-    // --- CLIENT-SIDE scripted Discovery flows ---
-    function handleDiscoverPayload(payload) {
-      if (payload === "discover:values") {
-        addBotMessage("Great — let's find your core values. Tell me one area of life that feels important to you right now (career, wellness, relationships, creativity, or something else).");
-        addOptions([
-          { id: "v-career", label: "Career", payload: "discover:value_area:career" },
-          { id: "v-well", label: "Wellness", payload: "discover:value_area:wellness" },
-          { id: "v-relationships", label: "Relationships", payload: "discover:value_area:relationships" },
-          { id: "v-creativity", label: "Creativity", payload: "discover:value_area:creativity" },
-          { id: "v-other", label: "Other — I'll type it", payload: "discover:value_area:other" }
-        ]);
-        return;
-      }
-      if (payload === "discover:motivations") {
-        addBotMessage("What energizes you most these days? What gives you a sense of purpose or momentum?");
-        addOptions([
-          { id: "m-1", label: "Connection & relationships", payload: "discover:motivation:connection" },
-          { id: "m-2", label: "Career growth & challenge", payload: "discover:motivation:career" },
-          { id: "m-3", label: "Health & energy", payload: "discover:motivation:health" },
-          { id: "m-4", label: "I'll type my own", payload: "discover:motivation:other" }
-        ]);
-        return;
-      }
-      if (payload === "discover:advantages_disadvantages") {
-        addBotMessage("Let's map strengths and challenges. What skills, supports, or resources help you? (then we'll ask about obstacles)");
-        addOptions([
-          { id: "s-1", label: "Skills & knowledge", payload: "discover:strength:skills" },
-          { id: "s-2", label: "People & relationships", payload: "discover:strength:people" },
-          { id: "s-3", label: "Time & routines", payload: "discover:strength:routines" },
-          { id: "s-4", label: "I'll describe my own", payload: "discover:strength:other" }
-        ]);
-        return;
-      }
-      if (payload === "discover:goal_seeds") {
-        addBotMessage("What would you love to improve or move toward in the next chapter of your life? Try listing 1–3 short aspirations (examples: 'feel healthier', 'shift career').");
-        addOptions([
-          { id: "g-1", label: "I want to feel healthier", payload: "discover:goal:health" },
-          { id: "g-2", label: "I want a career shift", payload: "discover:goal:career" },
-          { id: "g-3", label: "I want stronger boundaries", payload: "discover:goal:boundaries" },
-          { id: "g-4", label: "I'll type my own", payload: "discover:goal:other" }
-        ]);
-        return;
-      }
-      if (payload === "discover:obstacles") {
-        addBotMessage("What tends to get in your way? List obstacles, fears, or limitations (time, confidence, resources, support).");
-        addOptions([
-          { id: "o-1", label: "Time & scheduling", payload: "discover:obstacle:time" },
-          { id: "o-2", label: "Confidence & motivation", payload: "discover:obstacle:motivation" },
-          { id: "o-3", label: "Resources & money", payload: "discover:obstacle:resources" },
-          { id: "o-4", label: "Other — I'll type", payload: "discover:obstacle:other" }
-        ]);
-        return;
-      }
-      if (payload === "discover:strengths") {
-        addBotMessage("Tell me about strengths, resources, people, or routines that support you.");
-        addOptions([
-          { id: "str-1", label: "Supportive people", payload: "discover:strengths:people" },
-          { id: "str-2", label: "Skills & training", payload: "discover:strengths:skills" },
-          { id: "str-3", label: "Stable routines/habits", payload: "discover:strengths:routines" },
-          { id: "str-4", label: "I'll type my own", payload: "discover:strengths:other" }
-        ]);
-        return;
-      }
-      if (payload === "discover:updated_story") {
-        addBotMessage("If there's one belief or story that no longer fits who you're becoming, what is it? Or: what new story would you like to try on?");
-        addOptions([
-          { id: "st-1", label: "I'm not enough → I'm learning & growing", payload: "discover:story:example1" },
-          { id: "st-2", label: "I don't deserve rest → I prioritize renewal", payload: "discover:story:example2" },
-          { id: "st-3", label: "I'll type my own", payload: "discover:story:other" }
-        ]);
-        return;
-      }
-      if (payload === "discover:starting_snapshot") {
-        addBotMessage("Quick snapshot: On a scale of 1–10, how aligned do you feel in each area? (We'll ask a few areas). First: Career (1–10).");
-        addOptions([
-          { id: "snap-1", label: "1–3 (low)", payload: "discover:snapshot:career_low" },
-          { id: "snap-2", label: "4–7 (somewhat)", payload: "discover:snapshot:career_mid" },
-          { id: "snap-3", label: "8–10 (high)", payload: "discover:snapshot:career_high" },
-          { id: "snap-4", label: "I'll type a number", payload: "discover:snapshot:career_custom" }
-        ]);
-        return;
-      }
-
-      addBotMessage("Thanks — tell me more (or choose another area).");
-    }
-    // --- end Discovery flows ---
-
-    // Interactions: request server options for Planning/Alignment fallback
+    // requestOptions: populate dropdown (no initial bot message)
     async function requestOptions() {
       try {
         const curated = curatedOptions();
-        addBotMessage("Let's explore what matters most to you. Select one of the options below to get started:");
-        // show curated list visually (buttons area)
-        addOptions(curated[currentStage] || curated["Discovery"]);
-        populateDropdown();
+        setDropdownOptions(curated[currentStage] || curated["Discovery"]);
 
-        // background fetch server options (non-blocking)
+        // background fetch server options (replace dropdown if returns and user hasn't acted)
         try {
           const resp = await fetchOptions(currentStage, conversation);
           const userActions = conversation.filter(m => m.role === 'user').length;
           if (resp && resp.options && userActions === 0) {
-            // replace button options if server returns and no user action yet
-            clearOptions();
-            addOptions(resp.options);
+            const list = resp.options.map(o => ({ id: o.id || "", label: o.label, payload: o.payload || "" }));
+            setDropdownOptions(list);
             updateSnapshot(resp);
           }
         } catch (err) {
@@ -390,11 +357,10 @@
         }
       } catch (err) {
         console.error("requestOptions error:", err);
-        addBotMessage("Sorry — I couldn't fetch options. Try again later.");
       }
     }
 
-    // Send free-text custom message (full generation)
+    // Send typed free-text (full generation)
     sendBtn.addEventListener("click", async () => {
       const text = userInput.value.trim();
       if (!text) return;
@@ -403,12 +369,14 @@
       try {
         addBotMessage("Generating a full response...");
         const res = await sendFull(currentStage, conversation.concat([{ role: "user", content: text }]));
+        // remove the 'Generating...' bubble and show result
         messagesEl.lastChild?.remove();
         addBotMessage(res.reply || "No reply from server.");
         conversation.push({ role: "user", content: text });
         conversation.push({ role: "assistant", content: res.reply || "" });
         updateSnapshot(res);
-        requestOptions();
+        // reset dropdown to curated stage list
+        setDropdownOptions(curatedOptions()[currentStage] || curatedOptions().Discovery);
       } catch (err) {
         console.error(err);
         addBotMessage("Error generating response: " + err.message);
@@ -421,7 +389,7 @@
       try {
         const messages = conversation.concat([{ role: "user", content: `Please compile a ${currentStage} summary / export for my LifePrint.` }]);
         const res = await sendFull("Export", messages);
-        addBotMessage("LifePrint ready. Click the button below to download.");
+        addBotMessage("LifePrint ready. Click the link below to download.");
         const blob = new Blob([res.reply], { type: "application/json" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
@@ -449,14 +417,14 @@
       conversation = [];
       messagesEl.innerHTML = "";
       userInput.value = "";
-      addBotMessage("Let's explore what matters most to you. Select one of the options below to get started:");
+      // refresh dropdown (no startup bubble)
       requestOptions();
     });
-    document.getElementById("summary-btn").addEventListener("click", async () => {
+    document.getElementById("summary-btn").addEventListener("click", () => {
       exportBtn.click();
     });
 
-    // setStage definition
+    // setStage definition (no startup bubble)
     function setStage(stage) {
       currentStage = stage;
       document.querySelectorAll(".stage-btn").forEach(b => b.classList.toggle("active", b.dataset.stage === stage));
@@ -465,15 +433,11 @@
         "Planning": "TRUE Planning: We'll turn insights into clear, sustainable plans (7/14/30/90 day blueprints).",
         "Alignment": "TRUE Alignment: We'll create systems to maintain progress — simplification, growth, resilience, rituals."
       }[stage] || "";
-      addBotMessage(`Switched to ${stage}. Ready to continue?`);
+      // Do not add a startup bot bubble; just refresh dropdown
       requestOptions();
     }
 
-    // Populate dropdown helper (exposed earlier)
-    populateDropdown();
-
-    // Initial kick-off
-    addBotMessage("Let's explore what matters most to you. Select one of the options below to get started:");
+    // Initial setup: populate dropdown and do not create initial message bubble
     requestOptions();
 
   </script>
