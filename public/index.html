@@ -42,22 +42,27 @@
   .wrap { max-width: 920px; margin: 28px auto; padding: 20px; }
   header { display:flex; justify-content:space-between; align-items:center; gap:16px; }
   h1 { margin:0; font-size:20px; color: var(--text); }
-  .stage-controls { display:flex; gap:8px; }
+  .stage-controls {
+  display: flex;
+  gap: 8px;
+}
 
-  .stage-btn {
-    padding:8px 12px;
-    border-radius:10px;
-    background: linear-gradient(180deg, var(--card), var(--assistant-bubble));
-    border:1px solid var(--input-border);
-    cursor:pointer;
-    color: var(--muted);
-  }
-  .stage-btn.active {
-    background: linear-gradient(180deg, var(--accent-soft), var(--accent));
-    border-color: var(--accent);
-    box-shadow: 0 6px 22px rgba(139,94,60,0.12);
-    color: var(--text);
-  }
+.stage-btn {
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, var(--card), var(--assistant-bubble));
+  border: 1px solid var(--input-border);
+  cursor: pointer;
+  color: var(--muted);
+  font-family: 'Montserrat', sans-serif;
+}
+
+.stage-btn.active {
+  background: #000000;
+  color: #ffffff;
+  border-color: #000000;
+  box-shadow: 0 6px 22px rgba(0,0,0,0.25);
+}
 
   main { margin-top:18px; display:grid; grid-template-columns: 1fr 360px; gap:18px; }
   .chat-panel {
@@ -198,8 +203,12 @@ h1.app-title {
     <h1 class="app-title">TRUE AI</h1>
   </div>
   <div class="stage-controls">
-    <!-- your stage buttons stay the same -->
+    <button class="stage-btn active" data-stage="Discovery">Discovery</button>
+    <button class="stage-btn" data-stage="Planning">Planning</button>
+    <button class="stage-btn" data-stage="Alignment">Alignment</button>
   </div>
+
+
 </header>
 
     <main>
