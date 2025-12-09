@@ -72,7 +72,7 @@
 
         <div class="input-area">
           <div class="input-row">
-            <textarea id="user-input" placeholder="Type your reply or pick an option from the menu above..."></textarea>
+            <textarea id="user-input" placeholder="Pick an option from the menu above..."></textarea>
             <div style="display:flex;flex-direction:column;gap:8px">
               <button id="send-btn" class="primary">Send</button>
               <button id="export-btn" class="export-btn">Export LifePrint</button>
@@ -177,4 +177,366 @@
       const container = document.createElement("div");
       container.className = "option-row options";
       options.forEach(opt => {
-        const btn = document.createEle
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.textContent = opt.label;
+        btn.addEventListener("click", () => handleOptionSelect(opt));
+        container.appendChild(btn);
+      });
+      messagesEl.appendChild(container);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function addBotMessage(text) {
+      appendBubble(text, "bot");
+      conversation.push({ role: "assistant", content: text });
+    }
+
+    function addUserMessage(text) {
+      appendBubble(text, "user");
+      conversation.push({ role: "user", content: text });
+    }
+
+    function updateSnapshot(data = {}) {
+      const recent = Array.isArray(data.options)
+        ? data.options.map(o => o.label).slice(0,3).join("; ")
+        : (data.reply || "").slice(0,80);
+      snapshotEl.textContent = `Stage: ${currentStage}\nLast action: ${new Date().toLocaleString()}\nRecent: ${recent}`;
+    }
+
+    // Populate dropdown helpers
+    function setDropdownFromList(list) {
+      starterSelect.innerHTML = "";
+      const placeholder = document.createElement("option");
+      placeholder.value = "";
+      placeholder.textContent = `Choose an action (${currentStage})...`;
+      placeholder.disabled = true;
+      placeholder.selected = true;
+      starterSelect.appendChild(placeholder);
+      (list || []).forEach(opt => {
+        const o = document.createElement("option");
+        o.value = opt.payload;
+        o.textContent = opt.label;
+        o.dataset.optId = opt.id || "";
+        starterSelect.appendChild(o);
+      });
+    }
+
+    function populateDropdown() {
+      const curated = curatedOptions();
+      const list = curated[currentStage] || curated["Discovery"];
+      setDropdownFromList(list);
+    }
+
+    // Dropdown selection handler
+    starterSelect.addEventListener("change", async (e) => {
+      const payload = e.target.value;
+      const curated = curatedOptions();
+      const list = curated[currentStage] || curated["Discovery"];
+      const found = list.find(it => it.payload === payload);
+      if (found) {
+        addUserMessage(found.label);
+        await handleOptionSelect(found);
+      }
+      // reset dropdown
+      setTimeout(() => { starterSelect.selectedIndex = 0; }, 250);
+    });
+
+    // Core handler for selecting an option (either from dropdown or message-area buttons)
+    async function handleOptionSelect(opt) {
+      // Discovery scripted client-side
+      if (opt.payload && opt.payload.startsWith("discover:")) {
+        handleDiscoverPayload(opt.payload);
+        conversation.push({ role: "user", content: opt.label });
+        return;
+      }
+
+      // Planning / Alignment -> server expand
+      if (opt.payload && (opt.payload.startsWith("planning:") || opt.payload.startsWith("alignment:"))) {
+        addBotMessage("Working on that — a moment please...");
+        try {
+          const res = await expandOption(currentStage, conversation, `expand:${opt.id}`);
+          // remove temporary "Working..." bubble (it's the last one we added)
+          const last = messagesEl.lastChild;
+          if (last && last.classList.contains("bubble") && last.classList.contains("bot") && last.textContent.includes("Working on")) {
+            last.remove();
+          }
+          addBotMessage(res.reply || "No reply from server");
+          conversation.push({ role: "user", content: opt.label });
+          conversation.push({ role: "assistant", content: res.reply || "" });
+
+          // Show server-provided followUps in message area if present
+          if (res.followUps && Array.isArray(res.followUps) && res.followUps.length) {
+            const fuList = res.followUps.map((f, i) => {
+              if (typeof f === "string") return { id: `fu-${i}`, label: f, payload: `expand:followup-${i}` };
+              return { id: f.id || `fu-${i}`, label: f.label || f.text || JSON.stringify(f), payload: f.payload || `expand:followup-${i}` };
+            });
+            addOptionsToArea(fuList);
+          } else {
+            clearOptionsArea();
+          }
+
+          updateSnapshot(res);
+        } catch (err) {
+          // remove "Working..." bubble
+          const last = messagesEl.lastChild;
+          if (last && last.classList.contains("bubble") && last.classList.contains("bot") && last.textContent.includes("Working on")) {
+            last.remove();
+          }
+          addBotMessage("Sorry — couldn't get details from server.");
+          console.error(err);
+        }
+        return;
+      }
+
+      // If option asks user to "type your own" (common pattern with :other), prompt typing
+      if (opt.payload && opt.payload.includes("discover:") && opt.payload.endsWith(":other")) {
+        addBotMessage("Please type your response in the box and click Send.");
+        clearOptionsArea();
+        return;
+      }
+
+      // Fallback: ask server for next options and display them in the message area
+      conversation.push({ role: "user", content: opt.label });
+      addBotMessage("…");
+      try {
+        const opts = await fetchOptions(currentStage, conversation);
+        // remove placeholder "…" bubble (last bot bubble)
+        const last = messagesEl.lastChild;
+        if (last && last.classList.contains("bubble") && last.classList.contains("bot") && last.textContent === "…") {
+          last.remove();
+        }
+        addBotMessage("Okay — here are a few next steps:");
+        if (opts && Array.isArray(opts.options) && opts.options.length) {
+          addOptionsToArea(opts.options);
+        } else {
+          clearOptionsArea();
+        }
+        conversation.push({ role: "assistant", content: opts && opts.options ? opts.options.map(o => o.label).join(" | ") : "" });
+        updateSnapshot(opts || {});
+      } catch (err) {
+        // remove placeholder "…" bubble
+        const last2 = messagesEl.lastChild;
+        if (last2 && last2.classList.contains("bubble") && last2.classList.contains("bot") && last2.textContent === "…") {
+          last2.remove();
+        }
+        addBotMessage("Sorry — failed to fetch options.");
+        console.error(err);
+      }
+    }
+
+    // --- CLIENT-SIDE scripted Discovery flows ---
+    function handleDiscoverPayload(payload) {
+      if (payload === "discover:values") {
+        addBotMessage("Great — let's find your core values. Tell me one area of life that feels important to you right now (career, wellness, relationships, creativity, or something else).");
+        addOptionsToArea([
+          { id: "v-career", label: "Career", payload: "discover:value_area:career" },
+          { id: "v-well", label: "Wellness", payload: "discover:value_area:wellness" },
+          { id: "v-relationships", label: "Relationships", payload: "discover:value_area:relationships" },
+          { id: "v-creativity", label: "Creativity", payload: "discover:value_area:creativity" },
+          { id: "v-other", label: "Other — I'll type it", payload: "discover:value_area:other" }
+        ]);
+        return;
+      }
+      if (payload === "discover:motivations") {
+        addBotMessage("What energizes you most these days? What gives you a sense of purpose or momentum?");
+        addOptionsToArea([
+          { id: "m-1", label: "Connection & relationships", payload: "discover:motivation:connection" },
+          { id: "m-2", label: "Career growth & challenge", payload: "discover:motivation:career" },
+          { id: "m-3", label: "Health & energy", payload: "discover:motivation:health" },
+          { id: "m-4", label: "I'll type my own", payload: "discover:motivation:other" }
+        ]);
+        return;
+      }
+      if (payload === "discover:advantages_disadvantages") {
+        addBotMessage("Let's map strengths and challenges. What skills, supports, or resources help you? (then we'll ask about obstacles)");
+        addOptionsToArea([
+          { id: "s-1", label: "Skills & knowledge", payload: "discover:strength:skills" },
+          { id: "s-2", label: "People & relationships", payload: "discover:strength:people" },
+          { id: "s-3", label: "Time & routines", payload: "discover:strength:routines" },
+          { id: "s-4", label: "I'll describe my own", payload: "discover:strength:other" }
+        ]);
+        return;
+      }
+      if (payload === "discover:goal_seeds") {
+        addBotMessage("What would you love to improve or move toward in the next chapter of your life? Try listing 1–3 short aspirations (examples: 'feel healthier', 'shift career').");
+        addOptionsToArea([
+          { id: "g-1", label: "I want to feel healthier", payload: "discover:goal:health" },
+          { id: "g-2", label: "I want a career shift", payload: "discover:goal:career" },
+          { id: "g-3", label: "I want stronger boundaries", payload: "discover:goal:boundaries" },
+          { id: "g-4", label: "I'll type my own", payload: "discover:goal:other" }
+        ]);
+        return;
+      }
+      if (payload === "discover:obstacles") {
+        addBotMessage("What tends to get in your way? List obstacles, fears, or limitations (time, confidence, resources, support).");
+        addOptionsToArea([
+          { id: "o-1", label: "Time & scheduling", payload: "discover:obstacle:time" },
+          { id: "o-2", label: "Confidence & motivation", payload: "discover:obstacle:motivation" },
+          { id: "o-3", label: "Resources & money", payload: "discover:obstacle:resources" },
+          { id: "o-4", label: "Other — I'll type", payload: "discover:obstacle:other" }
+        ]);
+        return;
+      }
+      if (payload === "discover:strengths") {
+        addBotMessage("Tell me about strengths, resources, people, or routines that support you.");
+        addOptionsToArea([
+          { id: "str-1", label: "Supportive people", payload: "discover:strengths:people" },
+          { id: "str-2", label: "Skills & training", payload: "discover:strengths:skills" },
+          { id: "str-3", label: "Stable routines/habits", payload: "discover:strengths:routines" },
+          { id: "str-4", label: "I'll type my own", payload: "discover:strengths:other" }
+        ]);
+        return;
+      }
+      if (payload === "discover:updated_story") {
+        addBotMessage("If there's one belief or story that no longer fits who you're becoming, what is it? Or: what new story would you like to try on?");
+        addOptionsToArea([
+          { id: "st-1", label: "I'm not enough → I'm learning & growing", payload: "discover:story:example1" },
+          { id: "st-2", label: "I don't deserve rest → I prioritize renewal", payload: "discover:story:example2" },
+          { id: "st-3", label: "I'll type my own", payload: "discover:story:other" }
+        ]);
+        return;
+      }
+      if (payload === "discover:starting_snapshot") {
+        addBotMessage("Quick snapshot: On a scale of 1–10, how aligned do you feel in each area? (We'll ask a few areas). First: Career (1–10).");
+        addOptionsToArea([
+          { id: "snap-1", label: "1–3 (low)", payload: "discover:snapshot:career_low" },
+          { id: "snap-2", label: "4–7 (somewhat)", payload: "discover:snapshot:career_mid" },
+          { id: "snap-3", label: "8–10 (high)", payload: "discover:snapshot:career_high" },
+          { id: "snap-4", label: "I'll type a number", payload: "discover:snapshot:career_custom" }
+        ]);
+        return;
+      }
+
+      addBotMessage("Thanks — tell me more (or choose another area).");
+    }
+
+    // Interactions: request server options for Planning/Alignment fallback
+    async function requestOptions() {
+      try {
+        // Populate dropdown only (no message-area option buttons at start)
+        populateDropdown();
+
+        // Background fetch server options (non-blocking). If server returns options and user hasn't acted, replace dropdown.
+        try {
+          const resp = await fetchOptions(currentStage, conversation);
+          const userActions = conversation.filter(m => m.role === 'user').length;
+          if (resp && resp.options && userActions === 0) {
+            const list = resp.options.map(o => ({ id: o.id || "", label: o.label, payload: o.payload || "" }));
+            setDropdownFromList(list);
+            updateSnapshot(resp);
+          }
+        } catch (err) {
+          console.warn("Server options not available; using curated options.");
+        }
+      } catch (err) {
+        console.error("requestOptions error:", err);
+      }
+    }
+
+    // Send free-text custom message (full generation)
+    sendBtn.addEventListener("click", async () => {
+      const text = userInput.value.trim();
+      if (!text) return;
+      addUserMessage(text);
+      userInput.value = "";
+      try {
+        addBotMessage("Generating a full response...");
+        const res = await sendFull(currentStage, conversation.concat([{ role: "user", content: text }]));
+        // remove the 'Generating...' bubble (last bot bubble)
+        const last = messagesEl.lastChild;
+        if (last && last.classList.contains("bubble") && last.classList.contains("bot") && last.textContent.includes("Generating")) {
+          last.remove();
+        }
+        addBotMessage(res.reply || "No reply from server.");
+        conversation.push({ role: "user", content: text });
+        conversation.push({ role: "assistant", content: res.reply || "" });
+        updateSnapshot(res);
+
+        // After free-text reply, fetch follow-up options and display them in message area (if server provides)
+        try {
+          const opts = await fetchOptions(currentStage, conversation);
+          if (opts && Array.isArray(opts.options) && opts.options.length) {
+            addOptionsToArea(opts.options);
+          } else {
+            clearOptionsArea();
+          }
+        } catch {
+          clearOptionsArea();
+        }
+      } catch (err) {
+        console.error(err);
+        addBotMessage("Error generating response: " + err.message);
+      }
+    });
+
+    // Export LifePrint
+    exportBtn.addEventListener("click", async () => {
+      addBotMessage("Compiling your LifePrint summary — this may take a moment.");
+      try {
+        const messages = conversation.concat([{ role: "user", content: `Please compile a ${currentStage} summary / export for my LifePrint.` }]);
+        const res = await sendFull("Export", messages);
+        addBotMessage("LifePrint ready. Click the button below to download.");
+        const blob = new Blob([res.reply], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `TrueLifePrint-${currentStage}-${new Date().toISOString().slice(0,10)}.json`;
+        a.textContent = `Download LifePrint (${currentStage})`;
+        a.className = "download-link";
+        messagesEl.appendChild(a);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      } catch (err) {
+        console.error(err);
+        addBotMessage("Failed to compile LifePrint: " + err.message);
+      }
+    });
+
+    // Stage buttons
+    document.querySelectorAll(".stage-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        setStage(btn.dataset.stage);
+      });
+    });
+
+    // Quick actions
+    document.getElementById("restart-btn").addEventListener("click", () => {
+      conversation = [];
+      messagesEl.innerHTML = "";
+      userInput.value = "";
+      populateDropdown();
+      clearOptionsArea();
+      updateSnapshot({});
+    });
+
+    document.getElementById("summary-btn").addEventListener("click", () => {
+      exportBtn.click();
+    });
+
+    // setStage definition
+    function setStage(stage) {
+      currentStage = stage;
+      document.querySelectorAll(".stage-btn").forEach(b => b.classList.toggle("active", b.dataset.stage === stage));
+      stageDesc.textContent = {
+        "Discovery": "TRUE Discovery: We'll explore what matters most — values, motivations, starting point, and goal seeds.",
+        "Planning": "TRUE Planning: We'll turn insights into clear, sustainable plans (7/14/30/90 day blueprints).",
+        "Alignment": "TRUE Alignment: We'll create systems to maintain progress — simplification, growth, resilience, rituals."
+      }[stage] || "";
+      // refresh dropdown and clear message-area options; do not create startup bot bubble
+      populateDropdown();
+      clearOptionsArea();
+    }
+
+    // Initial setup: populate dropdown only (no startup bubble)
+    populateDropdown();
+
+    // show a single startup bot bubble (only on fresh sessions)
+    if (conversation.length === 0) {
+      addBotMessage("Let's discover what matters most to you. Click the dropdown menu below for options.");
+    }
+
+    // Optionally request server options in background on load
+    requestOptions();
+  </script>
+</body>
+</html>
