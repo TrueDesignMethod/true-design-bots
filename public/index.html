@@ -23,12 +23,13 @@
     main { margin-top:18px; display:grid; grid-template-columns: 1fr 360px; gap:18px; }
     .chat-panel { background:var(--panel); border-radius:var(--round); padding:14px; min-height:520px; border:1px solid #f2e5dd; }
     .sidebar { background:var(--panel); border-radius:var(--round); padding:14px; border:1px solid #f2e5dd; height:520px; overflow:auto; }
-    #messages { height:410px; overflow:auto; padding:8px; display:flex; flex-direction:column; gap:8px; }
+    #messages { height:360px; overflow:auto; padding:8px; display:flex; flex-direction:column; gap:8px; }
     .bubble { max-width:78%; padding:10px 12px; border-radius:12px; line-height:1.35; }
     .bubble.bot { background:#fff3ee; align-self:flex-start; border:1px solid #f6d7c8; color:#3b2f2c; }
     .bubble.user { background:var(--accent); color:#fff; align-self:flex-end; }
     .meta { font-size:12px; color:var(--muted); margin-top:6px; }
-    .input-area { display:flex; gap:8px; margin-top:10px; align-items:flex-end; }
+    .input-area { display:flex; gap:8px; margin-top:10px; align-items:flex-end; flex-direction:column; }
+    .input-row { display:flex; gap:8px; width:100%; align-items:flex-end; }
     textarea { width:100%; border-radius:10px; padding:10px; border:1px solid #f1d6c4; min-height:72px; resize:vertical; background:#fffaf7; color:#2c2a28; }
     button.primary { background:var(--accent); color:#fff; border:none; padding:10px 14px; border-radius:10px; cursor:pointer; box-shadow: 0 6px 20px rgba(217,115,74,0.12); }
     .options { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
@@ -38,6 +39,9 @@
     .export-btn { display:block; margin-top:14px; border-radius:8px; padding:8px; border:1px dashed #f1d6c4; background:transparent; cursor:pointer; color:var(--muted); }
     a.download-link { display:inline-block; margin-top:8px; color:var(--accent-2); background:#fff6f2; padding:8px; border-radius:8px; border:1px solid #f1d6c4; text-decoration:none; }
     pre.snapshot { white-space:pre-wrap; font-family:inherit; color:var(--muted); }
+    select#starter-select { width:100%; padding:10px; border-radius:8px; border:1px solid #f1d6c4; background:#fffaf7; color:#2c2a28; }
+    .privacy { margin-top:10px; font-size:13px; }
+    .privacy a { color:var(--accent); text-decoration:none; }
   </style>
 </head>
 <body>
@@ -45,7 +49,7 @@
     <header>
       <div>
         <h1>TRUE — Life Design AI</h1>
-        <div class="small">Discovery → Planning → Alignment — guided, action-focused, and exportable.</div>
+        <!-- removed tagline as requested -->
       </div>
       <div class="stage-controls" role="tablist" aria-label="Stages">
         <button class="stage-btn active" data-stage="Discovery">Discovery</button>
@@ -58,14 +62,28 @@
       <section class="chat-panel" aria-live="polite">
         <div id="messages" aria-label="Conversation"></div>
 
+        <!-- Startup prompt + dropdown selector -->
+        <div style="margin-top:8px;">
+          <div id="startup-prompt" class="meta">Let's explore what matters most to you. Select one of the options below to get started:</div>
+          <select id="starter-select" aria-label="Select an action">
+            <!-- options will be populated by JS -->
+          </select>
+        </div>
+
         <div class="input-area">
-          <textarea id="user-input" placeholder="Type your reply or pick one of the suggested options above..."></textarea>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <button id="send-btn" class="primary">Send</button>
-            <button id="export-btn" class="export-btn">Export LifePrint</button>
+          <div class="input-row">
+            <textarea id="user-input" placeholder="Type your reply or pick an option from the menu above..."></textarea>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <button id="send-btn" class="primary">Send</button>
+              <button id="export-btn" class="export-btn">Export LifePrint</button>
+            </div>
+          </div>
+
+          <!-- privacy policy link replaces the old tip -->
+          <div class="privacy">
+            <a href="https://example.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
           </div>
         </div>
-        <div class="meta small">Tip: Use the suggested options to move faster and save costs. Type your own reply when you want a custom answer.</div>
       </section>
 
       <aside class="sidebar">
@@ -102,17 +120,41 @@
     const exportBtn = document.getElementById("export-btn");
     const snapshotEl = document.getElementById("snapshot");
     const stageDesc = document.getElementById("stage-desc");
+    const starterSelect = document.getElementById("starter-select");
 
-    function setStage(stage) {
-      currentStage = stage;
-      document.querySelectorAll(".stage-btn").forEach(b => b.classList.toggle("active", b.dataset.stage === stage));
-      stageDesc.textContent = {
-        "Discovery": "TRUE Discovery: We'll explore what matters most — values, motivations, starting point, and goal seeds.",
-        "Planning": "TRUE Planning: We'll turn insights into clear, sustainable plans (7/14/30/90 day blueprints).",
-        "Alignment": "TRUE Alignment: We'll create systems to maintain progress — simplification, growth, resilience, rituals."
-      }[stage] || "";
-      addBotMessage(`Switched to ${stage}. Ready to continue?`);
-      requestOptions();
+    // Curated options used both for dropdown and immediate UI
+    function curatedOptions() {
+      return {
+        "Discovery": [
+          { id: "d-1", label: "Help me discover my values", payload: "discover:values" },
+          { id: "d-2", label: "Explore motivations that drive me", payload: "discover:motivations" },
+          { id: "d-3", label: "Uncover my strengths and weaknesses", payload: "discover:advantages_disadvantages" },
+          { id: "d-4", label: "Help me figure out 1-3 goals this month", payload: "discover:goal_seeds" },
+          { id: "d-5", label: "Identify potential obstacles or fears to my goals", payload: "discover:obstacles" },
+          { id: "d-6", label: "Identify what strengths or resources I already have", payload: "discover:strengths" },
+          { id: "d-7", label: "Explore the new story I want to create for myself", payload: "discover:updated_story" },
+          { id: "d-8", label: "Provide my starting point snapshot", payload: "discover:starting_snapshot" }
+        ],
+        "Planning": [
+          { id: "p-1", label: "Discover 1-3 goals I want to prioritize this month", payload: "planning:prioritize_goals" },
+          { id: "p-2", label: "Help me refine my goal: Clear goal statement, emotional anchor, desired outcome", payload: "planning:refine_goal" },
+          { id: "p-3", label: "Provide one microstep, one momentum step, and one supporting habit", payload: "planning:micro_steps" },
+          { id: "p-4", label: "Help me uncover which obstacles apply to this goal", payload: "planning:obstacle_map" },
+          { id: "p-5", label: "Develop a 7-day action plan: 3 actions, 1 habit, 1 obstacle strategy, 1 reflection question", payload: "planning:7day" },
+          { id: "p-6", label: "Develop a 30-day action plan: Momentum steps, Habit progression, Two checkpoint reflections", payload: "planning:30day" },
+          { id: "p-7", label: "Develop a 90-day action plan: Monthly milestones, risk preparation, systems for discipline", payload: "planning:90day" }
+        ],
+        "Alignment": [
+          { id: "a-1", label: "Help me identify my clutter: mental, emotional, physical, schedule", payload: "alignment:clutter" },
+          { id: "a-2", label: "Identify which clutter I am ready to reduce, remove, or delegate", payload: "alignment:release_plan" },
+          { id: "a-3", label: "Design how I will revise my goals when needed", payload: "alignment:revision_strategy" },
+          { id: "a-4", label: "Identify what is helping me grow", payload: "alignment:growth_map" },
+          { id: "a-5", label: "Give me a 90-day growth theme", payload: "alignment:90day_theme" },
+          { id: "a-6", label: "Help me build a resilience toolkit", payload: "alignment:resilience" },
+          { id: "a-7", label: "Give me nurture rituals based on energy, values, personality", payload: "alignment:nurture_rituals" },
+          { id: "a-8", label: "Create an iteration strategy map for me", payload: "alignment:iteration_map" }
+        ]
+      };
     }
 
     // UI helpers
@@ -135,64 +177,12 @@
         const btn = document.createElement("button");
         btn.className = "option-btn";
         btn.textContent = opt.label;
-        btn.addEventListener("click", async () => {
-          // show as user choice
-          appendBubble(opt.label, "user");
-
-          // ROUTING: handle Discovery scripted flows client-side for low-cost
-          if (opt.payload && opt.payload.startsWith("discover:")) {
-            handleDiscoverPayload(opt.payload);
-            conversation.push({ role: "user", content: opt.label });
-            return;
-          }
-
-          // For Planning/Alignment payloads, request server-generated options/expansions
-          if (opt.payload && (opt.payload.startsWith("planning:") || opt.payload.startsWith("alignment:"))) {
-            // append a lightweight bot placeholder while we fetch
-            appendBubble("Working on that — a moment please...", "bot");
-            try {
-              // Use expand mode to get a helpful reply (server will generate or fall back)
-              const res = await expandOption(currentStage, conversation, `expand:${opt.id}`);
-              messagesEl.lastChild?.remove();
-              appendBubble(res.reply || "No reply from server", "bot");
-              conversation.push({ role: "user", content: opt.label });
-              conversation.push({ role: "assistant", content: res.reply || "" });
-              if (res.followUps && res.followUps.length) {
-                addOptions(res.followUps.map((f, i) => ({ id: `fu-${i}`, label: f, payload: `expand:followup-${i}` })));
-              } else {
-                requestOptions();
-              }
-              updateSnapshot(res);
-            } catch (err) {
-              messagesEl.lastChild?.remove();
-              appendBubble("Sorry — couldn't get details from server.", "bot");
-              console.error(err);
-            }
-            return;
-          }
-
-          // default: if payload is arbitrary or server-specific, ask server for next options
-          conversation.push({ role: "user", content: opt.label });
-          appendBubble("…", "bot");
-          try {
-            const opts = await fetchOptions(currentStage, conversation);
-            messagesEl.lastChild?.remove();
-            appendBubble(`Okay — here are a few next steps:`, "bot");
-            if (opts.options) addOptions(opts.options);
-            conversation.push({ role: "assistant", content: opts.options.map(o => o.label).join(" | ") });
-            updateSnapshot(opts);
-          } catch (err) {
-            messagesEl.lastChild?.remove();
-            appendBubble("Sorry — failed to fetch options.", "bot");
-            console.error(err);
-          }
-        });
+        btn.addEventListener("click", () => handleOptionSelect(opt));
         container.appendChild(btn);
       });
       messagesEl.appendChild(container);
       messagesEl.scrollTop = messagesEl.scrollHeight;
     }
-
     function addBotMessage(text) {
       appendBubble(text, "bot");
       conversation.push({ role: "assistant", content: text });
@@ -205,228 +195,19 @@
       snapshotEl.textContent = `Stage: ${currentStage}\nLast action: ${new Date().toLocaleString()}\nRecent: ${Array.isArray(data.options) ? data.options.map(o => o.label).slice(0,3).join("; ") : (data.reply || "").slice(0,80)}`;
     }
 
-    // --- CLIENT-SIDE scripted Discovery flows (lightweight question sequences) ---
-    function handleDiscoverPayload(payload) {
-      // Each payload triggers the first question in that module and displays quick choices where applicable.
-      if (payload === "discover:values") {
-        addBotMessage("Great — let's find your core values. Tell me one area of life that feels important to you right now (career, wellness, relationships, creativity, or something else).");
-        addOptions([
-          { id: "v-career", label: "Career", payload: "discover:value_area:career" },
-          { id: "v-well", label: "Wellness", payload: "discover:value_area:wellness" },
-          { id: "v-relationships", label: "Relationships", payload: "discover:value_area:relationships" },
-          { id: "v-creativity", label: "Creativity", payload: "discover:value_area:creativity" },
-          { id: "v-other", label: "Other — I'll type it", payload: "discover:value_area:other" }
-        ]);
-        return;
-      }
-
-      if (payload === "discover:motivations") {
-        addBotMessage("What energizes you most these days? What gives you a sense of purpose or momentum?");
-        // show choices to help users frame responses
-        addOptions([
-          { id: "m-1", label: "Connection & relationships", payload: "discover:motivation:connection" },
-          { id: "m-2", label: "Career growth & challenge", payload: "discover:motivation:career" },
-          { id: "m-3", label: "Health & energy", payload: "discover:motivation:health" },
-          { id: "m-4", label: "I'll type my own", payload: "discover:motivation:other" }
-        ]);
-        return;
-      }
-
-      if (payload === "discover:advantages_disadvantages") {
-        addBotMessage("Let's map strengths and challenges. What skills, supports, or resources help you? (then we'll ask about obstacles)");
-        addOptions([
-          { id: "s-1", label: "Skills & knowledge", payload: "discover:strength:skills" },
-          { id: "s-2", label: "People & relationships", payload: "discover:strength:people" },
-          { id: "s-3", label: "Time & routines", payload: "discover:strength:routines" },
-          { id: "s-4", label: "I'll describe my own", payload: "discover:strength:other" }
-        ]);
-        return;
-      }
-
-      if (payload === "discover:goal_seeds") {
-        addBotMessage("What would you love to improve or move toward in the next chapter of your life? Try listing 1–3 short aspirations (examples: 'feel healthier', 'shift career').");
-        // let user type; quick examples
-        addOptions([
-          { id: "g-1", label: "I want to feel healthier", payload: "discover:goal:health" },
-          { id: "g-2", label: "I want a career shift", payload: "discover:goal:career" },
-          { id: "g-3", label: "I want stronger boundaries", payload: "discover:goal:boundaries" },
-          { id: "g-4", label: "I'll type my own", payload: "discover:goal:other" }
-        ]);
-        return;
-      }
-
-      if (payload === "discover:obstacles") {
-        addBotMessage("What tends to get in your way? List obstacles, fears, or limitations (time, confidence, resources, support).");
-        addOptions([
-          { id: "o-1", label: "Time & scheduling", payload: "discover:obstacle:time" },
-          { id: "o-2", label: "Confidence & motivation", payload: "discover:obstacle:motivation" },
-          { id: "o-3", label: "Resources & money", payload: "discover:obstacle:resources" },
-          { id: "o-4", label: "Other — I'll type", payload: "discover:obstacle:other" }
-        ]);
-        return;
-      }
-
-      if (payload === "discover:strengths") {
-        addBotMessage("Tell me about strengths, resources, people, or routines that support you.");
-        addOptions([
-          { id: "str-1", label: "Supportive people", payload: "discover:strengths:people" },
-          { id: "str-2", label: "Skills & training", payload: "discover:strengths:skills" },
-          { id: "str-3", label: "Stable routines/habits", payload: "discover:strengths:routines" },
-          { id: "str-4", label: "I'll type my own", payload: "discover:strengths:other" }
-        ]);
-        return;
-      }
-
-      if (payload === "discover:updated_story") {
-        addBotMessage("If there's one belief or story that no longer fits who you're becoming, what is it? Or: what new story would you like to try on?");
-        addOptions([
-          { id: "st-1", label: "I'm not enough → I'm learning & growing", payload: "discover:story:example1" },
-          { id: "st-2", label: "I don't deserve rest → I prioritize renewal", payload: "discover:story:example2" },
-          { id: "st-3", label: "I'll type my own", payload: "discover:story:other" }
-        ]);
-        return;
-      }
-
-      if (payload === "discover:starting_snapshot") {
-        addBotMessage("Quick snapshot: On a scale of 1–10, how aligned do you feel in each area? (We'll ask a few areas). First: Career (1–10).");
-        addOptions([
-          { id: "snap-1", label: "1–3 (low)", payload: "discover:snapshot:career_low" },
-          { id: "snap-2", label: "4–7 (somewhat)", payload: "discover:snapshot:career_mid" },
-          { id: "snap-3", label: "8–10 (high)", payload: "discover:snapshot:career_high" },
-          { id: "snap-4", label: "I'll type a number", payload: "discover:snapshot:career_custom" }
-        ]);
-        return;
-      }
-
-      // Default fallback (shouldn't happen)
-      addBotMessage("Thanks — tell me more (or choose another area).");
-    }
-    // --- end Discovery flows ---
-
-    // Interactions: request server options only for planning/alignment or fallback
-    async function requestOptions() {
-      try {
-        // Show curated instant options (client does curated lists locally for snappy UX)
-        const curated = {
-          "Discovery": [
-            { id: "d-1", label: "Help me discover my values", payload: "discover:values" },
-            { id: "d-2", label: "Explore motivations that drive me", payload: "discover:motivations" },
-            { id: "d-3", label: "Uncover my strengths and weaknesses", payload: "discover:advantages_disadvantages" },
-            { id: "d-4", label: "Help me figure out 1-3 goals this month", payload: "discover:goal_seeds" },
-            { id: "d-5", label: "Identify potential obstacles or fears to my goals", payload: "discover:obstacles" },
-            { id: "d-6", label: "Identify what strengths or resources I already have", payload: "discover:strengths" },
-            { id: "d-7", label: "Explore the new story I want to create for myself", payload: "discover:updated_story" },
-            { id: "d-8", label: "Provide my starting point snapshot", payload: "discover:starting_snapshot" }
-          ],
-          "Planning": [
-            { id: "p-1", label: "Discover 1-3 goals I want to prioritize this month", payload: "planning:prioritize_goals" },
-            { id: "p-2", label: "Help me refine my goal: Clear goal statement, emotional anchor, desired outcome", payload: "planning:refine_goal" },
-            { id: "p-3", label: "Provide one microstep, one momentum step, and one supporting habit", payload: "planning:micro_steps" },
-            { id: "p-4", label: "Help me uncover which obstacles apply to this goal", payload: "planning:obstacle_map" },
-            { id: "p-5", label: "Develop a 7-day action plan: 3 actions, 1 habit, 1 obstacle strategy, 1 reflection question", payload: "planning:7day" },
-            { id: "p-6", label: "Develop a 30-day action plan: Momentum steps, Habit progression, Two checkpoint reflections", payload: "planning:30day" },
-            { id: "p-7", label: "Develop a 90-day action plan: Monthly milestones, risk preparation, systems for discipline", payload: "planning:90day" }
-          ],
-          "Alignment": [
-            { id: "a-1", label: "Help me identify my clutter: mental, emotional, physical, schedule", payload: "alignment:clutter" },
-            { id: "a-2", label: "Identify which clutter I am ready to reduce, remove, or delegate", payload: "alignment:release_plan" },
-            { id: "a-3", label: "Design how I will revise my goals when needed", payload: "alignment:revision_strategy" },
-            { id: "a-4", label: "Identify what is helping me grow", payload: "alignment:growth_map" },
-            { id: "a-5", label: "Give me a 90-day growth theme", payload: "alignment:90day_theme" },
-            { id: "a-6", label: "Help me build a resilience toolkit", payload: "alignment:resilience" },
-            { id: "a-7", label: "Give me nurture rituals based on energy, values, personality", payload: "alignment:nurture_rituals" },
-            { id: "a-8", label: "Create an iteration strategy map for me", payload: "alignment:iteration_map" }
-          ]
-        };
-
-        addBotMessage("Let's explore what matters most to you. Select one of the options below to get started:");
-        addOptions(curated[currentStage] || curated["Discovery"]);
-
-        // In the background, request server-generated options (non-blocking). If server returns and user hasn't interacted, replace options.
-        try {
-          const resp = await fetchOptions(currentStage, conversation);
-          const userActions = conversation.filter(m => m.role === 'user').length;
-          if (resp && resp.options && userActions === 0) {
-            clearOptions();
-            addOptions(resp.options);
-            updateSnapshot(resp);
-          }
-        } catch (err) {
-          // ignore — keep curated options
-          console.warn("Server options not available; using curated options.");
-        }
-      } catch (err) {
-        console.error("requestOptions error:", err);
-        addBotMessage("Sorry — I couldn't fetch options. Try again later.");
-      }
-    }
-
-    // Send free-text custom message (uses full generation)
-    sendBtn.addEventListener("click", async () => {
-      const text = userInput.value.trim();
-      if (!text) return;
-      addUserMessage(text);
-      userInput.value = "";
-      try {
-        addBotMessage("Generating a full response...");
-        const res = await sendFull(currentStage, conversation.concat([{ role: "user", content: text }]));
-        messagesEl.lastChild?.remove();
-        addBotMessage(res.reply || "No reply from server.");
-        conversation.push({ role: "user", content: text });
-        conversation.push({ role: "assistant", content: res.reply || "" });
-        updateSnapshot(res);
-        requestOptions();
-      } catch (err) {
-        console.error(err);
-        addBotMessage("Error generating response: " + err.message);
-      }
-    });
-
-    // Export LifePrint
-    exportBtn.addEventListener("click", async () => {
-      addBotMessage("Compiling your LifePrint summary — this may take a moment.");
-      try {
-        const messages = conversation.concat([{ role: "user", content: `Please compile a ${currentStage} summary / export for my LifePrint.` }]);
-        const res = await sendFull("Export", messages);
-        addBotMessage("LifePrint ready. Click the button below to download.");
-        const blob = new Blob([res.reply], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `TrueLifePrint-${currentStage}-${new Date().toISOString().slice(0,10)}.json`;
-        a.textContent = `Download LifePrint (${currentStage})`;
-        a.className = "download-link";
-        messagesEl.appendChild(a);
-        messagesEl.scrollTop = messagesEl.scrollHeight;
-      } catch (err) {
-        console.error(err);
-        addBotMessage("Failed to compile LifePrint: " + err.message);
-      }
-    });
-
-    // Stage buttons
-    document.querySelectorAll(".stage-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        setStage(btn.dataset.stage);
-      });
-    });
-
-    // Quick actions
-    document.getElementById("restart-btn").addEventListener("click", () => {
-      conversation = [];
-      messagesEl.innerHTML = "";
-      userInput.value = "";
-      addBotMessage("Let's explore what matters most to you. Select one of the options below to get started:");
-      requestOptions();
-    });
-    document.getElementById("summary-btn").addEventListener("click", async () => {
-      exportBtn.click();
-    });
-
-    // Initial kick-off (updated startup message)
-    addBotMessage("Let's explore what matters most to you. Select one of the options below to get started:");
-    requestOptions();
-
-  </script>
-</body>
-</html>
+    // Populate dropdown based on currentStage
+    function populateDropdown() {
+      const curated = curatedOptions();
+      const list = curated[currentStage] || curated["Discovery"];
+      starterSelect.innerHTML = ""; // clear
+      const placeholder = document.createElement("option");
+      placeholder.value = "";
+      placeholder.textContent = `Choose an action (${currentStage})...`;
+      placeholder.disabled = true;
+      placeholder.selected = true;
+      starterSelect.appendChild(placeholder);
+      list.forEach(opt => {
+        const o = document.createElement("option");
+        o.value = opt.payload;
+        o.textContent = opt.label;
+        starterSelect.appen
