@@ -162,22 +162,45 @@
 
   .privacy { margin-top:10px; font-size:13px; }
   .privacy a { color:var(--accent); text-decoration:none; }
+
+  /* Header title */
+h1.app-title {
+  margin: 0;
+  font-size: 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400; /* removes bold */
+  color: var(--text);
+}
+
+/* TD square icon */
+.td-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: #000000;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+}
+
 </style>
 
 </head>
 <body>
   <div class="wrap">
-    <header>
-      <div>
-        <h1>TRUE — Life Design AI</h1>
-      </div>
-
-      <div class="stage-controls" role="tablist" aria-label="Stages">
-        <button class="stage-btn active" data-stage="Discovery">Discovery</button>
-        <button class="stage-btn" data-stage="Planning">Planning</button>
-        <button class="stage-btn" data-stage="Alignment">Alignment</button>
-      </div>
-    </header>
+   <header>
+  <div style="display:flex; align-items:center; gap:10px;">
+    <div class="td-icon">TD</div>
+    <h1 class="app-title">TRUE AI</h1>
+  </div>
+  <div class="stage-controls">
+    <!-- your stage buttons stay the same -->
+  </div>
+</header>
 
     <main>
       <section class="chat-panel" aria-live="polite">
