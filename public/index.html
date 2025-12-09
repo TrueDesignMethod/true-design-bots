@@ -111,14 +111,15 @@
   }
 
   button.primary {
-    background: var(--accent);
-    color: var(--controls-text);
-    border:none;
-    padding:10px 14px;
-    border-radius:10px;
-    cursor:pointer;
-    box-shadow: 0 6px 20px rgba(139,94,60,0.12);
-  }
+  background: #000000;
+  color: #ffffff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+}
 
   .options { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
   .option-btn {
@@ -133,27 +134,29 @@
   .loading { font-size:13px; color:var(--muted); }
   .small { font-size:13px; color:var(--muted); }
 
-  .export-btn {
-    display:block;
-    margin-top:14px;
-    border-radius:8px;
-    padding:8px;
-    border:1px dashed var(--input-border);
-    background:transparent;
-    cursor:pointer;
-    color:var(--muted);
-  }
+  .export-btn,
+a.download-link {
+  display: block;
+  margin-top: 14px;
+  padding: 8px 12px;
+  border-radius: 10px;
 
-  a.download-link {
-    display:inline-block;
-    margin-top:8px;
-    color:var(--accent-soft);
-    background: var(--card);
-    padding:8px;
-    border-radius:8px;
-    border:1px solid var(--input-border);
-    text-decoration:none;
-  }
+  background: var(--card);
+  color: var(--muted);
+  text-decoration: none;
+
+  border: 1px solid var(--input-border); /* matches stage buttons */
+  font-family: 'Montserrat', sans-serif;
+  cursor: pointer;
+  transition: background .12s ease, box-shadow .12s ease;
+}
+
+.export-btn:hover,
+a.download-link:hover {
+  background: var(--assistant-bubble);
+  box-shadow: 0 4px 10px rgba(16,18,20,0.04);
+}
+
 
   pre.snapshot { white-space:pre-wrap; font-family:inherit; color:var(--muted); }
   select#starter-select {
@@ -245,10 +248,7 @@ h1.app-title {
           TRUE Discovery: We'll explore what matters most — values, motivations, starting point, and goal seeds.
         </div>
 
-        <hr style="margin:14px 0">
-
-        <div><strong>Session Snapshot</strong></div>
-        <pre id="snapshot" class="snapshot" style="margin-top:8px">No data yet.</pre>
+      
 
         <hr style="margin:14px 0">
 
