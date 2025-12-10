@@ -82,7 +82,8 @@
     overflow:auto;
   }
 
-  #messages { height:4200px; overflow:auto; padding:8px; display:flex; flex-direction:column; gap:8px; }
+  /* Fixed message height (was 4200px accidentally) */
+  #messages { height:420px; overflow:auto; padding:8px; display:flex; flex-direction:column; gap:8px; }
   .bubble { max-width:78%; padding:10px 12px; border-radius:12px; line-height:1.35; }
   .bubble.bot {
     background: var(--assistant-bubble);
@@ -211,8 +212,6 @@ h1.app-title {
     <button class="stage-btn" data-stage="Planning">Planning</button>
     <button class="stage-btn" data-stage="Alignment">Alignment</button>
   </div>
-
-
 </header>
 
     <main>
@@ -244,8 +243,6 @@ h1.app-title {
           TRUE Discovery: We'll explore what matters most — values, motivations, starting point, and goal seeds.
         </div>
 
-      
-
         <hr style="margin:14px 0">
 
         <div><strong>Quick actions</strong></div>
@@ -264,7 +261,6 @@ h1.app-title {
     let currentStage = "Discovery";
     let conversation = []; // array of {role, content}
     const messagesEl = document.getElementById("messages");
-    
     const exportBtn = document.getElementById("export-btn");
     const snapshotEl = document.getElementById("snapshot");
     const stageDesc = document.getElementById("stage-desc");
@@ -361,7 +357,6 @@ h1.app-title {
     }
 
     function updateSnapshot(data = {}) {
-      // snapshot element may not exist in this markup; guard it
       try {
         const recent = Array.isArray(data.options)
           ? data.options.map(o => o.label).slice(0,3).join("; ")
@@ -514,7 +509,7 @@ h1.app-title {
         return;
       }
 
-      // "other" case: prompt typing
+      // "other" case: prompt typing (you removed the text input; keep this message in case you re-add it later)
       if (p.endsWith(":other")) {
         appendSmall("Please type your response in the box and click Send.");
         clearOptionsArea();
@@ -799,63 +794,31 @@ h1.app-title {
       const label = starterSelect.options[starterSelect.selectedIndex].textContent;
       addUserMessage(label);
 
-      goBtn.addEventListener("click", async () => {
-  const payload = starterSelect.value;
-  if (!payload) {
-    appendSmall("Please pick an action from the dropdown first.");
-    return;
-  }
-  const label = starterSelect.options[starterSelect.selectedIndex].textContent;
-  addUserMessage(label);
+      // If payload maps to a client-root handler (discover, planning, alignment)
+      const curated = curatedOptions();
+      const roots = [].concat(curated.Discovery, curated.Planning, curated.Alignment).map(x => x.payload);
+      if (roots.includes(payload)) {
+        if (payload.startsWith("discover:")) {
+          conversation.push({ role: "user", content: label });
+          handleDiscoverPayload(payload);
+          starterSelect.selectedIndex = 0;
+          return;
+        }
+        if (payload.startsWith("planning:")) {
+          conversation.push({ role: "user", content: label });
+          handlePlanningPayload(payload);
+          starterSelect.selectedIndex = 0;
+          return;
+        }
+        if (payload.startsWith("alignment:")) {
+          conversation.push({ role: "user", content: label });
+          handleAlignmentPayload(payload);
+          starterSelect.selectedIndex = 0;
+          return;
+        }
+      }
 
-  // If payload maps to a client-root handler (discover, planning, alignment)
-  const curated = curatedOptions();
-  const roots = [].concat(curated.Discovery, curated.Planning, curated.Alignment).map(x => x.payload);
-  if (roots.includes(payload)) {
-    if (payload.startsWith("discover:")) {
-      conversation.push({ role: "user", content: label });
-      handleDiscoverPayload(payload);
-      starterSelect.selectedIndex = 0;
-      return;
-    }
-    if (payload.startsWith("planning:")) {
-      conversation.push({ role: "user", content: label });
-      handlePlanningPayload(payload);
-      starterSelect.selectedIndex = 0;
-      return;
-    }
-    if (payload.startsWith("alignment:")) {
-      conversation.push({ role: "user", content: label });
-      handleAlignmentPayload(payload);
-      starterSelect.selectedIndex = 0;
-      return;
-    }
-  }
-
-  // fallback: server expand for non-root payloads
-  const temp = appendSmall("Working on that — a moment please...");
-  try {
-    const res = await expandOption(currentStage, conversation, payload);
-    if (temp && temp.parentNode) temp.remove();
-    appendBubble(res.reply || "No reply from server.", "bot");
-    conversation.push({ role: "assistant", content: res.reply || "" });
-    if (res.followUps && res.followUps.length) {
-      const normalized = res.followUps.map((f,i) => (typeof f === "string") ? { id:`fu-${i}`, label:f, payload:f } : { id:f.id||`fu-${i}`, label:f.label||f.text||JSON.stringify(f), payload:f.payload||f.id||`fu-${i}` });
-      addOptionsToArea(normalized);
-    } else {
-      clearOptionsArea();
-    }
-    updateSnapshot(res);
-  } catch (err) {
-    if (temp && temp.parentNode) temp.remove();
-    appendSmall("Sorry — couldn't fetch details.");
-    console.error(err);
-  }
-  starterSelect.selectedIndex = 0;
-});
-
-
-      // fallback: send to server (expand)
+      // fallback: server expand for non-root payloads
       const temp = appendSmall("Working on that — a moment please...");
       try {
         const res = await expandOption(currentStage, conversation, payload);
@@ -875,25 +838,6 @@ h1.app-title {
         console.error(err);
       }
       starterSelect.selectedIndex = 0;
-    });
-
-  
-
-        // After free-text reply, fetch follow-up options and display them in message area (if server provides)
-        try {
-          const opts = await fetchOptions(currentStage, conversation);
-          if (opts && Array.isArray(opts.options) && opts.options.length) {
-            addOptionsToArea(opts.options);
-          } else {
-            clearOptionsArea();
-          }
-        } catch {
-          clearOptionsArea();
-        }
-      } catch (err) {
-        console.error(err);
-        addBotMessage("Error generating response: " + err.message);
-      }
     });
 
     // Export LifePrint (unchanged)
@@ -929,7 +873,6 @@ h1.app-title {
     document.getElementById("restart-btn").addEventListener("click", () => {
       conversation = [];
       messagesEl.innerHTML = "";
-      userInput.value = "";
       populateDropdown();
       clearOptionsArea();
       updateSnapshot({});
