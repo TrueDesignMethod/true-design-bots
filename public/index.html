@@ -82,7 +82,7 @@
     overflow:auto;
   }
 
-  #messages { height:360px; overflow:auto; padding:8px; display:flex; flex-direction:column; gap:8px; }
+  #messages { height:4200px; overflow:auto; padding:8px; display:flex; flex-direction:column; gap:8px; }
   .bubble { max-width:78%; padding:10px 12px; border-radius:12px; line-height:1.35; }
   .bubble.bot {
     background: var(--assistant-bubble);
@@ -264,8 +264,7 @@ h1.app-title {
     let currentStage = "Discovery";
     let conversation = []; // array of {role, content}
     const messagesEl = document.getElementById("messages");
-    const userInput = document.getElementById("user-input");
-    const sendBtn = document.getElementById("send-btn");
+    
     const exportBtn = document.getElementById("export-btn");
     const snapshotEl = document.getElementById("snapshot");
     const stageDesc = document.getElementById("stage-desc");
@@ -800,31 +799,61 @@ h1.app-title {
       const label = starterSelect.options[starterSelect.selectedIndex].textContent;
       addUserMessage(label);
 
-      // If payload is a client-root, handle locally
-      const curated = curatedOptions();
-      const roots = [].concat(curated.Discovery, curated.Planning, curated.Alignment).map(x => x.payload);
-      if (roots.includes(payload)) {
-        // route to handler depending on prefix
-        if (payload.startsWith("discover:")) {
-          conversation.push({ role: "user", content: label });
-          handleDiscoverPayload(payload);
-          // reset dropdown selection
-          starterSelect.selectedIndex = 0;
-          return;
-        }
-        if (payload.startsWith("planning:")) {
-          conversation.push({ role: "user", content: label });
-          handlePlanningPayload(payload);
-          starterSelect.selectedIndex = 0;
-          return;
-        }
-        if (payload.startsWith("alignment:")) {
-          conversation.push({ role: "user", content: label });
-          handleAlignmentPayload(payload);
-          starterSelect.selectedIndex = 0;
-          return;
-        }
-      }
+      goBtn.addEventListener("click", async () => {
+  const payload = starterSelect.value;
+  if (!payload) {
+    appendSmall("Please pick an action from the dropdown first.");
+    return;
+  }
+  const label = starterSelect.options[starterSelect.selectedIndex].textContent;
+  addUserMessage(label);
+
+  // If payload maps to a client-root handler (discover, planning, alignment)
+  const curated = curatedOptions();
+  const roots = [].concat(curated.Discovery, curated.Planning, curated.Alignment).map(x => x.payload);
+  if (roots.includes(payload)) {
+    if (payload.startsWith("discover:")) {
+      conversation.push({ role: "user", content: label });
+      handleDiscoverPayload(payload);
+      starterSelect.selectedIndex = 0;
+      return;
+    }
+    if (payload.startsWith("planning:")) {
+      conversation.push({ role: "user", content: label });
+      handlePlanningPayload(payload);
+      starterSelect.selectedIndex = 0;
+      return;
+    }
+    if (payload.startsWith("alignment:")) {
+      conversation.push({ role: "user", content: label });
+      handleAlignmentPayload(payload);
+      starterSelect.selectedIndex = 0;
+      return;
+    }
+  }
+
+  // fallback: server expand for non-root payloads
+  const temp = appendSmall("Working on that — a moment please...");
+  try {
+    const res = await expandOption(currentStage, conversation, payload);
+    if (temp && temp.parentNode) temp.remove();
+    appendBubble(res.reply || "No reply from server.", "bot");
+    conversation.push({ role: "assistant", content: res.reply || "" });
+    if (res.followUps && res.followUps.length) {
+      const normalized = res.followUps.map((f,i) => (typeof f === "string") ? { id:`fu-${i}`, label:f, payload:f } : { id:f.id||`fu-${i}`, label:f.label||f.text||JSON.stringify(f), payload:f.payload||f.id||`fu-${i}` });
+      addOptionsToArea(normalized);
+    } else {
+      clearOptionsArea();
+    }
+    updateSnapshot(res);
+  } catch (err) {
+    if (temp && temp.parentNode) temp.remove();
+    appendSmall("Sorry — couldn't fetch details.");
+    console.error(err);
+  }
+  starterSelect.selectedIndex = 0;
+});
+
 
       // fallback: send to server (expand)
       const temp = appendSmall("Working on that — a moment please...");
@@ -848,24 +877,7 @@ h1.app-title {
       starterSelect.selectedIndex = 0;
     });
 
-    // Send free-text custom message (unchanged)
-    sendBtn.addEventListener("click", async () => {
-      const text = userInput.value.trim();
-      if (!text) return;
-      addUserMessage(text);
-      userInput.value = "";
-      try {
-        addBotMessage("Generating a full response...");
-        const res = await sendFull(currentStage, conversation.concat([{ role: "user", content: text }]));
-        // remove last "Generating..." bubble if present
-        const last = messagesEl.lastChild;
-        if (last && last.classList.contains("bubble") && last.classList.contains("bot") && last.textContent.includes("Generating")) {
-          last.remove();
-        }
-        addBotMessage(res.reply || "No reply from server.");
-        conversation.push({ role: "user", content: text });
-        conversation.push({ role: "assistant", content: res.reply || "" });
-        updateSnapshot(res);
+  
 
         // After free-text reply, fetch follow-up options and display them in message area (if server provides)
         try {
