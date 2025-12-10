@@ -219,31 +219,23 @@ h1.app-title {
       <section class="chat-panel" aria-live="polite">
         <div id="messages" aria-label="Conversation"></div>
 
-        <!-- Startup prompt + dropdown selector -->
-        <div style="margin-top:8px;">
-          <div id="startup-prompt" class="meta">Select what you'd like to get started with here:</div>
-          <div style="display:flex;gap:8px;align-items:center;margin-top:6px;">
-            <select id="starter-select" aria-label="Select an action">
-              <!-- options will be populated by JS -->
-            </select>
-            <button id="go-btn" class="primary">Go</button>
-          </div>
-        </div>
+       <!-- Startup prompt + dropdown + Go button (no textbox) -->
+<div style="margin-top:8px;">
+  <div id="startup-prompt" class="meta">Select what you'd like to get started with here:</div>
+  <div style="display:flex;gap:8px;align-items:center;margin-top:6px;">
+    <select id="starter-select" aria-label="Select an action" style="flex:1">
+      <!-- options will be populated by JS -->
+    </select>
+    <button id="go-btn" class="primary">Go</button>
+    <button id="export-btn" class="export-btn">Export LifePrint</button>
+  </div>
+</div>
 
-        <div class="input-area">
-          <div class="input-row">
-            <textarea id="user-input" placeholder="Pick an option from the menu above..."></textarea>
-            <div style="display:flex;flex-direction:column;gap:8px">
-              <button id="send-btn" class="primary">Send</button>
-              <button id="export-btn" class="export-btn">Export LifePrint</button>
-            </div>
-          </div>
+<!-- privacy policy link -->
+<div class="privacy" style="margin-top:10px;">
+  <a href="https://example.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+</div>
 
-          <!-- privacy policy link replaces the old tip -->
-          <div class="privacy">
-            <a href="https://example.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
-          </div>
-        </div>
       </section>
 
       <aside class="sidebar">
