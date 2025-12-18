@@ -20,5 +20,8 @@ obstacles: true,
 resources: true,
 newStory: true,
 snapshot: "2–3 lines"
-}
+},
+  buildPrompt({ input, messages }) {
+    return this.prompt({ userInput: input });
+  }
 };
