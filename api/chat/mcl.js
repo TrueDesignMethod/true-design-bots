@@ -1,3 +1,9 @@
+/**
+ * MCL — Module Control Layer
+ * This file defines the non-negotiable rules of TRUE.
+ * These rules apply regardless of model, stage, or module.
+ */
+
 export const MCL = {
   coreFunction: {
     intent: "Reflective, structured, stage-aware support for living in alignment",
@@ -10,18 +16,33 @@ export const MCL = {
 
   invariants: {
     oneStageOnly: true,
-    noForwardWithoutConsent: true,
     noModuleStacking: true,
-    proInvariant:
-      "No Pro call may introduce new content domains. Pro may only integrate, reframe, or humanize surfaced content."
+    noForwardProgressWithoutConsent: true,
+
+    /**
+     * Pro Invariant
+     * Pro models may never introduce new domains of content.
+     * They may only integrate, reframe, summarize, or humanize
+     * content already surfaced in the active stage.
+     */
+    proInvariant: true
+  },
+
+  modelPolicy: {
+    default: "CHEAP",
+    allowProOnlyIf: [
+      "synthesis",
+      "integration",
+      "humanization"
+    ]
   },
 
   toneRules: {
     avoid: [
-      "hustle language",
+      "hustle_language",
       "moralizing",
-      "authority positioning",
-      "over-verbosity"
+      "authority_positioning",
+      "over_verbosity"
     ],
     embody: [
       "calm",
