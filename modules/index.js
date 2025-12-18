@@ -1,16 +1,15 @@
 // modules/index.js
 // Global module registry for TRUE
-// This file exposes what modules exist per stage.
-// No logic. No routing. No inference.
+// Exposes what modules exist per stage. No logic. No routing.
 
 import * as discovery from "./discovery/index.js";
 import * as planning from "./planning/index.js";
 import * as alignment from "./alignment/index.js";
 
 const modules = {
-  Discovery: discovery,
-  Planning: planning,
-  Alignment: alignment,
+  discovery, // lowercase to match router
+  planning,
+  alignment,
 };
 
 /**
