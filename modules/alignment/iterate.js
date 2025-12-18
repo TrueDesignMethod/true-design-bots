@@ -10,4 +10,8 @@ Remove shame from change.
 
 
 User input:\n"${userInput}"`
+},
+  buildPrompt({ input, messages }) {
+    return this.prompt({ userInput: input });
+  }
 };
