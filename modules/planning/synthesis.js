@@ -10,4 +10,8 @@ Do not advance into Alignment unless invited.
 
 
 Context:\n${context}`
+},
+  buildPrompt({ input, messages }) {
+    return this.prompt({ userInput: input });
+  }
 };
