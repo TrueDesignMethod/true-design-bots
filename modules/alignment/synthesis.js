@@ -10,4 +10,8 @@ Do not introduce new goals unless asked.
 
 
 Context:\n${context}`
+},
+  buildPrompt({ input, messages }) {
+    return this.prompt({ userInput: input });
+  }
 };
