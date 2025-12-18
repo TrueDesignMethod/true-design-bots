@@ -252,4 +252,3 @@ Not because it is powerful —
 But because it **knows what it refuses to do**.
 
 That restraint is the system.
-# true-design-bots
