@@ -7,7 +7,7 @@ import * as planning from "./planning/index.js";
 import * as alignment from "./alignment/index.js";
 
 const modules = {
-  discovery, // lowercase to match router
+  discovery,
   planning,
   alignment,
 };
