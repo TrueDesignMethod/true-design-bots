@@ -1,25 +1,55 @@
-import discovery from './discovery/index.js';
-import planning from './planning/index.js';
-import alignment from './alignment/index.js';
+// modules/index.js
+// Central module registry + router for TRUE
+// The client never selects modules — only stage + messages.
+// Meaning is inferred here.
 
+import discoveryModules from "./discovery/index.js";
+import planningModules from "./planning/index.js";
+import alignmentModules from "./alignment/index.js";
 
-// Extremely cheap routing heuristic
-export function routeToModule(message, state = {}) {
-const text = message.toLowerCase();
-
-
-// Discovery triggers
-if (!state.stage || state.stage === 'discovery') {
-return discovery.route(text, state);
+/**
+ * Resolve which module set is active based on stage.
+ */
+function getModulesForStage(stage) {
+  switch (stage) {
+    case "Discovery":
+      return discoveryModules;
+    case "Planning":
+      return planningModules;
+    case "Alignment":
+      return alignmentModules;
+    default:
+      return discoveryModules;
+  }
 }
 
+/**
+ * Very lightweight heuristic router.
+ * This is NOT a rigid classifier — just a gentle guide.
+ * You can later replace or enhance this with embeddings.
+ */
+function selectModule(modules, messages) {
+  const lastUserMessage = [...messages]
+    .reverse()
+    .find(m => m.role === "user")?.content?.toLowerCase() || "";
 
-// Planning triggers
-if (state.stage === 'planning') {
-return planning.route(text, state);
+  // Let modules self-declare relevance
+  for (const mod of modules) {
+    if (mod.match(lastUserMessage, messages)) {
+      return mod;
+    }
+  }
+
+  // Fallback: first module is always a safe reflective default
+  return modules[0];
 }
 
+/**
+ * Main entry point used by chat/index.js
+ */
+export async function runModule({ stage, messages, llm }) {
+  const modules = getModulesForStage(stage);
+  const module = selectModule(modules, messages);
 
-// Alignment triggers
-return alignment.route(text, state);
+  return module.run({ stage, messages, llm });
 }
