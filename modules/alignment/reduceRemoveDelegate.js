@@ -10,4 +10,8 @@ Avoid moral pressure.
 
 
 User input:\n"${userInput}"`
+},
+  buildPrompt({ input, messages }) {
+    return this.prompt({ userInput: input });
+  }
 };
