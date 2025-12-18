@@ -244,6 +244,28 @@ If not, it does not belong.
 
 ---
 
+Environmental & Ethical Design Notes
+
+TRUE is intentionally designed to minimize extractive or runaway use of generative systems.
+
+Key design choices support this:
+
+Bounded generation: All language generation is constrained by stage, module, and invariant rules. There is no infinite or novelty-driven output.
+
+Seasonal usage, not continuous engagement: TRUE encourages completion, synthesis, and exit — not prolonged interaction.
+
+Low-output bias: Clarity and integration are prioritized over volume. More text is not treated as more value.
+
+No behavioral optimization loops: TRUE does not predict, nudge, rank, or optimize user behavior for engagement.
+
+Human agency preserved: Meaning, decisions, and action always remain with the user, reducing dependency and repeated querying.
+
+TRUE treats computational resources as something to be used carefully and proportionally, in service of human understanding — not consumption.
+
+This makes TRUE closer to a decision-support and sense-making system than a conventional generative AI product.
+
+---
+
 ## Final Statement
 
 TRUE is designed to be trusted.
