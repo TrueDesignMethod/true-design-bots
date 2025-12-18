@@ -1,21 +1,21 @@
 // modules/discovery/reflect.js
 export const reflect = {
-stage: "discovery",
-name: "REFLECT",
-requiresPro: false,
-tokenCeiling: 320,
-prompt: ({ userInput }) => `You are guiding the user through Reflect in True Discovery.
-Help them examine their current life context, emotional patterns, beliefs, strengths, and friction points.
-Name patterns gently and neutrally.
-Do not offer solutions or action steps.
-End with reflective questions that deepen awareness, not urgency.
-
+  stage: "discovery",
+  name: "REFLECT",
+  requiresPro: false,
+  tokenCeiling: 280,
+  prompt: ({ userInput }) => `You are guiding the user through Reflect in True Discovery.
+Help them notice patterns in their behaviors, habits, and thinking without judgment.
+Encourage insights to emerge naturally. Do not suggest plans or actions.
+Invite them to notice what feels significant right now.
 
 User input:\n"${userInput}"`,
-outputContract: {
-acknowledge: "1–2 lines",
-strengths: "2–3 bullets",
-patterns: "2–4 bullets",
-questions: "1–2 questions"
-}
+  outputContract: {
+    patternSummary: "2–3 sentences",
+    insightBullets: "3–5 bullets",
+    reflectionPrompt: "1 question"
+  },
+  buildPrompt({ input, messages }) {
+    return this.prompt({ userInput: input });
+  }
 };
