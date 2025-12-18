@@ -1,13 +1,19 @@
 // modules/planning/plan7.js
 export const plan7 = {
-stage: "planning",
-name: "PLAN_7_DAY",
-requiresPro: true,
-tokenCeiling: 340,
-prompt: ({ userInput }) => `Create a 7-day action plan that includes exactly:
-3 actions, 1 habit, 1 obstacle strategy, and 1 reflection question.
-Keep it realistic and supportive.
+  stage: "planning",
+  name: "PLAN_7",
+  requiresPro: false,
+  tokenCeiling: 300,
+  prompt: ({ userInput }) => `Guide the user to reflect on the next 7 days.
+Identify gentle, bounded actions that feel aligned, without enforcing strict schedules.
+Support clarity and choice.
 
-
-User input:\n"${userInput}"`
+User input:\n"${userInput}"`,
+  outputContract: {
+    actions: "3–5 items",
+    notes: "1–2 sentences"
+  },
+  buildPrompt({ input, messages }) {
+    return this.prompt({ userInput: input });
+  }
 };
