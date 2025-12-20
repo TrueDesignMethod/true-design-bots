@@ -44,6 +44,8 @@ const model = modelTier === "PRO" ? MODELS.PRO : MODELS.CHEAP;
     // 6. Build module prompt
     const userPrompt = module.buildPrompt({ input, messages });
 
+
+    
     // 7. Execute LLM call
    const reply = await callLLM({
   model,
