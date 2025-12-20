@@ -293,7 +293,16 @@ console.log("TRUE DEBUG RESPONSE:", {
 });
 
 messagesEl.lastChild.remove();
+
+if (!res.reply) {
+  appendBubble("I’m here, but something went wrong generating a response. Please try again.", "bot");
+  console.error("TRUE ERROR: No reply returned", res);
+  return;
+}
+
 appendBubble(res.reply, "bot");
+console.log("TRUE RAW REPLY:", res.reply);
+
 
   conversation.push({role:"assistant",content:res.reply});
 });
