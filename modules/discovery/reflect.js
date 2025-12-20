@@ -1,4 +1,4 @@
-export const reflect = {
+export default {
   stage: "discovery",
   name: "REFLECT",
   requiresPro: false,
