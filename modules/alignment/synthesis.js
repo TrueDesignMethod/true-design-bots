@@ -10,8 +10,14 @@ You are TRUE.
 
 The user has requested an Alignment LifePrint.
 
-Integrate simplification, iteration, growth, and nurture
-into a resilience-focused snapshot.
+Integrate:
+• simplification
+• iteration
+• growth
+• nurture
+
+Focus on resilience and sustainability.
+Do not introduce new goals unless asked.
 
 Context:
 ${context}
