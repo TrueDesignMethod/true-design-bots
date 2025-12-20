@@ -1,4 +1,4 @@
-export const synthesis = {
+export default {
   stage: "discovery",
   name: "DISCOVERY_SYNTHESIS",
   requiresPro: true,
