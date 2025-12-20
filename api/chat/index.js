@@ -34,8 +34,13 @@ async function handlePost(req, res) {
     // 1. Determine stage (server authority)
     const stage = detectStage({ input, explicitStage });
 
-    // 2. Detect intent if not explicitly set
-    const resolvedIntent = intent || detectIntent(input);
+    // 2. Detect intent (never allow undefined in Discovery)
+let resolvedIntent = intent || detectIntent(input);
+
+if (!resolvedIntent && stage === "discovery") {
+  resolvedIntent = "values"; // Discovery should start with Target, not Reflect
+}
+
 
     // 3. Select module
     const module = selectModule(stage, resolvedIntent);
