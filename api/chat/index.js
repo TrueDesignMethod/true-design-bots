@@ -38,14 +38,19 @@ async function handlePost(req, res) {
     }
 
     // 5. Decide model
-    const modelTier = decideModel(module.meta);
-    const model = modelTier === "PRO" ? MODELS.PRO : MODELS.CHEAP;
+const modelTier = decideModel(module);
+const model = modelTier === "PRO" ? MODELS.PRO : MODELS.CHEAP;
 
     // 6. Build module prompt
     const userPrompt = module.buildPrompt({ input, messages });
 
     // 7. Execute LLM call
-    const reply = await callLLM({ model, userPrompt, maxTokens: module.meta.tokenCeiling });
+   const reply = await callLLM({
+  model,
+  userPrompt,
+  maxTokens: module.tokenCeiling
+});
+
 
     return res.json({
       stage,
