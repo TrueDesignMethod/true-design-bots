@@ -8,10 +8,22 @@ const cors = MicroCors();
 async function handlePost(req, res) {
   try {
     const body = req.body || await new Promise(resolve => {
-      let data = "";
-      req.on("data", chunk => (data += chunk));
-      req.on("end", () => resolve(JSON.parse(data || "{}")));
-    });
+  let data = "";
+
+  req.on("data", chunk => {
+    data += chunk;
+  });
+
+  req.on("end", () => {
+    try {
+      resolve(JSON.parse(data || "{}"));
+    } catch (err) {
+      console.error("JSON parse error:", err);
+      resolve({});
+    }
+  });
+});
+
 
     const { input = "", messages = [], explicitStage = null, intent = null } = body;
 
