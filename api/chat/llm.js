@@ -1,52 +1,30 @@
-// api/chat/llm.js
-
 import fetch from "node-fetch";
 import fs from "fs";
 import path from "path";
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
-// Load canonical system prompt once
 const SYSTEM_PROMPT = fs.readFileSync(
   path.resolve("prompts/system.txt"),
   "utf8"
 );
 
-// Model registry
 export const MODELS = {
   CHEAP: "gpt-3.5-turbo",
-  PRO: "gpt-3.5-turbo"
+  PRO: "gpt-3.5-turbo" // can use GPT-4 if available for PRO
 };
 
-/**
- * callLLM
- * Executes a single bounded generation using the Responses API.
- */
-export async function callLLM({
-  model = MODELS.CHEAP,
-  userPrompt,
-  maxTokens
-}) {
+export async function callLLM({ model = MODELS.CHEAP, userPrompt, maxTokens = 300 }) {
   const body = {
     model,
-    input: [
-      {
-        role: "system",
-        content: [
-          { type: "input_text", text: SYSTEM_PROMPT }
-        ]
-      },
-      {
-        role: "user",
-        content: [
-          { type: "input_text", text: userPrompt }
-        ]
-      }
+    messages: [
+      { role: "system", content: SYSTEM_PROMPT },
+      { role: "user", content: userPrompt }
     ],
-    max_output_tokens: maxTokens
+    max_tokens: maxTokens
   };
 
-  const res = await fetch("https://api.openai.com/v1/responses", {
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -56,17 +34,13 @@ export async function callLLM({
   });
 
   const data = await res.json();
-
   console.log("LLM RAW RESPONSE:", JSON.stringify(data, null, 2));
 
   if (!res.ok) {
     throw new Error(data.error?.message || "LLM call failed");
   }
 
-  // Correct Responses API extraction
-  if (data.output_text) {
-    return data.output_text;
-  }
+  if (data.choices?.[0]?.message?.content) return data.choices[0].message.content;
 
   throw new Error("LLM returned no usable output");
 }
