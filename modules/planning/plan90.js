@@ -1,4 +1,4 @@
-export const plan90 = {
+export default {
   stage: "planning",
   name: "PLAN_90",
   requiresPro: false,
