@@ -1,4 +1,4 @@
-export const reduceRemoveDelegate = {
+export default {
   stage: "alignment",
   name: "REDUCE_REMOVE_DELEGATE",
   requiresPro: false,
