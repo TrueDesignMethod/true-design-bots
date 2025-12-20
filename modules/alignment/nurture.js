@@ -1,4 +1,4 @@
-export const nurture = {
+export default {
   stage: "alignment",
   name: "NURTURE",
   requiresPro: false,
