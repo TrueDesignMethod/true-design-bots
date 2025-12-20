@@ -6,14 +6,18 @@ import { MCL } from "./mcl.js";
  * Stage detection is conservative. Defaults to Discovery.
  */
 export function detectStage({ input, explicitStage }) {
-  if (explicitStage === "planning") return "planning";
-  if (explicitStage === "alignment") return "alignment";
+  const stage = explicitStage?.toLowerCase();
+
+  if (stage === "planning") return "planning";
+  if (stage === "alignment") return "alignment";
+  if (stage === "discovery") return "discovery";
 
   if (/plan|steps|execute|next/i.test(input)) return "planning";
   if (/burnout|sustain|simplify|tired|overloaded/i.test(input)) return "alignment";
 
   return "discovery";
 }
+
 
 /**
  * detectIntent
