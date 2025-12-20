@@ -28,8 +28,14 @@ async function apiPost(body) {
  * @returns {Promise<{ reply: string }>}
  */
 export async function sendMessage(stage, conversation = []) {
+  const lastUserMessage = [...conversation]
+    .reverse()
+    .find(m => m.role === "user");
+
   return apiPost({
-    stage,
+    input: lastUserMessage?.content || "",
     messages: conversation,
+    explicitStage: stage.toLowerCase()
   });
 }
+
