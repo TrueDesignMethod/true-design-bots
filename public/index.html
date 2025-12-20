@@ -283,9 +283,18 @@ document.getElementById("send-btn").addEventListener("click",async()=>{
   conversation.push({role:"user",content:text});
 
   appendBubble("Reflecting…","bot");
-  const res=await sendMessage(currentStage,conversation);
-  messagesEl.lastChild.remove();
-  appendBubble(res.reply,"bot");
+  const res = await sendMessage(currentStage, conversation);
+
+// 🔍 DEBUG: See routing decisions
+console.log("TRUE DEBUG RESPONSE:", {
+  stage: res.stage,
+  intent: res.intent,
+  module: res.module
+});
+
+messagesEl.lastChild.remove();
+appendBubble(res.reply, "bot");
+
   conversation.push({role:"assistant",content:res.reply});
 });
 
