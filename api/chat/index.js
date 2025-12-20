@@ -55,11 +55,12 @@ const model = modelTier === "PRO" ? MODELS.PRO : MODELS.CHEAP;
 
 
     return res.json({
-      stage,
-      module: module.meta.name,
-      intent: resolvedIntent,
-      reply
-    });
+  stage,
+  module: module.name,
+  intent: resolvedIntent,
+  reply
+});
+
 
   } catch (err) {
     console.error("TRUE chat error:", err);
