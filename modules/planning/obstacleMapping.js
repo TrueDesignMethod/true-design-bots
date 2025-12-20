@@ -1,4 +1,4 @@
-export const obstacleMapping = {
+export default {
   stage: "planning",
   name: "OBSTACLE_MAPPING",
   requiresPro: false,
