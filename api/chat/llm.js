@@ -14,8 +14,8 @@ const SYSTEM_PROMPT = fs.readFileSync(
 
 // Model registry
 export const MODELS = {
-  CHEAP: "gpt-5-mini",
-  PRO: "gpt-5"
+  CHEAP: "gpt-3.5-turbo",
+  PRO: "gpt-3.5-turbo"
 };
 
 /**
