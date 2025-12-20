@@ -1,4 +1,4 @@
-export const simplify = {
+export default {
   stage: "alignment",
   name: "SIMPLIFY",
   requiresPro: false,
