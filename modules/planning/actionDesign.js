@@ -1,4 +1,4 @@
-export const actionDesign = {
+export default {
   stage: "planning",
   name: "ACTION_DESIGN",
   requiresPro: false,
