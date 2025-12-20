@@ -1,4 +1,6 @@
-export const target = {
+// modules/discovery/target.js
+
+export default {
   stage: "discovery",
   name: "TARGET",
   requiresPro: false,
