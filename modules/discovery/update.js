@@ -15,7 +15,11 @@ User input:\n"${userInput}"`,
     insightSummary: "1–2 sentences",
     reflectionQuestion: "1 question"
   },
-  buildPrompt({ input, messages }) {
-    return this.prompt({ userInput: input });
-  }
-};
+ buildPrompt({ input, messages }) {
+  return `
+User said:
+"${input}"
+
+Respond according to this module's purpose.
+`;
+}
