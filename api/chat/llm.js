@@ -50,5 +50,15 @@ export async function callLLM({
     throw new Error(data.error?.message || "LLM call failed");
   }
 
+ // GPT-5 compatible response extraction
+if (data.output_text) {
+  return data.output_text;
+}
+
+if (data.choices?.[0]?.message?.content) {
   return data.choices[0].message.content;
+}
+
+throw new Error("LLM returned no usable output");
+
 }
