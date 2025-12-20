@@ -1,4 +1,4 @@
-export const goalPrioritization = {
+export default {
   stage: "planning",
   name: "GOAL_PRIORITIZATION",
   requiresPro: false,
