@@ -28,14 +28,13 @@ async function apiPost(body) {
  * @returns {Promise<{ reply: string }>}
  */
 export async function sendMessage(stage, conversation = []) {
-  const lastUserMessage = [...conversation]
-    .reverse()
-    .find(m => m.role === "user");
+  const lastUser = conversation[conversation.length - 1];
 
   return apiPost({
-    input: lastUserMessage?.content || "",
+    input: lastUser?.content || "",
     messages: conversation,
     explicitStage: stage.toLowerCase()
   });
 }
+
 
