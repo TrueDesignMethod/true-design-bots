@@ -82,10 +82,7 @@ export function selectModule(stage, intent) {
  * Defaults to CHEAP; Pro only for synthesis/integration.
  */
 export function decideModel(module) {
-  if (
-    module.type === "synthesis" &&
-    MCL.modelPolicy.allowProOnlyIf.includes("synthesis")
-  ) return "PRO";
-
+  if (module.requiresPro === true) return "PRO";
   return "CHEAP";
 }
+
