@@ -17,6 +17,10 @@ User input:\n"${userInput}"`,
     resonanceQuestion: "1 question"
   },
   buildPrompt({ input, messages }) {
-    return this.prompt({ userInput: input });
-  }
-};
+  return `
+User said:
+"${input}"
+
+Respond according to this module's purpose.
+`;
+}
