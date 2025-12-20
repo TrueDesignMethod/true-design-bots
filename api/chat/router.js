@@ -49,11 +49,14 @@ export function selectModule(stage, intent) {
   if (!stageModules) throw new Error(`Unknown stage: ${stage}`);
 
  if (stage === "discovery") {
-  if (!intent) return stageModules.target; // DEFAULT TO TARGET, NOT REFLECT
   if (intent === "values") return stageModules.target;
   if (intent === "patterns") return stageModules.reflect;
   if (intent === "reframe") return stageModules.update;
-  }
+
+  // Safe default for Discovery
+  return stageModules.target;
+}
+
 
   if (stage === "planning") {
     if (intent === "prioritize") return stageModules.goalPrioritization;
