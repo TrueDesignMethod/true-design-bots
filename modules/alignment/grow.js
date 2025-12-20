@@ -1,4 +1,4 @@
-export const grow = {
+export default {
   stage: "alignment",
   name: "GROW",
   requiresPro: false,
