@@ -44,10 +44,17 @@ async function handlePost(req, res) {
       throw new Error(`No module resolved for stage "${stage}"`);
     }
 
-    // 4. Enforce MCL invariants
-    if (MCL.invariants.oneStageOnly && module.stage !== stage) {
-      throw new Error("Stage violation detected.");
-    }
+   // 4. Enforce MCL invariants (defensive)
+if (
+  MCL.invariants.oneStageOnly &&
+  module.stage &&
+  module.stage !== stage
+) {
+  throw new Error(
+    `Stage violation: resolved module "${module.name}" belongs to "${module.stage}" but stage is "${stage}"`
+  );
+}
+
 
     // 5. Decide model
 const modelTier = decideModel(module);
