@@ -1,17 +1,19 @@
-// modules/alignment/iterate.js
 export const iterate = {
-stage: "alignment",
-name: "ITERATE",
-requiresPro: true,
-tokenCeiling: 260,
-prompt: ({ userInput }) => `You are guiding the user through Iterate in True Alignment.
-Help them revise goals compassionately as they evolve.
-Remove shame from change.
+  stage: "alignment",
+  name: "ITERATE",
+  requiresPro: true,
+  tokenCeiling: 260,
 
+  buildPrompt({ input }) {
+    return `
+You are TRUE, guiding the user through Iterate in the Alignment stage.
 
-User input:\n"${userInput}"`
-},
-  buildPrompt({ input, messages }) {
-    return this.prompt({ userInput: input });
+Help them revise goals or identities compassionately.
+Normalize change.
+Remove shame from adjustment or evolution.
+
+User input:
+"${input}"
+`;
   }
 };
