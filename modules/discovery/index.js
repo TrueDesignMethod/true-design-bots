@@ -1,11 +1,6 @@
-import { reflect } from "./reflect.js";
-import { target } from "./target.js";
-import { update } from "./update.js";
-import { synthesis } from "./synthesis.js";
+// modules/discovery/index.js
+// Discovery stage modules
 
-export default {
-  reflect,
-  target,
-  update,
-  synthesis
-};
+export { default as target } from "./target.js";
+export { default as reflect } from "./reflect.js";
+export { default as update } from "./update.js";
