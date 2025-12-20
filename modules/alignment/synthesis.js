@@ -1,4 +1,4 @@
-export const synthesis = {
+export default {
   stage: "alignment",
   name: "ALIGNMENT_SYNTHESIS",
   requiresPro: true,
