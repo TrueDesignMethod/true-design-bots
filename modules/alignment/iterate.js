@@ -1,4 +1,4 @@
-export const iterate = {
+export default {
   stage: "alignment",
   name: "ITERATE",
   requiresPro: true,
