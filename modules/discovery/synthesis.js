@@ -21,7 +21,11 @@ resources: true,
 newStory: true,
 snapshot: "2–3 lines"
 },
-  buildPrompt({ input, messages }) {
-    return this.prompt({ userInput: input });
-  }
-};
+ buildPrompt({ input, messages }) {
+  return `
+User said:
+"${input}"
+
+Respond according to this module's purpose.
+`;
+}
