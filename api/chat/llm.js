@@ -46,6 +46,9 @@ export async function callLLM({
 
   const data = await res.json();
 
+  console.log("LLM RAW RESPONSE:", JSON.stringify(data, null, 2));
+
+
   if (!res.ok) {
     throw new Error(data.error?.message || "LLM call failed");
   }
