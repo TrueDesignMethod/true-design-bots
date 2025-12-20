@@ -1,4 +1,4 @@
-export const update = {
+export default {
   stage: "discovery",
   name: "UPDATE",
   requiresPro: false,
