@@ -68,5 +68,5 @@ export async function callLLM({
     return data.output_text;
   }
 
-  throw new Error("LLM returned no output_text");
+  throw new Error("LLM returned no usable output");
 }
