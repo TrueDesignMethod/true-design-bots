@@ -1,7 +1,12 @@
 // api/chat/index.js
 
 import MicroCors from "micro-cors";
-import { detectStage, detectIntent, selectModule, decideModel } from "./router.js";
+import {
+  detectStage,
+  detectIntent,
+  selectModule,
+  decideModel
+} from "./router.js";
 import { callLLM, MODELS } from "./llm.js";
 import { MCL } from "./mcl.js";
 
@@ -10,28 +15,41 @@ const cors = MicroCors();
 async function handlePost(req, res) {
   try {
     // Parse JSON body
-    const body = req.body || await new Promise(resolve => {
-      let data = "";
-      req.on("data", chunk => { data += chunk; });
-      req.on("end", () => {
-        try { resolve(JSON.parse(data || "{}")); }
-        catch (err) { console.error("JSON parse error:", err); resolve({}); }
-      });
-    });
+    const body =
+      req.body ||
+      (await new Promise(resolve => {
+        let data = "";
+        req.on("data", chunk => {
+          data += chunk;
+        });
+        req.on("end", () => {
+          try {
+            resolve(JSON.parse(data || "{}"));
+          } catch (err) {
+            console.error("JSON parse error:", err);
+            resolve({});
+          }
+        });
+      }));
 
-    const { input = "", messages = [], explicitStage = null, intent = null } = body;
+    const {
+      input = "",
+      messages = [],
+      explicitStage = null,
+      intent = null
+    } = body;
 
     if (!input && messages.length === 0) {
       return res.status(400).json({ error: "No input provided." });
     }
 
-    // 1. Determine stage
+    // 1. Determine stage (server authority)
     const stage = detectStage({ input, explicitStage });
 
     // 2. Detect intent
     let resolvedIntent = intent || detectIntent(input);
     if (!resolvedIntent && stage === "discovery") {
-      resolvedIntent = "values"; // default for Discovery
+      resolvedIntent = "values";
     }
 
     // 3. Select module
@@ -47,41 +65,43 @@ async function handlePost(req, res) {
       );
     }
 
-    // 5. Decide model
+    // 5. Detect stage change (based on assistant history)
+    const previousStage = messages
+      .slice()
+      .reverse()
+      .find(m => m.role === "assistant" && m.stage)?.stage;
+
+    const stageChanged = Boolean(previousStage && previousStage !== stage);
+
+    // 6. Decide model tier
     const modelTier = decideModel(module);
-    const model = modelTier === "PRO" ? MODELS.PRO : MODELS.CHEAP;
+    const model =
+      modelTier === "PRO" ? MODELS.PRO : MODELS.CHEAP;
 
-    const stage = detectStage({ input, explicitStage });
+    // 7. Build prompt
+    const userPrompt = module.buildPrompt({
+      input,
+      messages,
+      stageChanged,
+      previousStage
+    });
 
-// NEW: Detect stage change
-const previousStage = messages
-  .slice()
-  .reverse()
-  .find(m => m.role === "assistant")?.stage;
-
-const stageChanged = previousStage && previousStage !== stage;
-
-    // 6. Build prompt
-   const userPrompt = module.buildPrompt({
-  input,
-  messages,
-  stageChanged,
-  previousStage
-});
-
-
-    // 7. Call GPT-3.5
+    // 8. Call LLM
     const reply = await callLLM({
       model,
       userPrompt,
       maxTokens: module.tokenCeiling
     });
 
+    // 9. Respond (include stage metadata)
     return res.json({
       stage,
       module: module.name,
       intent: resolvedIntent,
-      reply
+      reply,
+      meta: {
+        stage
+      }
     });
 
   } catch (err) {
