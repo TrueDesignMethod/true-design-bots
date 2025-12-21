@@ -1,101 +1,113 @@
+// api/chat/router.js
 
-// api/chat/index.js
+const modules = require("../../modules/index.js");
 
-import MicroCors from "micro-cors";
-import { detectStage, detectIntent, selectModule, decideModel } from "./router.js";
-import { callLLM, MODELS } from "./llm.js";
-import { MCL } from "./mcl.js";
+/**
+ * detectStage
+ */
+function detectStage({ input = "", explicitStage = null }) {
+  const text = input.toLowerCase();
 
-const cors = MicroCors();
-
-async function handlePost(req, res) {
-  try {
-    // Parse JSON body
-    const body = req.body || await new Promise(resolve => {
-      let data = "";
-      req.on("data", chunk => { data += chunk; });
-      req.on("end", () => {
-        try { resolve(JSON.parse(data || "{}")); }
-        catch (err) { console.error("JSON parse error:", err); resolve({}); }
-      });
-    });
-
-    const { input = "", messages = [], explicitStage = null, intent = null } = body;
-
-    if (!input && messages.length === 0) {
-      return res.status(400).json({ error: "No input provided." });
-    }
-
-    // 1. Determine stage
-    const stage = detectStage({ input, explicitStage });
-
-    // 2. Detect intent
-    let resolvedIntent = intent || detectIntent(input);
-    if (!resolvedIntent && stage === "discovery") {
-      resolvedIntent = "values"; // default for Discovery
-    }
-
-    // 3. Select module
-    const module = selectModule(stage, resolvedIntent);
-    if (!module) {
-      throw new Error(`No module resolved for stage "${stage}"`);
-    }
-
-    // 4. Enforce MCL invariants
-    if (MCL.invariants.oneStageOnly && module.stage && module.stage !== stage) {
-      throw new Error(
-        `Stage violation: resolved module "${module.name}" belongs to "${module.stage}" but stage is "${stage}"`
-      );
-    }
-
-    // 5. Decide model
-    const modelTier = decideModel(module);
-    const model = modelTier === "PRO" ? MODELS.PRO : MODELS.CHEAP;
-
-    const stage = detectStage({ input, explicitStage });
-
-// NEW: Detect stage change
-const previousStage = messages
-  .slice()
-  .reverse()
-  .find(m => m.role === "assistant")?.stage;
-
-const stageChanged = previousStage && previousStage !== stage;
-
-    // 6. Build prompt
-   const userPrompt = module.buildPrompt({
-  input,
-  messages,
-  stageChanged,
-  previousStage
-});
-
-
-    // 7. Call GPT-3.5
-    const reply = await callLLM({
-      model,
-      userPrompt,
-      maxTokens: module.tokenCeiling
-    });
-
-    return res.json({
-      stage,
-      module: module.name,
-      intent: resolvedIntent,
-      reply
-    });
-
-  } catch (err) {
-    console.error("TRUE chat error:", err);
-    return res.status(500).json({
-      error: "Server error",
-      message: err.message
-    });
+  if (explicitStage) {
+    return explicitStage.toLowerCase();
   }
+
+  if (
+    text.includes("plan") ||
+    text.includes("steps") ||
+    text.includes("how do i") ||
+    text.includes("what should i do") ||
+    text.includes("give me a plan")
+  ) {
+    return "planning";
+  }
+
+  if (
+    text.includes("burnt out") ||
+    text.includes("burned out") ||
+    text.includes("overwhelmed") ||
+    text.includes("can't keep up") ||
+    text.includes("too much") ||
+    text.includes("balance") ||
+    text.includes("sustainable") ||
+    text.includes("afraid i won't stick")
+  ) {
+    return "alignment";
+  }
+
+  return "discovery";
 }
 
-export default cors((req, res) => {
-  if (req.method === "POST") return handlePost(req, res);
-  res.setHeader("Allow", "POST");
-  res.status(405).end("Method Not Allowed");
-});
+/**
+ * detectIntent
+ */
+function detectIntent(input = "") {
+  const text = input.toLowerCase();
+
+  if (text.includes("important") || text.includes("why")) return "values";
+  if (text.includes("pattern") || text.includes("habit")) return "patterns";
+  if (text.includes("reframe")) return "reframe";
+
+  if (text.includes("prioritize")) return "prioritize";
+  if (text.includes("refine")) return "refine";
+  if (text.includes("7 day")) return "7day";
+  if (text.includes("30 day")) return "30day";
+  if (text.includes("90 day")) return "90day";
+
+  if (text.includes("simplify")) return "simplify";
+  if (text.includes("grow")) return "grow";
+  if (text.includes("nurture")) return "nurture";
+
+  return null;
+}
+
+/**
+ * selectModule
+ */
+function selectModule(stage, intent) {
+  const stageModules = modules[stage];
+
+  if (!stageModules) {
+    throw new Error(`Unknown stage "${stage}"`);
+  }
+
+  if (stage === "discovery") {
+    if (intent === "values") return stageModules.target;
+    if (intent === "patterns") return stageModules.reflect;
+    if (intent === "reframe") return stageModules.update;
+    return stageModules.target;
+  }
+
+  if (stage === "planning") {
+    if (intent === "prioritize") return stageModules.goalPrioritization;
+    if (intent === "refine") return stageModules.goalRefinement;
+    if (intent === "7day") return stageModules.plan7;
+    if (intent === "30day") return stageModules.plan30;
+    if (intent === "90day") return stageModules.plan90;
+    return stageModules.goalPrioritization;
+  }
+
+  if (stage === "alignment") {
+    if (intent === "simplify") return stageModules.simplify;
+    if (intent === "grow") return stageModules.grow;
+    if (intent === "nurture") return stageModules.nurture;
+    return stageModules.simplify;
+  }
+
+  throw new Error(`Unhandled stage "${stage}"`);
+}
+
+/**
+ * decideModel
+ */
+function decideModel(module) {
+  if (module?.requiresPro === true) return "PRO";
+  return "CHEAP";
+}
+
+module.exports = {
+  detectStage,
+  detectIntent,
+  selectModule,
+  decideModel
+};
