@@ -1,126 +1,101 @@
-// api/chat/router.js
 
-import modules from "../../modules/index.js";
+// api/chat/index.js
+
+import MicroCors from "micro-cors";
+import { detectStage, detectIntent, selectModule, decideModel } from "./router.js";
+import { callLLM, MODELS } from "./llm.js";
 import { MCL } from "./mcl.js";
 
-/**
- * detectStage
- * Stage detection is conservative. Defaults to discovery.
- */
-export function detectStage({ input = "", explicitStage }) {
-  const stage = explicitStage?.toLowerCase();
+const cors = MicroCors();
 
-  if (stage === "planning") return "planning";
-  if (stage === "alignment") return "alignment";
-  if (stage === "discovery") return "discovery";
+async function handlePost(req, res) {
+  try {
+    // Parse JSON body
+    const body = req.body || await new Promise(resolve => {
+      let data = "";
+      req.on("data", chunk => { data += chunk; });
+      req.on("end", () => {
+        try { resolve(JSON.parse(data || "{}")); }
+        catch (err) { console.error("JSON parse error:", err); resolve({}); }
+      });
+    });
 
-  if (/plan|steps|execute|next/i.test(input)) return "planning";
-  if (/burnout|sustain|simplify|tired|overloaded/i.test(input)) return "alignment";
+    const { input = "", messages = [], explicitStage = null, intent = null } = body;
 
-  return "discovery";
-}
-// router.js
+    if (!input && messages.length === 0) {
+      return res.status(400).json({ error: "No input provided." });
+    }
 
-export function detectStage({ input, explicitStage }) {
-  const text = input.toLowerCase();
+    // 1. Determine stage
+    const stage = detectStage({ input, explicitStage });
 
-  // 1. Explicit stage override (if you keep this)
-  if (explicitStage) return explicitStage;
+    // 2. Detect intent
+    let resolvedIntent = intent || detectIntent(input);
+    if (!resolvedIntent && stage === "discovery") {
+      resolvedIntent = "values"; // default for Discovery
+    }
 
-  // 2. PLANNING OVERRIDE — no resistance
-  if (
-    text.includes("plan") ||
-    text.includes("steps") ||
-    text.includes("how do i") ||
-    text.includes("what should i do") ||
-    text.includes("give me a plan")
-  ) {
-    return "Planning";
+    // 3. Select module
+    const module = selectModule(stage, resolvedIntent);
+    if (!module) {
+      throw new Error(`No module resolved for stage "${stage}"`);
+    }
+
+    // 4. Enforce MCL invariants
+    if (MCL.invariants.oneStageOnly && module.stage && module.stage !== stage) {
+      throw new Error(
+        `Stage violation: resolved module "${module.name}" belongs to "${module.stage}" but stage is "${stage}"`
+      );
+    }
+
+    // 5. Decide model
+    const modelTier = decideModel(module);
+    const model = modelTier === "PRO" ? MODELS.PRO : MODELS.CHEAP;
+
+    const stage = detectStage({ input, explicitStage });
+
+// NEW: Detect stage change
+const previousStage = messages
+  .slice()
+  .reverse()
+  .find(m => m.role === "assistant")?.stage;
+
+const stageChanged = previousStage && previousStage !== stage;
+
+    // 6. Build prompt
+   const userPrompt = module.buildPrompt({
+  input,
+  messages,
+  stageChanged,
+  previousStage
+});
+
+
+    // 7. Call GPT-3.5
+    const reply = await callLLM({
+      model,
+      userPrompt,
+      maxTokens: module.tokenCeiling
+    });
+
+    return res.json({
+      stage,
+      module: module.name,
+      intent: resolvedIntent,
+      reply
+    });
+
+  } catch (err) {
+    console.error("TRUE chat error:", err);
+    return res.status(500).json({
+      error: "Server error",
+      message: err.message
+    });
   }
-
-  // 3. ALIGNMENT OVERRIDE — sustainability signals
-  if (
-    text.includes("burnt out") ||
-    text.includes("overwhelmed") ||
-    text.includes("can’t keep up") ||
-    text.includes("too much") ||
-    text.includes("balance") ||
-    text.includes("sustainable") ||
-    text.includes("afraid i won’t stick")
-  ) {
-    return "Alignment";
-  }
-
-  // 4. Default behavior
-  return "Discovery";
-}
-
-/**
- * detectIntent
- * Keyword-based intent detection.
- */
-export function detectIntent(input = "") {
-  if (/value|important|meaning|desire|motivation/i.test(input)) return "values";
-  if (/pattern|habit|routine|behavior/i.test(input)) return "patterns";
-  if (/reframe|perspective|update/i.test(input)) return "reframe";
-
-  if (/prioritize/i.test(input)) return "prioritize";
-  if (/refine/i.test(input)) return "refine";
-  if (/7 ?day/i.test(input)) return "7day";
-  if (/30 ?day/i.test(input)) return "30day";
-  if (/90 ?day/i.test(input)) return "90day";
-
-  if (/simplify/i.test(input)) return "simplify";
-  if (/grow/i.test(input)) return "grow";
-  if (/nurture/i.test(input)) return "nurture";
-
-  return null;
-}
-
-/**
- * selectModule
- * Deterministic stage + intent → module resolution
- */
-export function selectModule(stage, intent) {
-  const stageModules = modules[stage];
-
-  if (!stageModules) {
-    throw new Error(
-      `Unknown stage "${stage}". Available stages: ${Object.keys(modules).join(", ")}`
-    );
-  }
-
-  if (stage === "discovery") {
-    if (intent === "values") return stageModules.target;
-    if (intent === "patterns") return stageModules.reflect;
-    if (intent === "reframe") return stageModules.update;
-    return stageModules.target; // safe default
-  }
-
-  if (stage === "planning") {
-    if (intent === "prioritize") return stageModules.goalPrioritization;
-    if (intent === "refine") return stageModules.goalRefinement;
-    if (intent === "7day") return stageModules.plan7;
-    if (intent === "30day") return stageModules.plan30;
-    if (intent === "90day") return stageModules.plan90;
-    return stageModules.goalPrioritization;
-  }
-
-  if (stage === "alignment") {
-    if (intent === "simplify") return stageModules.simplify;
-    if (intent === "grow") return stageModules.grow;
-    if (intent === "nurture") return stageModules.nurture;
-    return stageModules.simplify;
-  }
-
-  throw new Error(`Unhandled stage "${stage}"`);
 }
 
-/**
- * decideModel
- * Defaults to CHEAP; PRO only when explicitly required
- */
-export function decideModel(module) {
-  if (module?.requiresPro === true) return "PRO";
-  return "CHEAP";
-}
+export default cors((req, res) => {
+  if (req.method === "POST") return handlePost(req, res);
+  res.setHeader("Allow", "POST");
+  res.status(405).end("Method Not Allowed");
+});
