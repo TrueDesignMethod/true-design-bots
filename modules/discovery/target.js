@@ -47,6 +47,9 @@ EXAMPLE VALUES:
 - Curiosity
 - Meaning
 
+Reflection should feel human and varied.
+Do not begin consecutive replies with reflective phrases.
+
 FORMAT STRICTLY AS FOLLOWS:
 
 – Use short paragraphs (1–2 sentences max per paragraph).
