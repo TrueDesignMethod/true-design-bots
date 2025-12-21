@@ -48,6 +48,15 @@ End with good transition questions:
 • “Would you like to take a small step with this next?”
 • “Would it feel helpful to look at how this connects to what you want next?”
 
+FORMAT STRICTLY AS FOLLOWS:
+– Use short paragraphs (1–2 sentences max per paragraph).
+– Do NOT use numbered lists.
+– Avoid long bullet lists.
+– Each paragraph should express a single idea.
+– Use natural line breaks to create visual breathing room.
+– Write for quick reading and short attention spans.
+– Depth should come from clarity, not length.
+
 Context:
 ${context}
 `;
