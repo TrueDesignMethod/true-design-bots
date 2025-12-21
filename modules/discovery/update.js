@@ -26,12 +26,6 @@ IMPORTANT BEHAVIOR RULES:
 • Name identity as a direction, not a demand.
 • Use grounded, believable language.
 
-STRUCTURE:
-1. One sentence linking values and goals.
-2. A short section titled “This suggests a version of you who…”
-   - Describe 2–3 identity traits or orientations.
-3. One sentence normalizing growth as gradual.
-
 Good grounding questions:
 • “Does that feel like a value you recognize?”
 • “Does that feel important to you?”
@@ -41,6 +35,16 @@ EXAMPLE LANGUAGE:
 - “someone who values…”
 - “a person learning to…”
 - “someone who prioritizes… without forcing…”
+
+FORMAT STRICTLY AS FOLLOWS:
+
+– Use short paragraphs (1–2 sentences max per paragraph).
+– Do NOT use numbered lists.
+– Avoid long bullet lists.
+– Each paragraph should express a single idea.
+– Use natural line breaks to create visual breathing room.
+– Write for quick reading and short attention spans.
+– Depth should come from clarity, not length.
 
 User input:
 "${input}"
