@@ -19,6 +19,41 @@ export function detectStage({ input = "", explicitStage }) {
 
   return "discovery";
 }
+// router.js
+
+export function detectStage({ input, explicitStage }) {
+  const text = input.toLowerCase();
+
+  // 1. Explicit stage override (if you keep this)
+  if (explicitStage) return explicitStage;
+
+  // 2. PLANNING OVERRIDE — no resistance
+  if (
+    text.includes("plan") ||
+    text.includes("steps") ||
+    text.includes("how do i") ||
+    text.includes("what should i do") ||
+    text.includes("give me a plan")
+  ) {
+    return "Planning";
+  }
+
+  // 3. ALIGNMENT OVERRIDE — sustainability signals
+  if (
+    text.includes("burnt out") ||
+    text.includes("overwhelmed") ||
+    text.includes("can’t keep up") ||
+    text.includes("too much") ||
+    text.includes("balance") ||
+    text.includes("sustainable") ||
+    text.includes("afraid i won’t stick")
+  ) {
+    return "Alignment";
+  }
+
+  // 4. Default behavior
+  return "Discovery";
+}
 
 /**
  * detectIntent
