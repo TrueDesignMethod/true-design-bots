@@ -44,6 +44,12 @@ header {
   background: var(--bg);
 }
 
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .logo {
   width: 34px;
   height: 34px;
@@ -57,16 +63,22 @@ header {
   font-size: 14px;
 }
 
-/* ───────── Main Layout ───────── */
+.brand {
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+
+/* ───────── Layout ───────── */
 main {
   flex: 1;
   display: flex;
   overflow: hidden;
 }
 
-/* ───────── Sidebar ───────── */
+/* ───────── Sidebar (Session History) ───────── */
 aside {
-  width: 260px;
+  width: 25%;
   background: var(--card);
   border-right: 1px solid var(--input-border);
   padding: 16px;
@@ -80,23 +92,16 @@ aside h3 {
   color: var(--muted);
 }
 
-.stage-btn {
-  width: 100%;
-  padding: 10px 12px;
-  margin-bottom: 8px;
-  border-radius: 10px;
-  border: 1px solid var(--input-border);
-  background: var(--card);
-  cursor: pointer;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 13px;
-  text-align: left;
+.session-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.stage-btn.active {
-  background: #000;
-  color: #fff;
-  border-color: #000;
+.session-entry {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.4;
 }
 
 /* ───────── Chat Area ───────── */
@@ -104,7 +109,6 @@ section.chat {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: var(--bg);
 }
 
 /* Messages */
@@ -180,17 +184,20 @@ button.primary:hover {
 <body>
 
 <header>
-  <div class="logo">T</div>
+  <div class="header-left">
+    <div class="logo">T</div>
+    <div class="brand">TrueDesign</div>
+  </div>
 </header>
 
 <main>
 
   <!-- Sidebar -->
   <aside>
-    <h3>Stages</h3>
-    <button class="stage-btn active" data-stage="Discovery">Discovery</button>
-    <button class="stage-btn" data-stage="Planning">Planning</button>
-    <button class="stage-btn" data-stage="Alignment">Alignment</button>
+    <h3>Session History</h3>
+    <div id="session-history" class="session-list">
+      <div class="session-entry">Beginning exploration</div>
+    </div>
   </aside>
 
   <!-- Chat -->
@@ -203,7 +210,7 @@ button.primary:hover {
           id="user-input"
           placeholder="Write what you'd like to explore…"
         ></textarea>
-        <button id="send-btn" class="primary">Send</button>
+        <button id="send-btn" class="primary">Next</button>
       </div>
     </div>
   </section>
@@ -220,25 +227,13 @@ const messagesEl = document.getElementById("messages");
 const inputEl = document.getElementById("user-input");
 
 /* Append message bubble */
-function appendBubble(text, who="bot") {
+function appendBubble(text, who = "bot") {
   const d = document.createElement("div");
   d.className = "bubble " + who;
   d.textContent = text;
   messagesEl.appendChild(d);
   messagesEl.scrollTop = messagesEl.scrollHeight;
 }
-
-/* Stage switching */
-function setStage(stage) {
-  currentStage = stage;
-  document.querySelectorAll(".stage-btn").forEach(btn => {
-    btn.classList.toggle("active", btn.dataset.stage === stage);
-  });
-}
-
-document.querySelectorAll(".stage-btn").forEach(btn => {
-  btn.addEventListener("click", () => setStage(btn.dataset.stage));
-});
 
 /* Send message */
 document.getElementById("send-btn").addEventListener("click", async () => {
@@ -252,7 +247,6 @@ document.getElementById("send-btn").addEventListener("click", async () => {
   appendBubble("Reflecting…", "bot");
 
   const res = await sendMessage(currentStage, conversation);
-
   messagesEl.lastChild.remove();
 
   if (!res || !res.reply) {
