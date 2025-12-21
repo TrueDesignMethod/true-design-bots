@@ -51,8 +51,24 @@ async function handlePost(req, res) {
     const modelTier = decideModel(module);
     const model = modelTier === "PRO" ? MODELS.PRO : MODELS.CHEAP;
 
+    const stage = detectStage({ input, explicitStage });
+
+// NEW: Detect stage change
+const previousStage = messages
+  .slice()
+  .reverse()
+  .find(m => m.role === "assistant")?.stage;
+
+const stageChanged = previousStage && previousStage !== stage;
+
     // 6. Build prompt
-    const userPrompt = module.buildPrompt({ input, messages });
+   const userPrompt = module.buildPrompt({
+  input,
+  messages,
+  stageChanged,
+  previousStage
+});
+
 
     // 7. Call GPT-3.5
     const reply = await callLLM({
