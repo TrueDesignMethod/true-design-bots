@@ -4,14 +4,17 @@ const modules = require("../../modules/index.js");
 
 /**
  * detectStage
+ * Conservative default, explicit forward jumps allowed
  */
 function detectStage({ input = "", explicitStage = null }) {
   const text = input.toLowerCase();
 
+  // Explicit override always wins
   if (explicitStage) {
     return explicitStage.toLowerCase();
   }
 
+  // PLANNING — immediate forward motion
   if (
     text.includes("plan") ||
     text.includes("steps") ||
@@ -22,6 +25,7 @@ function detectStage({ input = "", explicitStage = null }) {
     return "planning";
   }
 
+  // ALIGNMENT — sustainability / overload signals
   if (
     text.includes("burnt out") ||
     text.includes("burned out") ||
@@ -35,11 +39,13 @@ function detectStage({ input = "", explicitStage = null }) {
     return "alignment";
   }
 
+  // Default
   return "discovery";
 }
 
 /**
  * detectIntent
+ * Lightweight, optional
  */
 function detectIntent(input = "") {
   const text = input.toLowerCase();
