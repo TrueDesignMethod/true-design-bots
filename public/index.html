@@ -4,10 +4,9 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<!-- Montserrat -->
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
 
-<title>TRUE</title>
+<title>TrueDesign</title>
 
 <style>
 :root {
@@ -18,15 +17,19 @@
 
   --assistant-bubble: #f4f2ef;
   --user-bubble: #e5d9d0;
+
   --input-bg: #f4f2ef;
-  --input-border: rgba(16,18,20,0.06);
+  --input-border: rgba(16,18,20,0.08);
+
+  --radius: 12px;
+  --transition: 240ms ease;
 }
 
 * { box-sizing: border-box; }
 
 body {
   margin: 0;
-  height: 100vh;
+  height: 100svh;
   font-family: 'Montserrat', system-ui, sans-serif;
   background: var(--bg);
   color: var(--text);
@@ -40,14 +43,16 @@ header {
   display: flex;
   align-items: center;
   padding: 0 16px;
+  gap: 12px;
   border-bottom: 1px solid var(--input-border);
-  background: var(--bg);
 }
 
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.menu-btn {
+  display: none;
+  font-size: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
 .logo {
@@ -60,13 +65,11 @@ header {
   align-items: center;
   justify-content: center;
   font-weight: 600;
-  font-size: 14px;
 }
 
 .brand {
   font-size: 16px;
   font-weight: 500;
-  letter-spacing: 0.2px;
 }
 
 /* ───────── Layout ───────── */
@@ -76,42 +79,97 @@ main {
   overflow: hidden;
 }
 
-/* ───────── Sidebar (Session History) ───────── */
+/* ───────── Sidebar ───────── */
 aside {
-  width: 25%;
+  width: 260px;
   background: var(--card);
   border-right: 1px solid var(--input-border);
   padding: 16px;
   overflow-y: auto;
+  transition: transform var(--transition);
 }
 
 aside h3 {
-  margin: 0 0 12px 0;
+  margin: 0 0 12px;
   font-size: 13px;
   font-weight: 500;
   color: var(--muted);
 }
 
-.session-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
 .session-entry {
   font-size: 13px;
   color: var(--muted);
-  line-height: 1.4;
+  margin-bottom: 10px;
 }
 
-/* ───────── Chat Area ───────── */
-section.chat {
+/* ───────── Content ───────── */
+section.content {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 
-/* Messages */
+/* ───────── Landing ───────── */
+#landing {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fadeIn 300ms ease;
+}
+
+.landing-card {
+  max-width: 520px;
+  width: 100%;
+  text-align: center;
+}
+
+.landing-card h1 {
+  font-size: 24px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.landing-card p {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+
+.landing-input {
+  display: flex;
+  gap: 12px;
+}
+
+textarea {
+  flex: 1;
+  min-height: 64px;
+  padding: 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  font-family: inherit;
+  font-size: 14px;
+}
+
+button.primary {
+  background: #000;
+  color: #fff;
+  border: none;
+  padding: 14px 20px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  min-width: 72px;
+}
+
+/* ───────── Chat ───────── */
+#chat {
+  flex: 1;
+  display: none;
+  flex-direction: column;
+}
+
 #messages {
   flex: 1;
   padding: 24px;
@@ -126,7 +184,7 @@ section.chat {
   padding: 14px 16px;
   border-radius: 14px;
   line-height: 1.55;
-  white-space: pre-wrap;
+  animation: slideUp 200ms ease;
 }
 
 .bubble.bot {
@@ -139,44 +197,38 @@ section.chat {
   align-self: flex-end;
 }
 
-/* Input Bar */
 .input-bar {
   padding: 16px;
   border-top: 1px solid var(--input-border);
-  background: var(--bg);
 }
 
-.input-row {
-  display: flex;
-  gap: 12px;
-  align-items: flex-end;
+/* ───────── Motion ───────── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-textarea {
-  flex: 1;
-  min-height: 64px;
-  resize: vertical;
-  padding: 14px;
-  border-radius: 12px;
-  border: 1px solid var(--input-border);
-  background: var(--input-bg);
-  font-family: 'Montserrat', sans-serif;
-  font-size: 14px;
+@keyframes slideUp {
+  from { transform: translateY(4px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
-button.primary {
-  background: #000;
-  color: #fff;
-  border: none;
-  padding: 14px 20px;
-  border-radius: 12px;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 14px;
-  cursor: pointer;
-}
+/* ───────── Mobile ───────── */
+@media (max-width: 768px) {
+  aside {
+    position: fixed;
+    inset: 56px auto 0 0;
+    transform: translateX(-100%);
+    z-index: 10;
+  }
 
-button.primary:hover {
-  opacity: 0.9;
+  aside.open {
+    transform: translateX(0);
+  }
+
+  .menu-btn {
+    display: block;
+  }
 }
 </style>
 </head>
@@ -184,50 +236,66 @@ button.primary:hover {
 <body>
 
 <header>
-  <div class="header-left">
-    <div class="logo">T</div>
-    <div class="brand">TrueDesign</div>
-  </div>
+  <button class="menu-btn" aria-label="Toggle menu">☰</button>
+  <div class="logo">T</div>
+  <div class="brand">TrueDesign</div>
 </header>
 
 <main>
 
-  <!-- Sidebar -->
-  <aside>
-    <h2>Session History</h2>
-    <div id="session-history" class="session-list">
-      <div class="session-entry">Beginning exploration</div>
-    </div>
+  <aside id="sidebar">
+    <h3>Session History</h3>
+    <div class="session-entry">Current reflection</div>
   </aside>
 
-  <!-- Chat -->
-  <section class="chat">
-    <div id="messages"></div>
+  <section class="content">
 
-    <div class="input-bar">
-      <div class="input-row">
-        <textarea
-          id="user-input"
-          placeholder="Write what you'd like to explore…"
-        ></textarea>
-        <button id="send-btn" class="primary">Next</button>
+    <!-- Landing -->
+    <div id="landing">
+      <div class="landing-card">
+        <h1 id="landing-title">Where would you like to begin?</h1>
+        <p>You don’t need a plan yet. Just write what feels important right now.</p>
+
+        <div class="landing-input">
+          <textarea id="landing-input"
+            aria-label="Initial reflection"
+            placeholder="A thought, a question, or something you can’t stop thinking about…"></textarea>
+          <button class="primary" id="landing-btn">Next</button>
+        </div>
       </div>
     </div>
-  </section>
 
+    <!-- Chat -->
+    <div id="chat" aria-live="polite">
+      <div id="messages"></div>
+
+      <div class="input-bar">
+        <div class="landing-input">
+          <textarea id="chat-input" aria-label="Continue reflection" placeholder="Continue…"></textarea>
+          <button id="send-btn" class="primary">Next</button>
+        </div>
+      </div>
+    </div>
+
+  </section>
 </main>
 
 <script type="module">
 import { sendMessage } from "./send.js";
 
-let currentStage = "Discovery";
-let conversation = [];
+/* ───────── State ───────── */
+let currentStage = "discovery"; // canonical lowercase
+let conversation = JSON.parse(sessionStorage.getItem("true_convo") || "[]");
 
+/* ───────── Elements ───────── */
+const landing = document.getElementById("landing");
+const chat = document.getElementById("chat");
 const messagesEl = document.getElementById("messages");
-const inputEl = document.getElementById("user-input");
+const landingInput = document.getElementById("landing-input");
+const chatInput = document.getElementById("chat-input");
 
-/* Append message bubble */
-function appendBubble(text, who = "bot") {
+/* ───────── Utilities ───────── */
+function appendBubble(text, who) {
   const d = document.createElement("div");
   d.className = "bubble " + who;
   d.textContent = text;
@@ -235,12 +303,26 @@ function appendBubble(text, who = "bot") {
   messagesEl.scrollTop = messagesEl.scrollHeight;
 }
 
-/* Send message */
-document.getElementById("send-btn").addEventListener("click", async () => {
-  const text = inputEl.value.trim();
+function persist() {
+  sessionStorage.setItem("true_convo", JSON.stringify(conversation));
+}
+
+/* ───────── Re-entry State ───────── */
+if (conversation.length > 0) {
+  landing.style.display = "none";
+  chat.style.display = "flex";
+  conversation.forEach(m => appendBubble(m.content, m.role === "assistant" ? "bot" : "user"));
+  chatInput.focus();
+}
+
+/* ───────── Landing Submit ───────── */
+document.getElementById("landing-btn").onclick = async () => {
+  const text = landingInput.value.trim();
   if (!text) return;
 
-  inputEl.value = "";
+  landing.style.display = "none";
+  chat.style.display = "flex";
+
   appendBubble(text, "user");
   conversation.push({ role: "user", content: text });
 
@@ -249,20 +331,37 @@ document.getElementById("send-btn").addEventListener("click", async () => {
   const res = await sendMessage(currentStage, conversation);
   messagesEl.lastChild.remove();
 
-  if (!res || !res.reply) {
-    appendBubble("I’m here, but something went wrong. Please try again.", "bot");
-    return;
-  }
+  appendBubble(res.reply, "bot");
+  conversation.push({ role: "assistant", content: res.reply });
+
+  persist();
+  chatInput.focus();
+};
+
+/* ───────── Chat Submit ───────── */
+document.getElementById("send-btn").onclick = async () => {
+  const text = chatInput.value.trim();
+  if (!text) return;
+
+  chatInput.value = "";
+  appendBubble(text, "user");
+  conversation.push({ role: "user", content: text });
+
+  appendBubble("Reflecting…", "bot");
+
+  const res = await sendMessage(currentStage, conversation);
+  messagesEl.lastChild.remove();
 
   appendBubble(res.reply, "bot");
   conversation.push({ role: "assistant", content: res.reply });
-});
 
-/* Initial message */
-appendBubble(
-`Welcome. I’m TRUE. What's been taking up the most mental space lately?`,
-"bot"
-);
+  persist();
+};
+
+/* ───────── Sidebar Toggle ───────── */
+document.querySelector(".menu-btn").onclick = () => {
+  document.getElementById("sidebar").classList.toggle("open");
+};
 </script>
 
 </body>
