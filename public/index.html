@@ -130,6 +130,14 @@ section.content {
   text-align: center;
 }
 
+  .landing-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+
 .landing-card h1 {
   font-size: 24px;
   font-weight: 500;
@@ -342,6 +350,9 @@ const chat = document.getElementById("chat");
 const messagesEl = document.getElementById("messages");
 const loginOverlay = document.getElementById("login-overlay");
 loginOverlay.classList.remove("active");
+
+  const landingInput = document.getElementById("landing-input");
+const chatInput = document.getElementById("chat-input");
 
 function bubble(text, who) {
   const d = document.createElement("div");
