@@ -1,6 +1,6 @@
 // api/chat/router.js
 
-const modules = require("../../modules/index.js");
+const modules = require("../../modules/index.js").default;
 
 /**
  * detectStage
