@@ -316,8 +316,11 @@ button.primary {
     <h2>Want me to remember this?</h2>
     <p>Sign in to save your reflections.</p>
     <input type="email" id="login-email" placeholder="Email">
-    <button id="login-btn" class="primary">Send link</button>
-    <p><button id="continue-guest">Continue without saving</button></p>
+   <button id="login-btn" class="primary" type="button">Send link</button>
+<p>
+  <button id="continue-guest" type="button">Continue without saving</button>
+</p>
+
   </div>
 </div>
 
@@ -332,6 +335,8 @@ let assistantTurns = 0;
 const landing = document.getElementById("landing");
 const chat = document.getElementById("chat");
 const messagesEl = document.getElementById("messages");
+const loginOverlay = document.getElementById("login-overlay");
+loginOverlay.hidden = true;
 
 function bubble(text, who) {
   const d = document.createElement("div");
@@ -353,6 +358,12 @@ async function assistantReply() {
   if (assistantTurns === 2) {
     document.getElementById("login-overlay").hidden = false;
   }
+  assistantTurns++;
+
+if (assistantTurns === 2 && loginOverlay.hidden) {
+  loginOverlay.hidden = false;
+}
+
 }
 
 /* Landing */
@@ -392,8 +403,10 @@ document.getElementById("login-btn").onclick = async () => {
   });
 };
 
-document.getElementById("continue-guest").onclick = () =>
-  document.getElementById("login-overlay").hidden = true;
+document.getElementById("continue-guest").onclick = () => {
+  loginOverlay.hidden = true;
+};
+
 </script>
 
 </body>
