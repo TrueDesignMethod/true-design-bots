@@ -212,10 +212,15 @@ button.primary {
   position: fixed;
   inset: 0;
   background: rgba(251,249,247,0.85);
-  display: grid;
   place-items: center;
   z-index: 20;
+  display: none; /* JS controls visibility */
 }
+
+#login-overlay.active {
+  display: grid;
+}
+
 
 .login-card {
   background: var(--card);
@@ -336,7 +341,7 @@ const landing = document.getElementById("landing");
 const chat = document.getElementById("chat");
 const messagesEl = document.getElementById("messages");
 const loginOverlay = document.getElementById("login-overlay");
-loginOverlay.hidden = true;
+loginOverlay.classList.remove("active");
 
 function bubble(text, who) {
   const d = document.createElement("div");
@@ -348,6 +353,7 @@ function bubble(text, who) {
 
 async function assistantReply() {
   bubble("Reflecting…", "bot");
+
   const res = await sendMessage("discovery", conversation);
   messagesEl.lastChild.remove();
 
@@ -355,16 +361,12 @@ async function assistantReply() {
   conversation.push({ role: "assistant", content: res.reply });
 
   assistantTurns++;
+
   if (assistantTurns === 2) {
-    document.getElementById("login-overlay").hidden = false;
+    loginOverlay.classList.add("active");
   }
-  assistantTurns++;
-
-if (assistantTurns === 2 && loginOverlay.hidden) {
-  loginOverlay.hidden = false;
 }
 
-}
 
 /* Landing */
 document.getElementById("landing-btn").onclick = async () => {
@@ -404,8 +406,9 @@ document.getElementById("login-btn").onclick = async () => {
 };
 
 document.getElementById("continue-guest").onclick = () => {
-  loginOverlay.hidden = true;
+  loginOverlay.classList.remove("active");
 };
+
 
 </script>
 
