@@ -8,7 +8,6 @@ const {
   decideModel
 } = require("./router.js");
 const { callLLM, MODELS } = require("./llm.js");
-const { MCL } = require("./mcl.js");
 
 const cors = MicroCors();
 
@@ -28,40 +27,55 @@ async function handlePost(req, res) {
         });
       }));
 
-    const { input = "", messages = [], explicitStage = null, intent = null } = body;
+    const {
+      input = "",
+      messages = [],
+      explicitStage = null,
+      intent = null
+    } = body;
 
+    // 1. Detect stage (with explicit override + plan/alignment jumps)
     const stage = detectStage({ input, explicitStage });
 
+    // 2. Detect intent (lightweight, optional)
     let resolvedIntent = intent || detectIntent(input);
+
     if (!resolvedIntent && stage === "discovery") {
       resolvedIntent = "values";
     }
 
+    // 3. Select module
     const module = selectModule(stage, resolvedIntent);
 
+    // 4. Detect stage transition (for optional announcement)
     const previousStage = messages
       .slice()
       .reverse()
       .find(m => m.role === "assistant" && m.stage)?.stage;
 
-    const stageChanged = previousStage && previousStage !== stage;
+    const stageChanged = Boolean(previousStage && previousStage !== stage);
 
+    // 5. Decide model tier
     const modelTier = decideModel(module);
     const model = modelTier === "PRO" ? MODELS.PRO : MODELS.CHEAP;
 
+    // 6. Build prompt (this is where reflection vs planning tone lives)
     const userPrompt = module.buildPrompt({
       input,
       messages,
+      stage,
       stageChanged,
       previousStage
     });
 
+    // 7. Call LLM
     const reply = await callLLM({
       model,
       userPrompt,
       maxTokens: module.tokenCeiling
     });
 
+    // 8. Respond
     return res.json({
       stage,
       module: module.name,
@@ -70,8 +84,8 @@ async function handlePost(req, res) {
     });
 
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
+    console.error("TRUE chat error:", err);
+    return res.status(500).json({ error: "Server error" });
   }
 }
 
