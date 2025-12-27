@@ -1,0 +1,69 @@
+// sessions.js
+// Handles all Supabase persistence for TRUE sessions + messages
+
+import { supabase } from "./supabase.js";
+
+/* ───────── Sessions ───────── */
+
+export async function createSession(userId, stage = "discovery") {
+  const { data, error } = await supabase
+    .from("sessions")
+    .insert({
+      user_id: userId,
+      current_stage: stage
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function getLatestSession(userId) {
+  const { data, error } = await supabase
+    .from("sessions")
+    .select("*")
+    .eq("user_id", userId)
+    .order("last_active_at", { ascending: false })
+    .limit(1)
+    .single();
+
+  if (error) return null;
+  return data;
+}
+
+export async function getAllSessions(userId) {
+  const { data, error } = await supabase
+    .from("sessions")
+    .select("id, started_at, current_stage")
+    .eq("user_id", userId)
+    .order("started_at", { ascending: false });
+
+  if (error) throw error;
+  return data;
+}
+
+/* ───────── Messages ───────── */
+
+export async function saveMessage(sessionId, role, content) {
+  const { error } = await supabase
+    .from("messages")
+    .insert({
+      session_id: sessionId,
+      role,
+      content
+    });
+
+  if (error) throw error;
+}
+
+export async function getMessages(sessionId) {
+  const { data, error } = await supabase
+    .from("messages")
+    .select("*")
+    .eq("session_id", sessionId)
+    .order("created_at");
+
+  if (error) throw error;
+  return data;
+}
