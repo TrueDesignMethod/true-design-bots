@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
-
 <title>TrueDesign</title>
 
 <style>
@@ -19,7 +18,6 @@
   --input-bg: #f4f2ef;
   --input-border: rgba(16,18,20,0.08);
   --radius: 12px;
-  --transition: 240ms ease;
 }
 
 * { box-sizing: border-box; }
@@ -49,13 +47,6 @@ header {
   border-bottom: 1px solid var(--input-border);
 }
 
-.menu-btn {
-  display: none;
-  background: none;
-  border: none;
-  font-size: 20px;
-}
-
 .logo {
   width: 34px;
   height: 34px;
@@ -67,32 +58,10 @@ header {
   font-weight: 600;
 }
 
+/* Layout */
 main {
   flex: 1;
   display: flex;
-  overflow: hidden;
-}
-
-/* Sidebar */
-aside {
-  width: 260px;
-  background: var(--card);
-  border-right: 1px solid var(--input-border);
-  padding: 16px;
-  transition: transform var(--transition);
-}
-
-@media (max-width: 768px) {
-  aside {
-    position: fixed;
-    top: 56px;
-    left: 0;
-    bottom: 0;
-    transform: translateX(-100%);
-    z-index: 10;
-  }
-  aside.open { transform: translateX(0); }
-  .menu-btn { display: block; }
 }
 
 /* Content */
@@ -106,8 +75,8 @@ section.content {
 #landing {
   flex: 1;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   padding: 24px;
 }
 
@@ -117,37 +86,9 @@ section.content {
   text-align: center;
 }
 
-.landing-card h1 {
-  font-size: 22px;
-  font-weight: 500;
-}
-
-.landing-card p {
-  font-size: 14px;
-  color: var(--muted);
-  margin-bottom: 20px;
-}
-
 .landing-input {
   display: flex;
   gap: 12px;
-}
-
-textarea {
-  flex: 1;
-  padding: 14px;
-  border-radius: var(--radius);
-  border: 1px solid var(--input-border);
-  background: var(--input-bg);
-  font-family: inherit;
-}
-
-button.primary {
-  background: #000;
-  color: #fff;
-  border: none;
-  border-radius: var(--radius);
-  padding: 14px 20px;
 }
 
 /* Chat */
@@ -179,6 +120,25 @@ button.primary {
   margin-left: auto;
 }
 
+/* Inputs */
+textarea {
+  flex: 1;
+  padding: 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  font-family: inherit;
+}
+
+button.primary {
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 14px 20px;
+  cursor: pointer;
+}
+
 /* Login Modal */
 #login-modal {
   position: fixed;
@@ -203,19 +163,14 @@ button.primary {
 <body>
 
 <header>
-  <button class="menu-btn">☰</button>
   <div class="logo">T</div>
   <div class="brand">TrueDesign</div>
 </header>
 
 <main>
-
-<aside id="sidebar">
-  <h3>Session History</h3>
-</aside>
-
 <section class="content">
 
+<!-- Landing -->
 <div id="landing">
   <div class="landing-card">
     <h1>Where to begin?</h1>
@@ -227,6 +182,7 @@ button.primary {
   </div>
 </div>
 
+<!-- Chat -->
 <div id="chat">
   <div id="messages" aria-live="polite"></div>
   <div class="landing-input">
@@ -238,6 +194,7 @@ button.primary {
 </section>
 </main>
 
+<!-- Login Modal -->
 <div id="login-modal" hidden>
   <div class="login-card">
     <h2>Welcome back.</h2>
@@ -251,28 +208,61 @@ button.primary {
 <script type="module">
 import { sendMessage } from "./send.js";
 import { supabase } from "./supabase.js";
+import {
+  createSession,
+  saveMessage
+} from "./sessions.js";
+
+/* ───────── State ───────── */
 
 let conversation = [];
 let currentUser = null;
+let sessionId = null;
 let hasPromptedLogin = false;
+let currentStage = "discovery";
 
-supabase.auth.onAuthStateChange((_e, session) => {
+/* ───────── Auth ───────── */
+
+supabase.auth.onAuthStateChange(async (_event, session) => {
   currentUser = session?.user ?? null;
+
+  if (currentUser && !sessionId) {
+    const sessionRow = await createSession(currentUser.id, currentStage);
+    sessionId = sessionRow.id;
+
+    // Persist existing conversation
+    for (const msg of conversation) {
+      await saveMessage(sessionId, msg.role, msg.content);
+    }
+
+    document.getElementById("login-modal").hidden = true;
+  }
 });
+
+/* ───────── UI Helpers ───────── */
 
 function appendBubble(text, role) {
   const el = document.createElement("div");
   el.className = `bubble ${role}`;
   el.textContent = text;
   document.getElementById("messages").appendChild(el);
+  el.scrollIntoView({ behavior: "smooth" });
 }
+
+/* ───────── Assistant Turn ───────── */
 
 async function assistantReply() {
   appendBubble("Reflecting…", "bot");
-  const res = await sendMessage("discovery", conversation);
+
+  const res = await sendMessage(currentStage, conversation);
   document.querySelector(".bubble.bot:last-child")?.remove();
+
   appendBubble(res.reply, "bot");
   conversation.push({ role: "assistant", content: res.reply });
+
+  if (sessionId) {
+    await saveMessage(sessionId, "assistant", res.reply);
+  }
 
   if (!currentUser && !hasPromptedLogin) {
     hasPromptedLogin = true;
@@ -280,22 +270,33 @@ async function assistantReply() {
   }
 }
 
+/* ───────── Events ───────── */
+
 document.getElementById("landing-btn").onclick = async () => {
   const text = landingInput.value.trim();
   if (!text) return;
+
   document.getElementById("landing").style.display = "none";
   document.getElementById("chat").style.display = "flex";
+
   appendBubble(text, "user");
   conversation.push({ role: "user", content: text });
+
   await assistantReply();
 };
 
 document.getElementById("send-btn").onclick = async () => {
   const text = chatInput.value.trim();
   if (!text) return;
+
   chatInput.value = "";
   appendBubble(text, "user");
   conversation.push({ role: "user", content: text });
+
+  if (sessionId) {
+    await saveMessage(sessionId, "user", text);
+  }
+
   await assistantReply();
 };
 
