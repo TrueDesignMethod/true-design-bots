@@ -127,10 +127,6 @@ section.content {
 .landing-card {
   max-width: 520px;
   width: 100%;
-  text-align: center;
-}
-
-  .landing-card {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -154,18 +150,28 @@ section.content {
   display: flex;
   gap: 12px;
   width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  align-items: center;
 }
 
-textarea {
-  flex: 1;
-  min-height: 64px;
-  padding: 14px;
+
+input[type="text"] {
+  width: 100%;
+  height: 52px;
+  padding: 0 16px;
   border-radius: var(--radius);
   border: 1px solid var(--input-border);
   background: var(--input-bg);
   font-family: inherit;
-  font-size: 14px;
+  font-size: 15px;
 }
+
+  input[type="text"]:focus {
+  outline: none;
+  border-color: rgba(0,0,0,0.2);
+}
+
 
 button.primary {
   background: #000;
@@ -302,7 +308,12 @@ button.primary {
         <p>You don’t need a plan yet. Write what matters.</p>
 
         <div class="landing-input">
-          <textarea id="landing-input"></textarea>
+          <input
+  id="landing-input"
+  type="text"
+  placeholder="What do you need support with?"
+/>
+
           <button class="primary" id="landing-btn">Next</button>
         </div>
       </div>
@@ -314,7 +325,12 @@ button.primary {
 
       <div class="input-bar">
         <div class="landing-input">
-          <textarea id="chat-input"></textarea>
+         <input
+  id="chat-input"
+  type="text"
+  placeholder="Continue…"
+/>
+
           <button id="send-btn" class="primary">Next</button>
         </div>
       </div>
