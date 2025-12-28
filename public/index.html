@@ -372,7 +372,8 @@ let currentUser = null;
 let conversation = [];
 let assistantTurns = 0;
 let hasPromptedLogin = false;
-  let currentStage = "discovery"; "planning"; "alignment";
+ let currentStage = "discovery"; // allowed: discovery | planning | alignment
+
 
 /* ── Auth ── */
 supabase.auth.onAuthStateChange((event, session) => {
@@ -417,9 +418,15 @@ async function assistantReply() {
   bubble(res.reply, "bot");
   conversation.push({ role: "assistant", content: res.reply });
 
-  if (res.suggestedStage && res.suggestedStage !== currentStage) {
+  // ── STAGE TRANSITION LOGIC (THIS IS WHERE IT GOES) ──
+  if (res.requiresConsent) {
+    // Stay in current stage (usually discovery)
+    // Do NOT auto-switch — wait for user response
+  } else if (res.suggestedStage && res.suggestedStage !== currentStage) {
     currentStage = res.suggestedStage;
   }
+  // ────────────────────────────────────────────────
+
   assistantTurns++;
 
   if (assistantTurns === 2 && !currentUser && !hasPromptedLogin) {
