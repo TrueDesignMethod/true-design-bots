@@ -231,9 +231,8 @@ button.primary {
   display: none; /* JS controls visibility */
 }
 
-#login-overlay.active {
-  display: grid;
-}
+
+#login-overlay.active { display: grid; }
 
 
 .login-card {
@@ -296,7 +295,7 @@ button.primary {
 
   <aside id="sidebar">
     <h3>Session History</h3>
-    <div class="session-entry">Current reflection</div>
+   
   </aside>
 
   <section class="content">
@@ -340,12 +339,20 @@ button.primary {
 </main>
 
 <!-- Login Overlay -->
-<div id="login-overlay" hidden>
+<div id="login-overlay">
+
   <div class="login-card">
     <h2>Want me to remember this?</h2>
     <p>Sign in to save your reflections.</p>
-    <input type="email" id="login-email" placeholder="Email">
-   <button id="login-btn" class="primary" type="button">Send link</button>
+   <div id="login-form">
+  <input type="email" id="login-email" placeholder="Email">
+  <button id="login-btn" class="primary" type="button">Send link</button>
+</div>
+
+<p id="login-status" style="display:none; color: var(--muted); margin-top: 12px;">
+  Check your email — you can keep going here.
+</p>
+
 <p>
   <button id="continue-guest" type="button">Continue without saving</button>
 </p>
@@ -357,27 +364,37 @@ button.primary {
 import { sendMessage } from "./send.js";
 import { supabase } from "./supabase.js";
 
+/* ── State ── */
+let currentUser = null;
 let conversation = [];
 let assistantTurns = 0;
+let hasPromptedLogin = false;
 
-/* UI */
+/* ── Auth ── */
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event === "SIGNED_IN") {
+    loginOverlay.classList.remove("active");
+  }
+
+  if (session?.user) {
+    currentUser = session.user;
+    loadUserSessions(currentUser.id);
+    setSavedStateUI(true);
+  } else {
+    currentUser = null;
+    setSavedStateUI(false);
+  }
+});
+
+/* ── UI refs ── */
 const landing = document.getElementById("landing");
 const chat = document.getElementById("chat");
 const messagesEl = document.getElementById("messages");
 const loginOverlay = document.getElementById("login-overlay");
-loginOverlay.classList.remove("active");
-
-  const landingInput = document.getElementById("landing-input");
+const landingInput = document.getElementById("landing-input");
 const chatInput = document.getElementById("chat-input");
 
-function bubble(text, who) {
-  const d = document.createElement("div");
-  d.className = "bubble " + who;
-  d.textContent = text;
-  messagesEl.appendChild(d);
-  messagesEl.scrollTop = messagesEl.scrollHeight;
-}
-
+/* ── Assistant ── */
 async function assistantReply() {
   bubble("Reflecting…", "bot");
 
@@ -389,10 +406,12 @@ async function assistantReply() {
 
   assistantTurns++;
 
-  if (assistantTurns === 2) {
+  if (assistantTurns === 2 && !currentUser && !hasPromptedLogin) {
+    hasPromptedLogin = true;
     loginOverlay.classList.add("active");
   }
 }
+
 
 
 /* Landing */
@@ -427,14 +446,71 @@ document.querySelector(".menu-btn").onclick = () =>
 
 /* Login */
 document.getElementById("login-btn").onclick = async () => {
-  await supabase.auth.signInWithOtp({
-    email: document.getElementById("login-email").value
+  const email = document.getElementById("login-email").value.trim();
+  if (!email) return;
+
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
   });
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  // UX feedback
+  document.getElementById("login-form").style.display = "none";
+  document.getElementById("login-status").style.display = "block";
+
+  // Auto-dismiss overlay after a moment
+  setTimeout(() => {
+    loginOverlay.classList.remove("active");
+  }, 1500);
 };
+
 
 document.getElementById("continue-guest").onclick = () => {
   loginOverlay.classList.remove("active");
 };
+async function loadUserSessions(userId) {
+  const sidebar = document.getElementById("sidebar");
+
+  // Clear old entries but keep the title
+  sidebar.innerHTML = `<h3>Session History</h3>`;
+
+  const { data, error } = await supabase
+    .from("sessions")
+    .select("id, started_at, current_stage")
+    .order("last_active_at", { ascending: false });
+
+  if (error) {
+    console.error("Error loading sessions:", error);
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "session-entry";
+    empty.textContent = "No saved reflections yet";
+    sidebar.appendChild(empty);
+    return;
+  }
+
+  data.forEach((session) => {
+    const div = document.createElement("div");
+    div.className = "session-entry";
+
+    const date = new Date(session.started_at).toLocaleDateString();
+    div.textContent = `Reflection · ${date}`;
+
+    div.onclick = () => {
+      // Phase 5: load messages for this session
+      console.log("Load session", session.id);
+    };
+
+    sidebar.appendChild(div);
+  });
+}
 
 
 </script>
