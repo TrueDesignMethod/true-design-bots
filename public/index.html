@@ -372,6 +372,7 @@ let currentUser = null;
 let conversation = [];
 let assistantTurns = 0;
 let hasPromptedLogin = false;
+  let currentStage = "discovery"; "planning"; "alignment";
 
 /* ── Auth ── */
 supabase.auth.onAuthStateChange((event, session) => {
@@ -410,12 +411,15 @@ const chatInput = document.getElementById("chat-input");
 async function assistantReply() {
   bubble("Reflecting…", "bot");
 
-  const res = await sendMessage("discovery", conversation);
+  const res = await sendMessage(currentStage, conversation);
   messagesEl.lastChild.remove();
 
   bubble(res.reply, "bot");
   conversation.push({ role: "assistant", content: res.reply });
 
+  if (res.suggestedStage && res.suggestedStage !== currentStage) {
+    currentStage = res.suggestedStage;
+  }
   assistantTurns++;
 
   if (assistantTurns === 2 && !currentUser && !hasPromptedLogin) {
