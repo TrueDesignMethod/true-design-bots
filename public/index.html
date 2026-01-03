@@ -412,6 +412,18 @@ const loginOverlay = document.getElementById("login-overlay");
 const landingInput = document.getElementById("landing-input");
 const chatInput = document.getElementById("chat-input");
 
+/* ── Bubble renderer (GLOBAL) ── */
+function bubble(text, role) {
+  const div = document.createElement("div");
+  div.className = `bubble ${
+    role === "assistant" || role === "bot" ? "bot" : "user"
+  }`;
+  div.textContent = text;
+  messagesEl.appendChild(div);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+
 /* ── Auth init (ONCE) ── */
 initAuth({
   onUserChange: async (user) => {
