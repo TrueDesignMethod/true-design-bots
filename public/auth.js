@@ -17,15 +17,22 @@ export function initAuth({
 if (!user) {
   authStatusEl.textContent = "Sign in";
   authStatusEl.style.cursor = "pointer";
+  authStatusEl.style.textDecoration = "underline";
   if (logoutBtn) logoutBtn.style.display = "none";
   return;
 }
 
 
+
 if (logoutBtn) logoutBtn.style.display = "inline";
 
 
-    authStatusEl.textContent = `Saved as ${user.email}`;
+   authStatusEl.textContent = `Saved as ${user.email}`;
+authStatusEl.style.cursor = "default";
+authStatusEl.style.textDecoration = "none";
+if (logoutBtn) logoutBtn.style.display = "inline";
+
+    
     loadUserSessions(user.id);
 const btn = document.getElementById("login-btn");
 if (btn) {
