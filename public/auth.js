@@ -41,25 +41,3 @@ export function initAuth({
     }
   });
 }
-const lastSession = await getLatestSession(user.id);
-
-if (lastSession) {
-  currentSession = lastSession;
-  currentStage = lastSession.current_stage;
-
-  const messages = await getMessages(lastSession.id);
-
-  // Clear UI
-  document.getElementById("landing").style.display = "none";
-  document.getElementById("chat").style.display = "flex";
-  const messagesEl = document.getElementById("messages");
-  messagesEl.innerHTML = "";
-
-  messages.forEach((msg) => {
-    const div = document.createElement("div");
-    div.className = `bubble ${msg.role === "user" ? "user" : "bot"}`;
-    div.textContent = msg.content;
-    messagesEl.appendChild(div);
-  });
-}
-
