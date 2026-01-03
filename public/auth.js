@@ -25,6 +25,11 @@ if (logoutBtn) logoutBtn.style.display = "inline";
 
     authStatusEl.textContent = `Saved as ${user.email}`;
     loadUserSessions(user.id);
+const btn = document.getElementById("login-btn");
+if (btn) {
+  btn.disabled = false;
+  btn.textContent = "Sign in or create account";
+}
 
     // Close overlay on successful auth
     if (event === "SIGNED_IN") {
