@@ -15,10 +15,12 @@ export function initAuth({
     const logoutBtn = document.getElementById("logout-btn");
 
 if (!user) {
-  authStatusEl.textContent = "Not signed in";
+  authStatusEl.textContent = "Sign in";
+  authStatusEl.style.cursor = "pointer";
   if (logoutBtn) logoutBtn.style.display = "none";
   return;
 }
+
 
 if (logoutBtn) logoutBtn.style.display = "inline";
 
