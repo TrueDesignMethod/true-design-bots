@@ -1,7 +1,6 @@
 // auth.js
 import { supabase } from "./supabase.js";
 import { loadUserSessions } from "./sessions.js";
-import { getLatestSession, getMessages } from "./sessions.js";
 
 /**
  * Initializes auth state handling for the app.
