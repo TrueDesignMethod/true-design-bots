@@ -15,7 +15,7 @@ export function initAuth({
     const logoutBtn = document.getElementById("logout-btn");
 
 if (!user) {
-  authStatusEl.textContent = "Sign in to save";
+  authStatusEl.textContent = "Sign in";
   authStatusEl.style.cursor = "pointer";
   authStatusEl.style.textDecoration = "underline";
   if (logoutBtn) logoutBtn.style.display = "none";
