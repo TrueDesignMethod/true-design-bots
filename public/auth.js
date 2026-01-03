@@ -30,13 +30,13 @@ export function initAuth({
     loadUserSessions(user.id);
 
     // Show reassurance only on actual sign-in
-    if (event === "SIGNED_IN" && confirmationEl) {
-      confirmationEl.style.display = "block";
+    if (event === "SIGNED_IN") {
+    confirmationEl?.style.display = "block";
 
-      setTimeout(() => {
-        loginOverlayEl.classList.remove("active");
-        confirmationEl.style.display = "none";
-      }, 1800);
-    }
-  });
+    setTimeout(() => {
+      loginOverlayEl.classList.remove("active");
+      confirmationEl.style.display = "none";
+    }, 1500);
+  }
+});
 }
