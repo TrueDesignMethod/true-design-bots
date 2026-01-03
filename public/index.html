@@ -408,24 +408,35 @@ const chatInput = document.getElementById("chat-input");
 
 /* ── Auth init (ONCE) ── */
 initAuth({
-  onUserChange: (user) => {
+  onUserChange: async (user) => {
     currentUser = user;
+
+    if (!user) return;
+
+    const lastSession = await getLatestSession(user.id);
+    if (!lastSession) return;
+
+    currentSession = lastSession;
+    currentStage = lastSession.current_stage;
+
+    const messages = await getMessages(lastSession.id);
+
+    // Restore UI
+    landing.style.display = "none";
+    chat.style.display = "flex";
+    messagesEl.innerHTML = "";
+    conversation = [];
+
+    messages.forEach((msg) => {
+      bubble(msg.content, msg.role);
+      conversation.push({ role: msg.role, content: msg.content });
+    });
   },
   loginOverlayEl: loginOverlay,
   confirmationEl: document.getElementById("save-confirmation"),
   authStatusEl: document.getElementById("auth-status")
 });
 
-
- function bubble(text, role) {
-  const div = document.createElement("div");
-  div.className = `bubble ${role === "user" ? "user" : "bot"}`;
-  div.textContent = text;
-
-  messagesEl.appendChild(div);
-
-  div.scrollIntoView({ behavior: "smooth", block: "end" });
-}
 
 /* ── Assistant ── */
 async function assistantReply() {
