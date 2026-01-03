@@ -564,6 +564,7 @@ document.querySelector(".menu-btn").onclick = () =>
 
 /* Login */
 document.getElementById("login-btn").onclick = async () => {
+  const btn = document.getElementById("login-btn");
   const email = document.getElementById("login-email").value.trim();
   const password = document.getElementById("login-password").value;
 
@@ -572,21 +573,27 @@ document.getElementById("login-btn").onclick = async () => {
     return;
   }
 
+  btn.disabled = true;
+  btn.textContent = "Signing in…";
+
   // Try signing in first
-const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
 
-if (error) {
-  const { error: signUpError } = await supabase.auth.signUp({
-    email,
-    password
-  });
+  if (error) {
+    const { error: signUpError } = await supabase.auth.signUp({
+      email,
+      password
+    });
 
-  if (signUpError) {
-    alert(signUpError.message);
-    return;
+    if (signUpError) {
+      alert(signUpError.message);
+      btn.disabled = false;
+      btn.textContent = "Sign in or create account";
+      return;
+    }
   }
-}
 };
+
 
 </script>
 
