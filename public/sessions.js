@@ -48,9 +48,11 @@ export async function loadUserSessions(userId) {
   sidebar.innerHTML = `<h3>Session History</h3>`;
 
   const { data, error } = await supabase
-    .from("sessions")
-    .select("id, started_at, current_stage")
-    .order("last_active_at", { ascending: false });
+  .from("sessions")
+  .select("id, started_at, current_stage")
+  .eq("user_id", userId)
+  .order("last_active_at", { ascending: false });
+
 
   if (error) {
     console.error("Error loading sessions:", error);
