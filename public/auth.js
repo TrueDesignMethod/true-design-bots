@@ -12,10 +12,16 @@ export function initAuth({
 
     onUserChange(user);
 
-    if (!user) {
-      authStatusEl.textContent = "Not signed in";
-      return;
-    }
+    const logoutBtn = document.getElementById("logout-btn");
+
+if (!user) {
+  authStatusEl.textContent = "Not signed in";
+  if (logoutBtn) logoutBtn.style.display = "none";
+  return;
+}
+
+if (logoutBtn) logoutBtn.style.display = "inline";
+
 
     authStatusEl.textContent = `Saved as ${user.email}`;
     loadUserSessions(user.id);
