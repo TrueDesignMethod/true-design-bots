@@ -362,9 +362,15 @@ button.primary {
   <button id="login-btn" class="primary" type="button">Send link</button>
 </div>
 
-<p id="login-status" style="display:none; color: var(--muted); margin-top: 12px;">
-  Check your email — you can keep going here.
+<p
+  id="login-status"
+  style="display:none; color: var(--muted); margin-top: 12px;"
+>
+  Check your email and click the link to continue.
+  <br />
+  Your current reflection will still be here.
 </p>
+
 <p
   id="save-confirmation"
   style="
@@ -379,6 +385,20 @@ button.primary {
 
 <p>
   <button id="continue-guest" type="button">Continue without saving</button>
+<button
+  id="close-login-overlay"
+  style="
+    margin-top: 12px;
+    background: none;
+    border: none;
+    font-size: 13px;
+    color: var(--muted);
+    cursor: pointer;
+  "
+>
+  Continue writing
+</button>
+
 </p>
 
   </div>
@@ -429,15 +449,30 @@ initAuth({
   onUserChange: async (user) => {
     currentUser = user;
 
-    if (!user) return;
+   if (!user) return;
 
-    const lastSession = await getLatestSession(user.id);
-    if (!lastSession) return;
+// 🔑 USER SIGNED IN MID-REFLECTION
+if (!currentSession && conversation.length > 0) {
+  currentSession = await createSession(user.id, currentStage);
 
-    currentSession = lastSession;
-    currentStage = lastSession.current_stage;
+  for (const msg of conversation) {
+    await saveMessage(currentSession.id, msg.role, msg.content);
+  }
+document.getElementById("save-confirmation").style.display = "block";
+loginOverlay.classList.remove("active");
 
-    const messages = await getMessages(lastSession.id);
+  return; // DO NOT overwrite UI or reload messages
+}
+
+
+   const lastSession = await getLatestSession(user.id);
+if (!lastSession) return;
+
+currentSession = lastSession;
+currentStage = lastSession.current_stage;
+
+const messages = await getMessages(lastSession.id);
+
 
     // Restore UI
     landing.style.display = "none";
@@ -486,6 +521,9 @@ if (currentSession) {
     loginOverlay.classList.add("active");
   }
 }
+document.getElementById("close-login-overlay").onclick = () => {
+  loginOverlay.classList.remove("active");
+};
 
 /* Landing */
 document.getElementById("landing-btn").onclick = async () => {
