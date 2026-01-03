@@ -272,6 +272,7 @@ button.primary {
 }
 
 
+
 /* ───────── Mobile ───────── */
 @media (max-width: 768px) {
   aside {
@@ -368,6 +369,12 @@ Nothing changes if you’d rather continue quietly.
     Sign in or create account
   </button>
 </div>
+<p
+  id="save-confirmation"
+  style="display:none; font-size:12px; color: var(--muted);"
+>
+  This reflection is now saved to your account.
+</p>
 
 <p style="font-size:12px; color: var(--muted);">
  If this is your first time, we’ll create your account.
@@ -424,6 +431,12 @@ function bubble(text, role) {
   messagesEl.scrollTop = messagesEl.scrollHeight;
 }
 
+function maybePromptAuth() {
+  if (!currentUser && !hasPromptedLogin) {
+    hasPromptedLogin = true;
+    loginOverlay.classList.add("active");
+  }
+}
 
 
 /* ── Auth init (ONCE) ── */
@@ -502,9 +515,7 @@ if (currentSession) {
   maybePromptAuth();
 }
 
-document.getElementById("close-login-overlay").onclick = () => {
-  loginOverlay.classList.remove("active");
-};
+
 
 /* Landing */
 document.getElementById("landing-btn").onclick = async () => {
@@ -562,23 +573,19 @@ document.getElementById("login-btn").onclick = async () => {
   }
 
   // Try signing in first
-  let { error } = await supabase.auth.signInWithPassword({
+const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+if (error) {
+  const { error: signUpError } = await supabase.auth.signUp({
     email,
     password
   });
 
-  // If user doesn't exist, create account
-  if (error && error.message.includes("Invalid login credentials")) {
-    const res = await supabase.auth.signUp({
-      email,
-      password
-    });
-
-    if (res.error) {
-      alert(res.error.message);
-      return;
-    }
+  if (signUpError) {
+    alert(signUpError.message);
+    return;
   }
+}
 };
 
 </script>
