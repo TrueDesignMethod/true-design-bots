@@ -188,16 +188,23 @@ button.primary {
   flex: 1;
   display: none;
   flex-direction: column;
+  overflow: hidden; /* CRITICAL */
 }
+
+
 
 #messages {
   flex: 1;
+  min-height: 0; /* 🔑 REQUIRED FOR FLEX SCROLLING */
   padding: 24px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
+
+
+
 
 .bubble {
   max-width: 70%;
@@ -217,12 +224,12 @@ button.primary {
 }
 
 .input-bar {
-  position: sticky;
-  bottom: 0;
   background: var(--bg);
   padding: 16px;
   border-top: 1px solid var(--input-border);
+  flex-shrink: 0; /* CRITICAL */
 }
+
 
 /* ───────── Login Overlay ───────── */
 #login-overlay {
@@ -405,8 +412,11 @@ const chatInput = document.getElementById("chat-input");
   div.textContent = text;
 
   messagesEl.appendChild(div);
-  messagesEl.scrollTop = messagesEl.scrollHeight;
+
+  // single, stable scroll behavior
+  div.scrollIntoView({ behavior: "smooth", block: "end" });
 }
+
 
 /* ── Assistant ── */
 async function assistantReply() {
