@@ -356,20 +356,22 @@ button.primary {
 
   <div class="login-card">
     <h2>Want me to remember this?</h2>
-    <p>Sign in to save your reflections.</p>
+    <p>
+Sign in to save this reflection to your account.<br />
+You’ll get a secure link by email.
+</p>
+
    <div id="login-form">
   <input type="email" id="login-email" placeholder="Email">
   <button id="login-btn" class="primary" type="button">Send link</button>
 </div>
 
-<p
-  id="login-status"
-  style="display:none; color: var(--muted); margin-top: 12px;"
->
-  Check your email and click the link to continue.
+<p id="login-status" style="display:none; color: var(--muted); margin-top: 12px;">
+  Check your email and click the link to finish signing in.
   <br />
-  Your current reflection will still be here.
+  You can keep writing here in the meantime — nothing will be lost.
 </p>
+
 
 <p
   id="save-confirmation"
@@ -584,6 +586,8 @@ document.getElementById("login-btn").onclick = async () => {
 
   document.getElementById("login-form").style.display = "none";
   document.getElementById("login-status").style.display = "block";
+  document.getElementById("login-email").disabled = true;
+
 };
 
 document.getElementById("continue-guest").onclick = () => {
