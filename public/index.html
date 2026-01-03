@@ -357,8 +357,8 @@ button.primary {
   <div class="login-card">
     <h2>Want me to remember this?</h2>
     <p>
-Sign in to save this reflection to your account.<br />
-You’ll get a secure link by email.
+Create an account to save your reflections and return to them later.
+Nothing changes if you’d rather continue quietly.
 </p>
 
    <div id="login-form">
@@ -370,7 +370,7 @@ You’ll get a secure link by email.
 </div>
 
 <p style="font-size:12px; color: var(--muted);">
-  If you’re new, this will create your account.
+ If this is your first time, we’ll create your account.
 </p>
 
 <p>
@@ -498,11 +498,10 @@ if (currentSession) {
 
   assistantTurns++;
 
-  if (assistantTurns === 2 && !currentUser && !hasPromptedLogin) {
-    hasPromptedLogin = true;
-    loginOverlay.classList.add("active");
-  }
+  if (assistantTurns === 4) {
+  maybePromptAuth();
 }
+
 document.getElementById("close-login-overlay").onclick = () => {
   loginOverlay.classList.remove("active");
 };
