@@ -32,12 +32,19 @@ if (btn) {
 }
 
     // Close overlay on successful auth
-    if (event === "SIGNED_IN") {
+   if (event === "SIGNED_IN") {
   const pw = document.getElementById("login-password");
   if (pw) pw.value = "";
 
+  const btn = document.getElementById("login-btn");
+  if (btn) {
+    btn.disabled = false;
+    btn.textContent = "Sign in or create account";
+  }
+
   loginOverlayEl.classList.remove("active");
 }
+
 
 
   });
