@@ -388,6 +388,7 @@ button.primary {
 import { sendMessage } from "./send.js";
 import { supabase } from "./supabase.js";
 import { initAuth } from "./auth.js";
+import { createSession, getLatestSession, saveMessage } from "./sessions.js";
 
 /* ── State ── */
 let currentUser = null;
@@ -395,10 +396,7 @@ let conversation = [];
 let assistantTurns = 0;
 let hasPromptedLogin = false;
  let currentStage = "discovery"; // allowed: discovery | planning | alignment
-
-
-
- 
+let currentSession = null;
 
 /* ── UI refs ── */
 const landing = document.getElementById("landing");
@@ -429,8 +427,6 @@ initAuth({
   div.scrollIntoView({ behavior: "smooth", block: "end" });
 }
 
-
-
 /* ── Assistant ── */
 async function assistantReply() {
   bubble("Reflecting…", "bot");
@@ -440,6 +436,10 @@ async function assistantReply() {
 
   bubble(res.reply, "bot");
   conversation.push({ role: "assistant", content: res.reply });
+
+if (currentSession) {
+  await saveMessage(currentSession.id, "assistant", res.reply);
+}
 
   // ── STAGE TRANSITION LOGIC (THIS IS WHERE IT GOES) ──
   if (res.requiresConsent) {
@@ -458,8 +458,6 @@ async function assistantReply() {
   }
 }
 
-
-
 /* Landing */
 document.getElementById("landing-btn").onclick = async () => {
   const text = landingInput.value.trim();
@@ -471,8 +469,19 @@ document.getElementById("landing-btn").onclick = async () => {
   bubble(text, "user");
   conversation.push({ role: "user", content: text });
 
+  // CREATE SESSION IF SIGNED IN
+  if (currentUser && !currentSession) {
+    currentSession = await createSession(currentUser.id, currentStage);
+  }
+
+  // SAVE USER MESSAGE
+  if (currentSession) {
+    await saveMessage(currentSession.id, "user", text);
+  }
+
   await assistantReply();
 };
+
 
 /* Chat */
 document.getElementById("send-btn").onclick = async () => {
@@ -482,6 +491,10 @@ document.getElementById("send-btn").onclick = async () => {
   chatInput.value = "";
   bubble(text, "user");
   conversation.push({ role: "user", content: text });
+
+  if (currentSession) {
+    await saveMessage(currentSession.id, "user", text);
+  }
 
   await assistantReply();
 };
@@ -509,46 +522,6 @@ document.getElementById("login-btn").onclick = async () => {
 document.getElementById("continue-guest").onclick = () => {
   loginOverlay.classList.remove("active");
 };
-
-
-  // Clear old entries but keep the title
-  sidebar.innerHTML = `<h3>Session History</h3>`;
-
-  const { data, error } = await supabase
-    .from("sessions")
-    .select("id, started_at, current_stage")
-    .order("last_active_at", { ascending: false });
-
-  if (error) {
-    console.error("Error loading sessions:", error);
-    return;
-  }
-
-  if (!data || data.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "session-entry";
-    empty.textContent = "No saved reflections yet";
-    sidebar.appendChild(empty);
-    return;
-  }
-
-  data.forEach((session) => {
-    const div = document.createElement("div");
-    div.className = "session-entry";
-
-    const date = new Date(session.started_at).toLocaleDateString();
-    div.textContent = `Reflection · ${date}`;
-
-    div.onclick = () => {
-      // Phase 5: load messages for this session
-      console.log("Load session", session.id);
-    };
-
-    sidebar.appendChild(div);
-  });
-}
-
-
 </script>
 
 </body>
