@@ -399,6 +399,7 @@ let hasPromptedLogin = false;
 
 
  
+
 /* ── UI refs ── */
 const landing = document.getElementById("landing");
 const chat = document.getElementById("chat");
@@ -407,14 +408,8 @@ const loginOverlay = document.getElementById("login-overlay");
 const landingInput = document.getElementById("landing-input");
 const chatInput = document.getElementById("chat-input");
 
-  function bubble(text, role) {
-  const div = document.createElement("div");
-  div.className = `bubble ${role === "user" ? "user" : "bot"}`;
-  div.textContent = text;
-
-  messagesEl.appendChild(div);
-
-    initAuth({
+/* ── Auth init (ONCE) ── */
+initAuth({
   onUserChange: (user) => {
     currentUser = user;
   },
@@ -424,9 +419,16 @@ const chatInput = document.getElementById("chat-input");
 });
 
 
-  // single, stable scroll behavior
+ function bubble(text, role) {
+  const div = document.createElement("div");
+  div.className = `bubble ${role === "user" ? "user" : "bot"}`;
+  div.textContent = text;
+
+  messagesEl.appendChild(div);
+
   div.scrollIntoView({ behavior: "smooth", block: "end" });
 }
+
 
 
 /* ── Assistant ── */
@@ -507,8 +509,7 @@ document.getElementById("login-btn").onclick = async () => {
 document.getElementById("continue-guest").onclick = () => {
   loginOverlay.classList.remove("active");
 };
-async function loadUserSessions(userId) {
-  const sidebar = document.getElementById("sidebar");
+
 
   // Clear old entries but keep the title
   sidebar.innerHTML = `<h3>Session History</h3>`;
