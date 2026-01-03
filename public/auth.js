@@ -21,9 +21,13 @@ export function initAuth({
     loadUserSessions(user.id);
 
     // Close overlay on successful auth
-    if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+    if (event === "SIGNED_IN") {
+  const pw = document.getElementById("login-password");
+  if (pw) pw.value = "";
+
   loginOverlayEl.classList.remove("active");
 }
+
 
   });
 }
