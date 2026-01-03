@@ -388,7 +388,13 @@ button.primary {
 import { sendMessage } from "./send.js";
 import { supabase } from "./supabase.js";
 import { initAuth } from "./auth.js";
-import { createSession, getLatestSession, saveMessage } from "./sessions.js";
+import {
+  createSession,
+  getLatestSession,
+  getMessages,
+  saveMessage
+} from "./sessions.js";
+
 
 /* ── State ── */
 let currentUser = null;
