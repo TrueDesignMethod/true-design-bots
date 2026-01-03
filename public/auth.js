@@ -21,8 +21,9 @@ export function initAuth({
     loadUserSessions(user.id);
 
     // Close overlay on successful auth
-    if (event === "SIGNED_IN") {
-      loginOverlayEl.classList.remove("active");
-    }
+    if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+  loginOverlayEl.classList.remove("active");
+}
+
   });
 }
