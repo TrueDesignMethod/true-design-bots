@@ -271,6 +271,7 @@ button.primary {
   margin-bottom: 12px;
 }
 
+
 /* ───────── Mobile ───────── */
 @media (max-width: 768px) {
   aside {
@@ -299,6 +300,8 @@ button.primary {
   <button class="menu-btn">☰</button>
   <div class="logo">T</div>
   <div class="brand">TrueDesign</div>
+  <div id="auth-status" style="margin-left:auto; font-size:13px; color: var(--muted);"></div>
+
 </header>
 
 <main>
@@ -362,6 +365,17 @@ button.primary {
 <p id="login-status" style="display:none; color: var(--muted); margin-top: 12px;">
   Check your email — you can keep going here.
 </p>
+<p
+  id="save-confirmation"
+  style="
+    display: none;
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 12px;
+  "
+>
+  This reflection is now saved to your account.
+</p>
 
 <p>
   <button id="continue-guest" type="button">Continue without saving</button>
@@ -384,20 +398,41 @@ let hasPromptedLogin = false;
 
 /* ── Auth ── */
 supabase.auth.onAuthStateChange((event, session) => {
-  if (event === "SIGNED_IN") {
-    loginOverlay.classList.remove("active");
+  const confirmation = document.getElementById("save-confirmation");
+
+  if (event === "SIGNED_IN" && session?.user) {
+    currentUser = session.user;
+    updateAuthStatus(currentUser);
+    loadUserSessions(currentUser.id);
+
+    if (confirmation) {
+      confirmation.style.display = "block";
+
+      setTimeout(() => {
+        loginOverlay.classList.remove("active");
+        confirmation.style.display = "none";
+      }, 1800);
+    }
   }
 
-  if (session?.user) {
-    currentUser = session.user;
-    loadUserSessions(currentUser.id);
-    setSavedStateUI(true);
-  } else {
+  if (!session?.user) {
     currentUser = null;
-    setSavedStateUI(false);
+    updateAuthStatus(null);
   }
 });
 
+
+function updateAuthStatus(user) {
+  const el = document.getElementById("auth-status");
+
+  if (!user) {
+    el.textContent = "Not signed in";
+    return;
+  }
+
+  el.textContent = `Saved as ${user.email}`;
+}
+ 
 /* ── UI refs ── */
 const landing = document.getElementById("landing");
 const chat = document.getElementById("chat");
@@ -482,25 +517,16 @@ document.getElementById("login-btn").onclick = async () => {
   const email = document.getElementById("login-email").value.trim();
   if (!email) return;
 
-  const { error } = await supabase.auth.signInWithOtp({
-    email,
-  });
+  const { error } = await supabase.auth.signInWithOtp({ email });
 
   if (error) {
     alert(error.message);
     return;
   }
 
-  // UX feedback
   document.getElementById("login-form").style.display = "none";
   document.getElementById("login-status").style.display = "block";
-
-  // Auto-dismiss overlay after a moment
-  setTimeout(() => {
-    loginOverlay.classList.remove("active");
-  }, 1500);
 };
-
 
 document.getElementById("continue-guest").onclick = () => {
   loginOverlay.classList.remove("active");
