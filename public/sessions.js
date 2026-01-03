@@ -59,13 +59,14 @@ export async function loadUserSessions(userId) {
     return;
   }
 
-  if (!data || data.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "session-entry";
-    empty.textContent = "No saved reflections yet";
-    sidebar.appendChild(empty);
-    return;
-  }
+ if (!data || data.length === 0) {
+  const empty = document.createElement("div");
+  empty.className = "session-entry";
+  empty.textContent = "Reflections you save will appear here.";
+  sidebar.appendChild(empty);
+  return;
+}
+
 
   data.forEach((session) => {
     const div = document.createElement("div");
