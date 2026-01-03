@@ -366,42 +366,21 @@ You’ll get a secure link by email.
   <button id="login-btn" class="primary" type="button">Send link</button>
 </div>
 
-<p id="login-status" style="display:none; color: var(--muted); margin-top: 12px;">
+<p
+  id="login-status"
+  style="display:none; color: var(--muted); margin-top: 12px;"
+>
   Check your email and click the link to finish signing in.
   <br />
-  You can keep writing here in the meantime — nothing will be lost.
-</p>
-
-
-<p
-  id="save-confirmation"
-  style="
-    display: none;
-    font-size: 13px;
-    color: var(--muted);
-    margin-top: 12px;
-  "
->
-  This reflection is now saved to your account.
+  Nothing will be lost.
 </p>
 
 <p>
-  <button id="continue-guest" type="button">Continue without saving</button>
-<button
-  id="close-login-overlay"
-  style="
-    margin-top: 12px;
-    background: none;
-    border: none;
-    font-size: 13px;
-    color: var(--muted);
-    cursor: pointer;
-  "
->
-  Continue writing
-</button>
-
+  <button id="continue-guest" type="button">
+    Continue without saving
+  </button>
 </p>
+
 
   </div>
 </div>
@@ -586,8 +565,7 @@ document.getElementById("login-btn").onclick = async () => {
 
   document.getElementById("login-form").style.display = "none";
   document.getElementById("login-status").style.display = "block";
-  document.getElementById("login-email").disabled = true;
-
+  
 };
 
 document.getElementById("continue-guest").onclick = () => {
