@@ -43,6 +43,38 @@ export async function getAllSessions(userId) {
   return data;
 }
 
+export async function loadUserSessions(userId) {
+  const sidebar = document.getElementById("sidebar");
+  sidebar.innerHTML = `<h3>Session History</h3>`;
+
+  const { data, error } = await supabase
+    .from("sessions")
+    .select("id, started_at, current_stage")
+    .order("last_active_at", { ascending: false });
+
+  if (error) {
+    console.error("Error loading sessions:", error);
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "session-entry";
+    empty.textContent = "No saved reflections yet";
+    sidebar.appendChild(empty);
+    return;
+  }
+
+  data.forEach((session) => {
+    const div = document.createElement("div");
+    div.className = "session-entry";
+    const date = new Date(session.started_at).toLocaleDateString();
+    div.textContent = `Reflection · ${date}`;
+    sidebar.appendChild(div);
+  });
+}
+
+
 /* ───────── Messages ───────── */
 
 export async function saveMessage(sessionId, role, content) {
