@@ -362,17 +362,15 @@ You’ll get a secure link by email.
 </p>
 
    <div id="login-form">
-  <input type="email" id="login-email" placeholder="Email">
-  <button id="login-btn" class="primary" type="button">Send link</button>
+  <input type="email" id="login-email" placeholder="Email" />
+  <input type="password" id="login-password" placeholder="Password" />
+  <button id="login-btn" class="primary" type="button">
+    Sign in or create account
+  </button>
 </div>
 
-<p
-  id="login-status"
-  style="display:none; color: var(--muted); margin-top: 12px;"
->
-  Check your email and click the link to finish signing in.
-  <br />
-  Nothing will be lost.
+<p style="font-size:12px; color: var(--muted);">
+  If you’re new, this will create your account.
 </p>
 
 <p>
@@ -380,6 +378,8 @@ You’ll get a secure link by email.
     Continue without saving
   </button>
 </p>
+
+
 
 
   </div>
@@ -423,6 +423,7 @@ function bubble(text, role) {
   messagesEl.appendChild(div);
   messagesEl.scrollTop = messagesEl.scrollHeight;
 }
+
 
 
 /* ── Auth init (ONCE) ── */
@@ -554,23 +555,33 @@ document.querySelector(".menu-btn").onclick = () =>
 /* Login */
 document.getElementById("login-btn").onclick = async () => {
   const email = document.getElementById("login-email").value.trim();
-  if (!email) return;
+  const password = document.getElementById("login-password").value;
 
-  const { error } = await supabase.auth.signInWithOtp({ email });
-
-  if (error) {
-    alert(error.message);
+  if (!email || !password) {
+    alert("Please enter both email and password.");
     return;
   }
 
-  document.getElementById("login-form").style.display = "none";
-  document.getElementById("login-status").style.display = "block";
-  
+  // Try signing in first
+  let { error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  // If user doesn't exist, create account
+  if (error && error.message.includes("Invalid login credentials")) {
+    const res = await supabase.auth.signUp({
+      email,
+      password
+    });
+
+    if (res.error) {
+      alert(res.error.message);
+      return;
+    }
+  }
 };
 
-document.getElementById("continue-guest").onclick = () => {
-  loginOverlay.classList.remove("active");
-};
 </script>
 
 </body>
