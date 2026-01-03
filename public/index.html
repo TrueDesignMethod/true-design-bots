@@ -387,6 +387,7 @@ button.primary {
 <script type="module">
 import { sendMessage } from "./send.js";
 import { supabase } from "./supabase.js";
+import { initAuth } from "./auth.js";
 
 /* ── State ── */
 let currentUser = null;
@@ -396,42 +397,7 @@ let hasPromptedLogin = false;
  let currentStage = "discovery"; // allowed: discovery | planning | alignment
 
 
-/* ── Auth ── */
-supabase.auth.onAuthStateChange((event, session) => {
-  const confirmation = document.getElementById("save-confirmation");
 
-  if (event === "SIGNED_IN" && session?.user) {
-    currentUser = session.user;
-    updateAuthStatus(currentUser);
-    loadUserSessions(currentUser.id);
-
-    if (confirmation) {
-      confirmation.style.display = "block";
-
-      setTimeout(() => {
-        loginOverlay.classList.remove("active");
-        confirmation.style.display = "none";
-      }, 1800);
-    }
-  }
-
-  if (!session?.user) {
-    currentUser = null;
-    updateAuthStatus(null);
-  }
-});
-
-
-function updateAuthStatus(user) {
-  const el = document.getElementById("auth-status");
-
-  if (!user) {
-    el.textContent = "Not signed in";
-    return;
-  }
-
-  el.textContent = `Saved as ${user.email}`;
-}
  
 /* ── UI refs ── */
 const landing = document.getElementById("landing");
@@ -447,6 +413,16 @@ const chatInput = document.getElementById("chat-input");
   div.textContent = text;
 
   messagesEl.appendChild(div);
+
+    initAuth({
+  onUserChange: (user) => {
+    currentUser = user;
+  },
+  loginOverlayEl: loginOverlay,
+  confirmationEl: document.getElementById("save-confirmation"),
+  authStatusEl: document.getElementById("auth-status")
+});
+
 
   // single, stable scroll behavior
   div.scrollIntoView({ behavior: "smooth", block: "end" });
