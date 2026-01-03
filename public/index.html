@@ -42,7 +42,9 @@ body {
   display: flex;
   flex-direction: column;
 }
-
+#auth-status:hover {
+  opacity: 0.8;
+}
 /* ───────── Header ───────── */
 header {
   height: 56px;
@@ -307,6 +309,7 @@ button.primary {
   style="margin-left:auto; font-size:13px; color: var(--muted);"
 ></div>
 
+
   <button
   id="logout-btn"
   style="margin-left:12px; display:none; background:none; border:none; font-size:13px; cursor:pointer;"
@@ -456,6 +459,10 @@ function maybePromptAuth() {
   }
 }
 document.getElementById("logout-btn").onclick = async () => {
+  document.getElementById("login-email").value = "";
+document.getElementById("login-password").value = "";
+document.getElementById("save-confirmation").style.display = "none";
+
   await supabase.auth.signOut();
 
   currentUser = null;
@@ -463,14 +470,25 @@ document.getElementById("logout-btn").onclick = async () => {
   conversation = [];
   assistantTurns = 0;
   hasPromptedLogin = false;
+landing.style.display = "flex";
+chat.style.display = "none";
+messagesEl.innerHTML = "";
+
+  // Clear sidebar
+  const sidebar = document.getElementById("sidebar");
+  sidebar.innerHTML = `<h3>Session History</h3>`;
 
   loginOverlay.classList.remove("active");
 };
+
 
 /* ── Auth init (ONCE) ── */
 initAuth({
   onUserChange: async (user) => {
     currentUser = user;
+
+const pw = document.getElementById("login-password");
+if (pw) pw.value = "";
 
    if (!user) return;
 
@@ -515,6 +533,11 @@ const messages = await getMessages(lastSession.id);
 
   document.getElementById("continue-guest").onclick = () => {
   loginOverlay.classList.remove("active");
+};
+document.getElementById("auth-status").onclick = () => {
+  if (!currentUser) {
+    loginOverlay.classList.add("active");
+  }
 };
 
   
@@ -572,8 +595,6 @@ if (currentSession) {
 }
 } 
 
-
-
 /* Landing */
 document.getElementById("landing-btn").onclick = async () => {
   const text = landingInput.value.trim();
@@ -584,6 +605,7 @@ document.getElementById("landing-btn").onclick = async () => {
 
   bubble(text, "user");
   conversation.push({ role: "user", content: text });
+
 
   // CREATE SESSION IF SIGNED IN
   if (currentUser && !currentSession) {
