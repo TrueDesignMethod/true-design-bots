@@ -453,11 +453,14 @@ function bubble(text, role) {
 }
 
 function maybePromptAuth() {
-  if (!currentUser && !hasPromptedLogin) {
+  if (currentUser) return; // 🔒 never prompt signed-in users
+
+  if (!hasPromptedLogin) {
     hasPromptedLogin = true;
     loginOverlay.classList.add("active");
   }
 }
+
 document.getElementById("logout-btn").onclick = async () => {
   document.getElementById("login-email").value = "";
 document.getElementById("login-password").value = "";
@@ -487,10 +490,25 @@ initAuth({
   onUserChange: async (user) => {
     currentUser = user;
 
+    const authStatus = document.getElementById("auth-status");
+    const logoutBtn = document.getElementById("logout-btn");
+
+   if (user) {
+  authStatus.textContent = "Signed in";
+  logoutBtn.style.display = "inline";
+  hasPromptedLogin = true;
+} else {
+  authStatus.textContent = "Sign in";
+  logoutBtn.style.display = "none";
+}
+
+
+    if (!user) return;
+
+
 const pw = document.getElementById("login-password");
 if (pw) pw.value = "";
 
-   if (!user) return;
 
 // 🔑 USER SIGNED IN MID-REFLECTION
 if (!currentSession && conversation.length > 0) {
