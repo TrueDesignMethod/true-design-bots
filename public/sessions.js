@@ -42,7 +42,6 @@ export async function getAllSessions(userId) {
   if (error) throw error;
   return data;
 }
-
 export async function loadUserSessions(userId) {
   const { data: sessions } = await supabase
     .from("sessions")
@@ -52,6 +51,8 @@ export async function loadUserSessions(userId) {
 
   const sidebar = document.getElementById("sidebar");
   sidebar.innerHTML = "<h3>Session History</h3>";
+
+  if (!sessions || sessions.length === 0) return;
 
   sessions.forEach((session) => {
     const div = document.createElement("div");
@@ -63,7 +64,13 @@ export async function loadUserSessions(userId) {
 
     sidebar.appendChild(div);
   });
+
+  // ✅ ADD THIS BLOCK — RIGHT HERE
+  sidebar
+    .querySelector(".session-entry")
+    ?.classList.add("active");
 }
+
 
 
 
