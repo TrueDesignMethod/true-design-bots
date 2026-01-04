@@ -448,11 +448,6 @@ function maybePromptAuth() {
   loginOverlay.classList.add("active");
 }
 
-
-  const authStatus = document.getElementById("auth-status");
-authStatus.dataset.state = "signed-out";
-authStatus.textContent = "Sign in";
-
 /* ── Auth init (ONCE) ── */
 initAuth({
   onUserChange: async (user) => {
