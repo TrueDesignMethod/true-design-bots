@@ -296,12 +296,7 @@ button.primary {
   style="margin-left:auto; font-size:13px; color: var(--muted);"
 ></div>
 
-  <button
-  id="logout-btn"
-  style="margin-left:12px; display:none; background:none; border:none; font-size:13px; cursor:pointer;"
->
-  Log out
-</button>
+  
 
 </header>
 
@@ -407,8 +402,10 @@ import {
   createSession,
   getLatestSession,
   getMessages,
-  saveMessage
+  saveMessage,
+  loadUserSessions
 } from "./sessions.js";
+
 
 /* ── State ── */
 let currentUser = null;
@@ -441,50 +438,35 @@ function maybePromptAuth() {
   if (currentUser) return; // 🔒 never prompt signed-in users
 
   if (!hasPromptedLogin) {
-    hasPromptedLogin = true;
+   
     loginOverlay.classList.add("active");
   }
 }
 
-document.getElementById("logout-btn").onclick = async () => {
-  document.getElementById("login-email").value = "";
-document.getElementById("login-password").value = "";
-document.getElementById("save-confirmation").style.display = "none";
-
-  await supabase.auth.signOut();
-
-  currentUser = null;
-  currentSession = null;
-  conversation = [];
-  assistantTurns = 0;
-  hasPromptedLogin = false;
-landing.style.display = "flex";
-chat.style.display = "none";
-messagesEl.innerHTML = "";
-
-  // Clear sidebar
-  const sidebar = document.getElementById("sidebar");
-  sidebar.innerHTML = `<h3>Session History</h3>`;
-
-  loginOverlay.classList.remove("active");
-};
+  
 
 /* ── Auth init (ONCE) ── */
 initAuth({
   onUserChange: async (user) => {
     currentUser = user;
+if (!user) {
+  loginOverlay.classList.remove("active");
+}
 
     const authStatus = document.getElementById("auth-status");
-    const logoutBtn = document.getElementById("logout-btn");
+    
 
    if (user) {
-  authStatus.textContent = "Signed in";
-  logoutBtn.style.display = "inline";
-  hasPromptedLogin = true;
+  authStatus.textContent = "Log out";
+  authStatus.style.cursor = "pointer";
+  authStatus.style.textDecoration = "underline";
+  
 } else {
   authStatus.textContent = "Sign in";
-  logoutBtn.style.display = "none";
+  authStatus.style.cursor = "pointer";
+  authStatus.style.textDecoration = "underline";
 }
+
 
     if (!user) return;
 
@@ -498,6 +480,8 @@ if (!currentSession && conversation.length > 0) {
   for (const msg of conversation) {
     await saveMessage(currentSession.id, msg.role, msg.content);
   }
+  await loadUserSessions(user.id);
+  
 document.getElementById("save-confirmation").style.display = "block";
 loginOverlay.classList.remove("active");
 
@@ -533,11 +517,14 @@ const messages = await getMessages(lastSession.id);
   loginOverlay.classList.remove("active");
 };
 
-document.getElementById("auth-status").onclick = () => {
+document.getElementById("auth-status").onclick = async () => {
   if (!currentUser) {
     loginOverlay.classList.add("active");
+  } else {
+    await supabase.auth.signOut();
   }
 };
+
   
   document.getElementById("reset-password").onclick = async () => {
   const email = document.getElementById("login-email").value.trim();
