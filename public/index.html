@@ -135,7 +135,6 @@ section.content {
   text-align: center;
 }
 
-
 .landing-card h1 {
   font-size: 24px;
   font-weight: 500;
@@ -157,7 +156,6 @@ section.content {
   align-items: center;
 }
 
-
 input[type="text"] {
   width: 100%;
   height: 52px;
@@ -173,7 +171,6 @@ input[type="text"] {
   outline: none;
   border-color: rgba(0,0,0,0.2);
 }
-
 
 button.primary {
   background: #000;
@@ -193,8 +190,6 @@ button.primary {
   overflow: hidden; /* CRITICAL */
 }
 
-
-
 #messages {
   flex: 1;
   min-height: 0; /* 🔑 REQUIRED FOR FLEX SCROLLING */
@@ -204,9 +199,6 @@ button.primary {
   flex-direction: column;
   gap: 16px;
 }
-
-
-
 
 .bubble {
   max-width: 70%;
@@ -232,7 +224,6 @@ button.primary {
   flex-shrink: 0; /* CRITICAL */
 }
 
-
 /* ───────── Login Overlay ───────── */
 #login-overlay {
   position: fixed;
@@ -243,9 +234,7 @@ button.primary {
   display: none; /* JS controls visibility */
 }
 
-
 #login-overlay.active { display: grid; }
-
 
 .login-card {
   background: var(--card);
@@ -272,8 +261,6 @@ button.primary {
   padding: 12px;
   margin-bottom: 12px;
 }
-
-
 
 /* ───────── Mobile ───────── */
 @media (max-width: 768px) {
@@ -308,7 +295,6 @@ button.primary {
   aria-live="polite"
   style="margin-left:auto; font-size:13px; color: var(--muted);"
 ></div>
-
 
   <button
   id="logout-btn"
@@ -424,7 +410,6 @@ import {
   saveMessage
 } from "./sessions.js";
 
-
 /* ── State ── */
 let currentUser = null;
 let conversation = [];
@@ -484,7 +469,6 @@ messagesEl.innerHTML = "";
   loginOverlay.classList.remove("active");
 };
 
-
 /* ── Auth init (ONCE) ── */
 initAuth({
   onUserChange: async (user) => {
@@ -502,13 +486,10 @@ initAuth({
   logoutBtn.style.display = "none";
 }
 
-
     if (!user) return;
-
 
 const pw = document.getElementById("login-password");
 if (pw) pw.value = "";
-
 
 // 🔑 USER SIGNED IN MID-REFLECTION
 if (!currentSession && conversation.length > 0) {
@@ -523,7 +504,6 @@ loginOverlay.classList.remove("active");
   return; // DO NOT overwrite UI or reload messages
 }
 
-
    const lastSession = await getLatestSession(user.id);
 if (!lastSession) return;
 
@@ -531,7 +511,6 @@ currentSession = lastSession;
 currentStage = lastSession.current_stage;
 
 const messages = await getMessages(lastSession.id);
-
 
     // Restore UI
     landing.style.display = "none";
@@ -549,15 +528,16 @@ const messages = await getMessages(lastSession.id);
   authStatusEl: document.getElementById("auth-status")
 });
 
-  document.getElementById("continue-guest").onclick = () => {
+ document.getElementById("continue-guest").onclick = () => {
+  hasPromptedLogin = true;
   loginOverlay.classList.remove("active");
 };
+
 document.getElementById("auth-status").onclick = () => {
   if (!currentUser) {
     loginOverlay.classList.add("active");
   }
 };
-
   
   document.getElementById("reset-password").onclick = async () => {
   const email = document.getElementById("login-email").value.trim();
@@ -581,7 +561,6 @@ setTimeout(() => {
     alert("Check your inbox for a password reset link.");
   }
 };
-
 
 /* ── Assistant ── */
 async function assistantReply() {
@@ -624,7 +603,6 @@ document.getElementById("landing-btn").onclick = async () => {
   bubble(text, "user");
   conversation.push({ role: "user", content: text });
 
-
   // CREATE SESSION IF SIGNED IN
   if (currentUser && !currentSession) {
     currentSession = await createSession(currentUser.id, currentStage);
@@ -637,7 +615,6 @@ document.getElementById("landing-btn").onclick = async () => {
 
   await assistantReply();
 };
-
 
 /* Chat */
 document.getElementById("send-btn").onclick = async () => {
@@ -694,8 +671,6 @@ document.getElementById("login-btn").onclick = async () => {
     }
   }
 };
-
-
 
 </script>
 
