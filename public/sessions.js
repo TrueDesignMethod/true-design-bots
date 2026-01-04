@@ -44,38 +44,27 @@ export async function getAllSessions(userId) {
 }
 
 export async function loadUserSessions(userId) {
+  const { data: sessions } = await supabase
+    .from("sessions")
+    .select("id, title, current_stage, created_at")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+
   const sidebar = document.getElementById("sidebar");
-  sidebar.innerHTML = `<h3>Session History</h3>`;
+  sidebar.innerHTML = "<h3>Session History</h3>";
 
-  const { data, error } = await supabase
-  .from("sessions")
-  .select("id, started_at, current_stage")
-  .eq("user_id", userId)
-  .order("last_active_at", { ascending: false });
-
-
-  if (error) {
-    console.error("Error loading sessions:", error);
-    return;
-  }
-
- if (!data || data.length === 0) {
-  const empty = document.createElement("div");
-  empty.className = "session-entry";
-  empty.textContent = "Reflections you save will appear here.";
-  sidebar.appendChild(empty);
-  return;
-}
-
-
-  data.forEach((session) => {
+  sessions.forEach((session) => {
     const div = document.createElement("div");
     div.className = "session-entry";
-    const date = new Date(session.started_at).toLocaleDateString();
-    div.textContent = `Reflection · ${date}`;
+    div.textContent = session.title || "Untitled reflection";
+
+    div.dataset.sessionId = session.id;
+    div.dataset.stage = session.current_stage;
+
     sidebar.appendChild(div);
   });
 }
+
 
 
 /* ───────── Messages ───────── */
