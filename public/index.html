@@ -652,6 +652,9 @@ document.getElementById("login-btn").onclick = async () => {
     return;
   }
 
+  // 🔑 IMMEDIATELY return user to their reflection
+  loginOverlay.classList.remove("active");
+
   btn.disabled = true;
   btn.textContent = "Signing in…";
 
@@ -668,10 +671,12 @@ document.getElementById("login-btn").onclick = async () => {
       alert(signUpError.message);
       btn.disabled = false;
       btn.textContent = "Sign in or create account";
+      loginOverlay.classList.add("active"); // reopen only on failure
       return;
     }
   }
 };
+
 
 
 </script>
