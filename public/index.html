@@ -440,15 +440,18 @@ function bubble(text, role) {
 }
 
 function maybePromptAuth() {
-  if (currentUser) return; // 🔒 never prompt signed-in users
+ 
+  if (currentUser) return;
+  if (hasPromptedLogin) return;
+  if (loginOverlay.classList.contains("active")) return;
 
-  if (!hasPromptedLogin) {
-   
-    loginOverlay.classList.add("active");
-  }
+  loginOverlay.classList.add("active");
 }
 
-  
+
+  const authStatus = document.getElementById("auth-status");
+authStatus.dataset.state = "signed-out";
+authStatus.textContent = "Sign in";
 
 /* ── Auth init (ONCE) ── */
 initAuth({
@@ -458,19 +461,20 @@ if (!user) {
   loginOverlay.classList.remove("active");
 }
 
-    const authStatus = document.getElementById("auth-status");
-    
+   const authStatus = document.getElementById("auth-status");
 
-   if (user) {
+if (user) {
   authStatus.textContent = "Log out";
+  authStatus.dataset.state = "signed-in";
   authStatus.style.cursor = "pointer";
   authStatus.style.textDecoration = "underline";
-  
 } else {
   authStatus.textContent = "Sign in";
+  authStatus.dataset.state = "signed-out";
   authStatus.style.cursor = "pointer";
   authStatus.style.textDecoration = "underline";
 }
+
 
 
     if (!user) return;
@@ -485,8 +489,14 @@ if (!currentSession && conversation.length > 0) {
   for (const msg of conversation) {
     await saveMessage(currentSession.id, msg.role, msg.content);
   }
-  await loadUserSessions(user.id);
-  
+ await loadUserSessions(user.id);
+
+  setTimeout(() => {
+  document
+    .querySelector(".session-entry")
+    ?.classList.add("active");
+}, 0);
+
 document.getElementById("save-confirmation").style.display = "block";
 loginOverlay.classList.remove("active");
 
@@ -498,8 +508,11 @@ if (!lastSession) return;
 
 currentSession = lastSession;
 currentStage = lastSession.current_stage;
+await loadUserSessions(user.id);
 
-const messages = await getMessages(lastSession.id);
+const msgs = await getMessages(lastSession.id);
+    
+
 
     // Restore UI
     landing.style.display = "none";
@@ -507,10 +520,12 @@ const messages = await getMessages(lastSession.id);
     messagesEl.innerHTML = "";
     conversation = [];
 
-    messages.forEach((msg) => {
+    msgs.forEach((msg) => {
       bubble(msg.content, msg.role);
       conversation.push({ role: msg.role, content: msg.content });
     });
+assistantTurns = msgs.filter(m => m.role === "assistant").length;
+
   },
   loginOverlayEl: loginOverlay,
   confirmationEl: document.getElementById("save-confirmation"),
@@ -520,30 +535,41 @@ const messages = await getMessages(lastSession.id);
  document.getElementById("continue-guest").onclick = () => {
   hasPromptedLogin = true;
   loginOverlay.classList.remove("active");
+   currentSession = null;
+assistantTurns = 0;
+
 };
 
 document.getElementById("auth-status").onclick = async () => {
-  if (!currentUser) {
-    loginOverlay.classList.add("active");
-  } else {
-    await supabase.auth.signOut();
+  const authStatus = document.getElementById("auth-status");
+
+  if (authStatus.dataset.state === "signed-in") {
+  hasPromptedLogin = true; // suppress re-prompt this session
+  await supabase.auth.signOut();
+}
+ else {
+    if (!currentUser) {
+      loginOverlay.classList.add("active");
+    }
   }
 };
 
+
   
-  document.getElementById("reset-password").onclick = async () => {
+ document.getElementById("reset-password").onclick = async () => {
   const email = document.getElementById("login-email").value.trim();
 
   if (!email) {
     alert("Enter your email first.");
     return;
   }
-const btn = document.getElementById("reset-password");
-btn.disabled = true;
 
-setTimeout(() => {
-  btn.disabled = false;
-}, 3000);
+  const btn = document.getElementById("reset-password");
+  btn.disabled = true;
+
+  setTimeout(() => {
+    btn.disabled = false;
+  }, 3000);
 
   const { error } = await supabase.auth.resetPasswordForEmail(email);
 
@@ -553,6 +579,7 @@ setTimeout(() => {
     alert("Check your inbox for a password reset link.");
   }
 };
+
 
 /* ── Assistant ── */
 async function assistantReply() {
@@ -656,10 +683,12 @@ document.getElementById("sidebar").addEventListener("click", async (e) => {
   chat.style.display = "flex";
   messagesEl.innerHTML = "";
 
-  msgs.forEach((msg) => {
-    bubble(msg.content, msg.role);
-    conversation.push({ role: msg.role, content: msg.content });
-  });
+ msgs.forEach((msg) => {
+  bubble(msg.content, msg.role);
+  conversation.push({ role: msg.role, content: msg.content });
+});
+
+assistantTurns = msgs.filter(m => m.role === "assistant").length;
 
   // Mobile UX
   document.getElementById("sidebar").classList.remove("open");
