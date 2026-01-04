@@ -109,6 +109,11 @@ aside h3 {
   color: var(--muted);
   margin-bottom: 10px;
 }
+  .session-entry.active {
+  color: var(--text);
+  font-weight: 500;
+}
+
 
 /* ───────── Content ───────── */
 section.content {
@@ -623,6 +628,43 @@ document.getElementById("send-btn").onclick = async () => {
 document.querySelector(".menu-btn").onclick = () =>
   document.getElementById("sidebar").classList.toggle("open");
 
+document.getElementById("sidebar").addEventListener("click", async (e) => {
+  const entry = e.target.closest(".session-entry");
+  if (!entry) return;
+
+  // Active state
+  document
+    .querySelectorAll(".session-entry")
+    .forEach(el => el.classList.remove("active"));
+  entry.classList.add("active");
+
+  const sessionId = entry.dataset.sessionId;
+  const stage = entry.dataset.stage;
+  if (!sessionId) return;
+
+  // Reset state
+  currentSession = { id: sessionId };
+  currentStage = stage;
+  conversation = [];
+  assistantTurns = 0;
+
+  // Load messages
+  const msgs = await getMessages(sessionId);
+
+  // Restore UI
+  landing.style.display = "none";
+  chat.style.display = "flex";
+  messagesEl.innerHTML = "";
+
+  msgs.forEach((msg) => {
+    bubble(msg.content, msg.role);
+    conversation.push({ role: msg.role, content: msg.content });
+  });
+
+  // Mobile UX
+  document.getElementById("sidebar").classList.remove("open");
+});
+
 /* Login */
 document.getElementById("login-btn").onclick = async () => {
   const btn = document.getElementById("login-btn");
@@ -656,6 +698,7 @@ document.getElementById("login-btn").onclick = async () => {
       loginOverlay.classList.add("active"); // reopen only on failure
       return;
     }
+   
   }
 };
 
