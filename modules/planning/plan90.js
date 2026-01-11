@@ -34,8 +34,8 @@ Format STRICTLY as a 3-month table:
 | Month 3 | [Insert key focus or milestone] | [Insert reflection question] |
 
 Instructions:
-– Suggest one key focus per month
-– Milestones should be aligned with user input and previous weekly/monthly plans
+– Suggest one key focus per month, referencing PLAN_30 milestones
+– Milestones should reinforce prior weekly and monthly actions
 – Reflection prompts should help assess alignment, progress, and adjustments
 
 User input:
