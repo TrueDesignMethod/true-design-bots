@@ -1,7 +1,7 @@
 // modules/discovery/upgrade.js
 // Discovery stage module — UPGRADE
 
-module.exports = Object.freeze({
+export default {
   stage: "discovery",
   name: "UPGRADE",
   requiresPro: false,
