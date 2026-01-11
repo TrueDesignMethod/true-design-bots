@@ -2,9 +2,9 @@
 // Global module registry for TRUE
 // Exposes module namespaces per stage. No routing logic.
 
-import * as discovery from "./discovery/index.js";
-import * as planning from "./planning/index.js";
-import * as alignment from "./alignment/index.js";
+const discovery = require("./discovery");
+const planning = require("./planning");
+const alignment = require("./alignment");
 
 const modules = Object.freeze({
   discovery: Object.freeze(discovery),
@@ -12,4 +12,4 @@ const modules = Object.freeze({
   alignment: Object.freeze(alignment),
 });
 
-export default modules;
+module.exports = modules;
