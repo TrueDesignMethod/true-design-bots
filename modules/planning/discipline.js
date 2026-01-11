@@ -44,7 +44,7 @@ Sample prompts you may use:
 – “Who can provide support or accountability for this habit?”
 – “Where might you use a tracker or accountability system to stay consistent?”
 
-Formatting rules (STRICT):
+Formatting rules:
 – Short paragraphs (1–2 sentences max)
 – No numbered lists
 – Avoid long bullet lists
