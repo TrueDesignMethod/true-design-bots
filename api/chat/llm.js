@@ -14,33 +14,37 @@ export const MODELS = {
   PRO: "gpt-3.5-turbo" // can use GPT-4 if available for PRO
 };
 
-export async function callLLM({ model = MODELS.CHEAP, userPrompt, maxTokens = 300 }) {
-  const body = {
-    model,
-    messages: [
-      { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: userPrompt }
-    ],
-    max_tokens: maxTokens
-  };
-
+export async function callLLM({
+  model = MODELS.CHEAP,
+  userPrompt,
+  maxTokens = 300
+}) {
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${OPENAI_API_KEY}`
+      "Authorization": `Bearer ${OPENAI_API_KEY}`,
+      "Content-Type": "application/json"
     },
-    body: JSON.stringify(body)
+    body: JSON.stringify({
+      model,
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: userPrompt }
+      ],
+      max_tokens: maxTokens
+    })
   });
 
   const data = await res.json();
-  console.log("LLM RAW RESPONSE:", JSON.stringify(data, null, 2));
 
   if (!res.ok) {
     throw new Error(data.error?.message || "LLM call failed");
   }
 
-  if (data.choices?.[0]?.message?.content) return data.choices[0].message.content;
+  const content = data.choices?.[0]?.message?.content;
+  if (!content) {
+    throw new Error("LLM returned no usable output");
+  }
 
-  throw new Error("LLM returned no usable output");
+  return content;
 }
