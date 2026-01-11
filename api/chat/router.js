@@ -1,103 +1,91 @@
-// api/chat/router.js
-
-const modules = require("../../modules/index.js").default;
+import modules from "../../modules/index.js";
 
 /**
  * detectStage
- * Conservative default, explicit forward jumps allowed
+ * Conservative, clarity-first, no forced acceleration
  */
-function detectStage({ input = "", explicitStage = null }) {
-  const text = input.toLowerCase();
+export function detectStage({ input = "", explicitStage = null }) {
+  if (explicitStage) return explicitStage.toLowerCase();
 
-  // Explicit override always wins
-  if (explicitStage) {
-    return explicitStage.toLowerCase();
-  }
+  const t = input.toLowerCase();
 
-  // PLANNING — immediate forward motion
   if (
-    text.includes("plan") ||
-    text.includes("steps") ||
-    text.includes("how do i") ||
-    text.includes("what should i do") ||
-    text.includes("give me a plan")
-  ) {
-    return "planning";
-  }
+    t.includes("burnout") ||
+    t.includes("overwhelmed") ||
+    t.includes("can't sustain") ||
+    t.includes("balance")
+  ) return "alignment";
 
-  // ALIGNMENT — sustainability / overload signals
   if (
-    text.includes("burnt out") ||
-    text.includes("burned out") ||
-    text.includes("overwhelmed") ||
-    text.includes("can't keep up") ||
-    text.includes("too much") ||
-    text.includes("balance") ||
-    text.includes("sustainable") ||
-    text.includes("afraid i won't stick")
-  ) {
-    return "alignment";
-  }
+    t.includes("plan") ||
+    t.includes("next step") ||
+    t.includes("execute")
+  ) return "planning";
 
-  // Default
   return "discovery";
 }
 
 /**
  * detectIntent
- * Lightweight, optional
+ * Stage-agnostic signal detection only
  */
-function detectIntent(input = "") {
-  const text = input.toLowerCase();
+export function detectIntent(input = "") {
+  const t = input.toLowerCase();
 
-  if (text.includes("important") || text.includes("why")) return "values";
-  if (text.includes("pattern") || text.includes("habit")) return "patterns";
-  if (text.includes("reframe")) return "reframe";
+  if (t.includes("why")) return "target";
+  if (t.includes("pattern")) return "reflect";
+  if (t.includes("upgrade")) return "upgrade";
 
-  if (text.includes("prioritize")) return "prioritize";
-  if (text.includes("refine")) return "refine";
-  if (text.includes("7 day")) return "7day";
-  if (text.includes("30 day")) return "30day";
-  if (text.includes("90 day")) return "90day";
+  if (t.includes("execute")) return "execute";
+  if (t.includes("discipline")) return "discipline";
+  if (t.includes("evaluate")) return "evaluate";
+  if (t.includes("7")) return "plan7";
+  if (t.includes("30")) return "plan30";
+  if (t.includes("90")) return "plan90";
 
-  if (text.includes("simplify")) return "simplify";
-  if (text.includes("grow")) return "grow";
-  if (text.includes("nurture")) return "nurture";
+  if (t.includes("simplify")) return "simplify";
+  if (t.includes("iterate")) return "iterate";
+  if (t.includes("grow")) return "grow";
+  if (t.includes("nurture")) return "nurture";
 
   return null;
 }
 
 /**
  * selectModule
+ * Explicit, stage-safe, philosophy-encoded
  */
-function selectModule(stage, intent) {
-  const stageModules = modules[stage];
-
-  if (!stageModules) {
+export function selectModule(stage, intent) {
+  const stageSet = modules[stage];
+  if (!stageSet) {
     throw new Error(`Unknown stage "${stage}"`);
   }
 
+  // DISCOVERY
   if (stage === "discovery") {
-    if (intent === "values") return stageModules.target;
-    if (intent === "patterns") return stageModules.reflect;
-    if (intent === "reframe") return stageModules.update;
-    return stageModules.target;
+    if (intent === "target") return stageSet.target;
+    if (intent === "reflect") return stageSet.reflect;
+    if (intent === "upgrade") return stageSet.upgrade;
+    return stageSet.index;
   }
 
+  // PLANNING
   if (stage === "planning") {
-    if (intent === "prioritize") return stageModules.goalPrioritization;
-    if (intent === "refine") return stageModules.goalRefinement;
-    if (intent === "7day") return stageModules.plan7;
-    if (intent === "30day") return stageModules.plan30;
-    if (intent === "90day") return stageModules.plan90;
-    return stageModules.goalPrioritization;
+    if (intent === "discipline") return stageSet.discipline;
+    if (intent === "evaluate") return stageSet.evaluate;
+    if (intent === "plan7") return stageSet.plan7;
+    if (intent === "plan30") return stageSet.plan30;
+    if (intent === "plan90") return stageSet.plan90;
+    return stageSet.execute;
   }
 
+  // ALIGNMENT
   if (stage === "alignment") {
-    if (intent === "simplify") return stageModules.simplify;
-    if (intent === "grow") return stageModules.grow;
-    if (intent === "nurture") return stageModules.nurture;
-    return stageModules.simplify;
+    if (intent === "simplify") return stageSet.simplify;
+    if (intent === "iterate") return stageSet.iterate;
+    if (intent === "grow") return stageSet.grow;
+    if (intent === "nurture") return stageSet.nurture;
+    return stageSet.simplify;
   }
 
   throw new Error(`Unhandled stage "${stage}"`);
@@ -106,14 +94,6 @@ function selectModule(stage, intent) {
 /**
  * decideModel
  */
-function decideModel(module) {
-  if (module?.requiresPro === true) return "PRO";
-  return "CHEAP";
+export function decideModel(module) {
+  return module?.requiresPro ? "PRO" : "CHEAP";
 }
-
-module.exports = {
-  detectStage,
-  detectIntent,
-  selectModule,
-  decideModel
-};
