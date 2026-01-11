@@ -1,6 +1,8 @@
-import fetch from "node-fetch";
-import fs from "fs";
-import path from "path";
+// api/chat/llm.js
+
+const fetch = require("node-fetch");
+const fs = require("fs");
+const path = require("path");
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
@@ -9,12 +11,12 @@ const SYSTEM_PROMPT = fs.readFileSync(
   "utf8"
 );
 
-export const MODELS = {
+const MODELS = {
   CHEAP: "gpt-3.5-turbo",
-  PRO: "gpt-3.5-turbo" // can use GPT-4 if available for PRO
+  PRO: "gpt-3.5-turbo" // upgrade later if desired
 };
 
-export async function callLLM({
+async function callLLM({
   model = MODELS.CHEAP,
   userPrompt,
   maxTokens = 300
@@ -48,3 +50,8 @@ export async function callLLM({
 
   return content;
 }
+
+module.exports = {
+  callLLM,
+  MODELS
+};
