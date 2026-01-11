@@ -1,15 +1,15 @@
-import { simplify } from "./simplify.js";
-import { reduceRemoveDelegate } from "./reduceRemoveDelegate.js";
-import { iterate } from "./iterate.js";
-import { grow } from "./grow.js";
-import { nurture } from "./nurture.js";
-import { synthesis } from "./synthesis.js";
+// modules/alignment/index.js
+// True Alignment stage modules (CommonJS)
 
-export default {
+const simplify = require("./simplify");
+const iterate = require("./iterate");
+const grow = require("./grow");
+const nurture = require("./nurture");
+
+module.exports = Object.freeze({
+  index: simplify,   // default alignment entry point
   simplify,
-  reduceRemoveDelegate,
   iterate,
   grow,
-  nurture,
-  synthesis
-};
+  nurture
+});
