@@ -1,10 +1,12 @@
-import modules from "../../modules/index.js";
+// api/chat/router.js
+
+const modules = require("../../modules/index.js").default;
 
 /**
  * detectStage
  * Conservative, clarity-first, no forced acceleration
  */
-export function detectStage({ input = "", explicitStage = null }) {
+function detectStage({ input = "", explicitStage = null }) {
   if (explicitStage) return explicitStage.toLowerCase();
 
   const t = input.toLowerCase();
@@ -14,13 +16,17 @@ export function detectStage({ input = "", explicitStage = null }) {
     t.includes("overwhelmed") ||
     t.includes("can't sustain") ||
     t.includes("balance")
-  ) return "alignment";
+  ) {
+    return "alignment";
+  }
 
   if (
     t.includes("plan") ||
     t.includes("next step") ||
     t.includes("execute")
-  ) return "planning";
+  ) {
+    return "planning";
+  }
 
   return "discovery";
 }
@@ -29,13 +35,15 @@ export function detectStage({ input = "", explicitStage = null }) {
  * detectIntent
  * Stage-agnostic signal detection only
  */
-export function detectIntent(input = "") {
+function detectIntent(input = "") {
   const t = input.toLowerCase();
 
+  // DISCOVERY
   if (t.includes("why")) return "target";
   if (t.includes("pattern")) return "reflect";
   if (t.includes("upgrade")) return "upgrade";
 
+  // PLANNING
   if (t.includes("execute")) return "execute";
   if (t.includes("discipline")) return "discipline";
   if (t.includes("evaluate")) return "evaluate";
@@ -43,6 +51,7 @@ export function detectIntent(input = "") {
   if (t.includes("30")) return "plan30";
   if (t.includes("90")) return "plan90";
 
+  // ALIGNMENT
   if (t.includes("simplify")) return "simplify";
   if (t.includes("iterate")) return "iterate";
   if (t.includes("grow")) return "grow";
@@ -55,8 +64,9 @@ export function detectIntent(input = "") {
  * selectModule
  * Explicit, stage-safe, philosophy-encoded
  */
-export function selectModule(stage, intent) {
+function selectModule(stage, intent) {
   const stageSet = modules[stage];
+
   if (!stageSet) {
     throw new Error(`Unknown stage "${stage}"`);
   }
@@ -71,6 +81,7 @@ export function selectModule(stage, intent) {
 
   // PLANNING
   if (stage === "planning") {
+    if (intent === "execute") return stageSet.execute;
     if (intent === "discipline") return stageSet.discipline;
     if (intent === "evaluate") return stageSet.evaluate;
     if (intent === "plan7") return stageSet.plan7;
@@ -94,6 +105,13 @@ export function selectModule(stage, intent) {
 /**
  * decideModel
  */
-export function decideModel(module) {
+function decideModel(module) {
   return module?.requiresPro ? "PRO" : "CHEAP";
 }
+
+module.exports = {
+  detectStage,
+  detectIntent,
+  selectModule,
+  decideModel
+};
