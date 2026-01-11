@@ -35,9 +35,9 @@ Format STRICTLY as a 4-week table (Week 1 → Week 4):
 | Week 4 | [Insert key focus or action] | [Insert reflection question] |
 
 Instructions:
-– Suggest one key action per week
-– Each week’s focus should be aligned with user input
-– Reflection prompts should help the user assess alignment, energy, and clarity
+– Suggest one key action per week, using the user input and PLAN_7 as a reference
+– Each week’s focus should reinforce prior weekly actions while expanding to new priorities
+– Reflection prompts should help assess alignment, energy, and clarity
 
 User input:
 "${input}"
