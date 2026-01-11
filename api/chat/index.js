@@ -34,32 +34,34 @@ async function handlePost(req, res) {
       intent = null
     } = body;
 
-    // 1. Detect stage (with explicit override + plan/alignment jumps)
+    // 1. Detect stage (explicit override respected)
     const stage = detectStage({ input, explicitStage });
 
-    // 2. Detect intent (lightweight, optional)
-    let resolvedIntent = intent || detectIntent(input);
+    // 2. Detect intent (optional, lightweight)
+    const resolvedIntent = intent || detectIntent(input);
 
-    if (!resolvedIntent && stage === "discovery") {
-      resolvedIntent = "values";
-    }
-
-    // 3. Select module
+    // 3. Select module (single-stage, no stacking)
     const module = selectModule(stage, resolvedIntent);
 
-    // 4. Detect stage transition (for optional announcement)
+    // 4. Detect previous stage (if assistant messages include stage metadata)
     const previousStage = messages
       .slice()
       .reverse()
-      .find(m => m.role === "assistant" && m.stage)?.stage;
+      .find(
+        m =>
+          m.role === "assistant" &&
+          typeof m.stage === "string"
+      )?.stage || null;
 
-    const stageChanged = Boolean(previousStage && previousStage !== stage);
+    const stageChanged =
+      Boolean(previousStage && previousStage !== stage);
 
-    // 5. Decide model tier
+    // 5. Decide model tier (module-driven)
     const modelTier = decideModel(module);
-    const model = modelTier === "PRO" ? MODELS.PRO : MODELS.CHEAP;
+    const model =
+      modelTier === "PRO" ? MODELS.PRO : MODELS.CHEAP;
 
-    // 6. Build prompt (this is where reflection vs planning tone lives)
+    // 6. Build prompt (module owns tone + framing)
     const userPrompt = module.buildPrompt({
       input,
       messages,
@@ -75,7 +77,7 @@ async function handlePost(req, res) {
       maxTokens: module.tokenCeiling
     });
 
-    // 8. Respond
+    // 8. Respond (explicitly tag stage for future turns)
     return res.json({
       stage,
       module: module.name,
