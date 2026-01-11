@@ -1,19 +1,19 @@
-import { actionDesign } from "./actionDesign.js";
-import { goalPrioritization } from "./goalPrioritization.js";
-import { goalRefinement } from "./goalRefinement.js";
-import { obstacleMapping } from "./obstacleMapping.js";
-import { plan7 } from "./plan7.js";
-import { plan30 } from "./plan30.js";
-import { plan90 } from "./plan90.js";
-import { synthesis } from "./synthesis.js";
+// modules/planning/index.js
+// True Planning stage modules (CommonJS)
 
-export default {
-  actionDesign,
-  goalPrioritization,
-  goalRefinement,
-  obstacleMapping,
+const execute = require("./execute");
+const discipline = require("./discipline");
+const evaluate = require("./evaluate");
+const plan7 = require("./plan7");
+const plan30 = require("./plan30");
+const plan90 = require("./plan90");
+
+module.exports = Object.freeze({
+  index: execute,   // default planning entry point
+  execute,
+  discipline,
+  evaluate,
   plan7,
   plan30,
-  plan90,
-  synthesis
-};
+  plan90
+});
