@@ -25,7 +25,7 @@ Guidelines:
 – Include a reflection prompt for each day
 – Support autonomy and choice
 
-Present the plan as:
+Present STRICTLY as structured daily sections:
 
 Day 1 — Focus
 Action:
