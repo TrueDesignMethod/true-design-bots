@@ -86,16 +86,17 @@ function selectModule(stage, intent) {
     return stageSet.index; // Default discovery entry
   }
 
-  // ---------------- PLANNING ----------------
-  if (stage === "planning") {
-    if (intent === "execute") return stageSet.execute;
-    if (intent === "discipline") return stageSet.discipline;
-    if (intent === "evaluate") return stageSet.evaluate;
-    if (intent === "plan7") return stageSet.plan7;
-    if (intent === "plan30") return stageSet.plan30;
-    if (intent === "plan90") return stageSet.plan90;
-    return stageSet.index; // DEFAULT: entry.js
-  }
+  // PLANNING
+if (stage === "planning") {
+  if (intent === "execute") return stageSet.execute;
+  if (intent === "discipline") return stageSet.discipline;
+  if (intent === "evaluate") return stageSet.evaluate;
+  if (intent === "plan7") return stageSet.plan7;
+  if (intent === "plan30") return stageSet.plan30;
+  if (intent === "plan90") return stageSet.plan90;
+  return stageSet.index;  // <— now points to execute
+}
+
 
   // ---------------- ALIGNMENT ----------------
   if (stage === "alignment") {
