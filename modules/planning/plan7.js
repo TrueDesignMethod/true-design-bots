@@ -25,17 +25,29 @@ Guidelines:
 – Include a reflection prompt for each day
 – Support autonomy and choice
 
-Format STRICTLY as a 7-day table:
+Present the plan as:
 
-| Day   | Focus / Action | Reflection Prompt |
-|-------|----------------|-----------------|
-| Day 1 | [Insert action] | [Insert reflection question] |
-| Day 2 | [Insert action] | [Insert reflection question] |
-| Day 3 | [Insert action] | [Insert reflection question] |
-| Day 4 | [Insert action] | [Insert reflection question] |
-| Day 5 | [Insert action] | [Insert reflection question] |
-| Day 6 | [Insert action] | [Insert reflection question] |
-| Day 7 | [Insert action] | [Insert reflection question] |
+Day 1 — Focus
+Action:
+• [Insert action]
+
+Reflection:
+• [Insert reflection question]
+
+Day 2 — Focus
+Action:
+• [Insert action]
+
+Reflection:
+• [Insert reflection question]
+
+Day 3 — Focus
+Action:
+• [Insert action]
+
+Reflection:
+• [Insert reflection question]
+
 
 Instructions:
 – Suggest one small, achievable action per day
