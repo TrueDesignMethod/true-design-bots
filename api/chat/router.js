@@ -1,20 +1,21 @@
 // api/chat/router.js
-// V2 Router — stage-safe, entry-aware, consent-respecting
+// TRUE V2 - Router / Module Selector
 
 const modules = require("../../modules/index.js");
 
 /**
- * detectStage (FALLBACK ONLY)
- * Used ONLY when:
- * - no session.stage
- * - no declaredStage
- * - legacy or malformed request
- *
- * Must remain conservative.
+ * detectStage
+ * Used only as a fallback if:
+ * - No current session stage
+ * - No declared stage from client
+ * - Legacy/malformed request
  */
-function detectStage({ input = "" }) {
+function detectStage({ input = "", explicitStage = null }) {
+  if (explicitStage) return explicitStage.toLowerCase();
+
   const t = input.toLowerCase();
 
+  // ALIGNMENT cues
   if (
     t.includes("burnout") ||
     t.includes("overwhelmed") ||
@@ -24,6 +25,7 @@ function detectStage({ input = "" }) {
     return "alignment";
   }
 
+  // PLANNING cues
   if (
     t.includes("plan") ||
     t.includes("next step") ||
@@ -32,14 +34,13 @@ function detectStage({ input = "" }) {
     return "planning";
   }
 
-  // Absolute safe default
+  // Default fallback
   return "discovery";
 }
 
 /**
  * detectIntent
- * Stage-agnostic signal detection.
- * Never advances stage.
+ * Lightweight, stage-agnostic signal detection
  */
 function detectIntent(input = "") {
   const t = input.toLowerCase();
@@ -68,8 +69,7 @@ function detectIntent(input = "") {
 
 /**
  * selectModule
- * Assumes stage has already been resolved upstream.
- * Never mutates stage.
+ * Returns the module to use given stage + intent
  */
 function selectModule(stage, intent) {
   const stageSet = modules[stage];
@@ -78,15 +78,15 @@ function selectModule(stage, intent) {
     throw new Error(`Unknown stage "${stage}"`);
   }
 
-  // DISCOVERY
+  // ---------------- DISCOVERY ----------------
   if (stage === "discovery") {
     if (intent === "target") return stageSet.target;
     if (intent === "reflect") return stageSet.reflect;
     if (intent === "upgrade") return stageSet.upgrade;
-    return stageSet.index;
+    return stageSet.index; // Default discovery entry
   }
 
-  // PLANNING
+  // ---------------- PLANNING ----------------
   if (stage === "planning") {
     if (intent === "execute") return stageSet.execute;
     if (intent === "discipline") return stageSet.discipline;
@@ -94,16 +94,16 @@ function selectModule(stage, intent) {
     if (intent === "plan7") return stageSet.plan7;
     if (intent === "plan30") return stageSet.plan30;
     if (intent === "plan90") return stageSet.plan90;
-    return stageSet.execute;
+    return stageSet.index; // DEFAULT: entry.js
   }
 
-  // ALIGNMENT
+  // ---------------- ALIGNMENT ----------------
   if (stage === "alignment") {
     if (intent === "simplify") return stageSet.simplify;
     if (intent === "iterate") return stageSet.iterate;
     if (intent === "grow") return stageSet.grow;
     if (intent === "nurture") return stageSet.nurture;
-    return stageSet.simplify;
+    return stageSet.simplify; // Default alignment entry
   }
 
   throw new Error(`Unhandled stage "${stage}"`);
@@ -111,14 +111,14 @@ function selectModule(stage, intent) {
 
 /**
  * decideModel
- * Model selection remains module-driven.
+ * Module-driven model selection
  */
 function decideModel(module) {
   return module?.requiresPro ? "PRO" : "CHEAP";
 }
 
 module.exports = {
-  detectStage,   // fallback only
+  detectStage,
   detectIntent,
   selectModule,
   decideModel
