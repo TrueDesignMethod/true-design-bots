@@ -1,6 +1,6 @@
 // modules/discovery/target.js
 
-export default {
+module.exports = {
   stage: "discovery",
   name: "TARGET",
   requiresPro: false,
