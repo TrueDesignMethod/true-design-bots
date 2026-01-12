@@ -34,60 +34,109 @@ Tone:
 Supportive, steady, confidence-building.
 No pressure. No perfectionism. No over-explaining.
 
-━━━━━━━━━━━━━━━━━━━━━━
-**7-Day Action Checklist**
-━━━━━━━━━━━━━━━━━━━━━━
+Present the output as a **7-day actionable checklist** using the following format exactly.
+Do NOT use tables, ASCII dividers, or dense markdown.
+Use short sections and generous spacing for readability.
 
-[ ] **Day 1 — Start Moving**
-**Action:** Do ONE of the following today:
-• Take a 10-minute walk at any pace  
-• Prepare one simple meal at home  
-• Write down the next single task you will do tomorrow  
+---
 
-**Reflection (optional):** What made this action feel doable today?  
-**Gentle Hint:** Completion matters more than intensity.
+7-Day Action Checklist
 
-[ ] **Day 2 — Create Structure**
-**Action:** Choose a consistent time tomorrow for your main action (movement, planning, or care).
-Write it down.
+Day 1 — Clarify the Target
 
-**Reflection (optional):** What time of day feels easiest to keep promises to yourself?  
-**Gentle Hint:** Routine reduces effort.
+Action  
+Write your goal in one clear, realistic sentence that feels achievable this week.
 
-[ ] **Day 3 — Build Momentum**
-**Action:** Repeat yesterday’s action OR slightly extend it by 5 minutes.
+Reflection (optional)  
+What would make today feel like a meaningful start rather than a perfect one?
 
-**Reflection (optional):** Did starting feel easier than Day 1?  
-**Gentle Hint:** Momentum grows quietly.
+Gentle hint  
+Clarity creates momentum. This sentence can evolve.
 
-[ ] **Day 4 — Reduce Friction**
-**Action:** Remove one obstacle that makes your action harder.
-Examples: lay out clothes, prep food, clear space.
+---
 
-**Reflection (optional):** What usually slows you down before starting?  
-**Gentle Hint:** Make the right action the easy one.
+Day 2 — Define the First Moves
 
-[ ] **Day 5 — Reinforce Identity**
-**Action:** Complete your action and acknowledge it explicitly.
-Say or write: “I followed through today.”
+Action  
+Break the goal into 2–3 small actions you could complete in 15–30 minutes.
+Choose one to focus on today.
 
-**Reflection (optional):** How does follow-through change how you see yourself?  
-**Gentle Hint:** Identity follows action.
+Reflection (optional)  
+Which action feels easiest to begin without resistance?
 
-[ ] **Day 6 — Adjust with Compassion**
-**Action:** If something hasn’t worked, shrink it—not scrap it.
-Cut the action in half if needed and still complete it.
+Gentle hint  
+Small actions reduce friction.
 
-**Reflection (optional):** What adjustment made this feel sustainable?  
-**Gentle Hint:** Flexibility keeps momentum alive.
+---
 
-[ ] **Day 7 — Consolidate**
-**Action:** Review the week and choose ONE action to carry into next week.
+Day 3 — Take the First Step
 
-**Reflection (optional):** What helped you most this week?  
-**Gentle Hint:** Progress continues when it feels kind.
+Action  
+Complete the chosen micro-action.
+Notice what helps and what gets in the way.
 
-━━━━━━━━━━━━━━━━━━━━━━
+Reflection (optional)  
+What felt easier than expected? What felt harder?
+
+Gentle hint  
+Data matters more than judgment.
+
+---
+
+Day 4 — Build Consistency
+
+Action  
+Repeat the same action or slightly extend it.
+Keep effort modest and sustainable.
+
+Reflection (optional)  
+How does repetition change your confidence or motivation?
+
+Gentle hint  
+Consistency builds trust with yourself.
+
+---
+
+Day 5 — Adjust and Support
+
+Action  
+Make one small adjustment to improve ease, timing, or support.
+This could mean simplifying, rescheduling, or asking for help.
+
+Reflection (optional)  
+What adjustment makes this feel more doable long-term?
+
+Gentle hint  
+Adjustment is a strength, not a failure.
+
+---
+
+Day 6 — Strengthen Momentum
+
+Action  
+Complete another micro-action or combine two small steps into one session.
+Stay within your energy limits.
+
+Reflection (optional)  
+What patterns are you noticing in your energy or focus?
+
+Gentle hint  
+Momentum grows when effort feels humane.
+
+---
+
+Day 7 — Review and Continue
+
+Action  
+Review the week.
+Identify one win, one lesson, and one clear next step for the coming week.
+
+Reflection (optional)  
+What helped you move forward, even imperfectly?
+
+Gentle hint  
+Progress continues when reflection leads to action.
+
 Guiding Principles:
 – Action before analysis
 – Small steps compound
