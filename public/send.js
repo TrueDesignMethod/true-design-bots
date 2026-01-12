@@ -31,17 +31,26 @@ async function apiPost(body) {
  * @param {Array<{ role: "user" | "assistant", content: string }>} conversation
  *
  * @param {Object} [options]
+ *
  * @param {boolean} [options.allowStageTransition=true]
  *   Whether the server may suggest a stage transition.
- *   This does NOT force a transition.
+ *
+ * @param {boolean} [options.consent=false]
+ *   Explicit user consent to enact a previously suggested stage change.
+ *   This should only be true on the turn AFTER a suggestion.
  *
  * @returns {Promise<{
  *   reply: string,
- *   suggestedStage?: "discovery" | "planning" | "alignment",
- *   requiresConsent?: boolean
+ *   stage: string,
+ *   module: string,
+ *   intent: string
  * }>}
  */
-export async function sendMessage(stage, conversation = [], options = {}) {
+export async function sendMessage(
+  stage,
+  conversation = [],
+  options = {}
+) {
   const lastUser = conversation[conversation.length - 1];
 
   return apiPost({
@@ -50,8 +59,12 @@ export async function sendMessage(stage, conversation = [], options = {}) {
     input: lastUser?.content || "",
     messages: conversation,
 
-    clientStage: stage,
+    // TRUE ENTRY SIGNALS
+    declaredStage: stage,
     allowStageTransition:
-      options.allowStageTransition !== false
+      options.allowStageTransition !== false,
+
+    // CONSENT SIGNAL (event-based)
+    consent: options.consent === true
   });
 }
