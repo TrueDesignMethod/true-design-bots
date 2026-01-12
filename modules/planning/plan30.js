@@ -25,14 +25,35 @@ Guidelines:
 – Include reflection prompts for each week
 – Support autonomy and choice
 
-Format STRICTLY as a 4-week table (Week 1 → Week 4):
+Present a 4-week List (Week 1 → Week 4):
 
-| Week  | Focus / Action | Reflection Prompt |
-|-------|----------------|-----------------|
-| Week 1 | [Insert key focus or action] | [Insert reflection question] |
-| Week 2 | [Insert key focus or action] | [Insert reflection question] |
-| Week 3 | [Insert key focus or action] | [Insert reflection question] |
-| Week 4 | [Insert key focus or action] | [Insert reflection question] |
+Week 1 — Focus
+Primary focus or action:
+• [Insert key focus or action]
+
+Reflection:
+• [Insert reflection question]
+
+Week 2 — Focus
+Primary focus or action:
+• [Insert key focus or action]
+
+Reflection:
+• [Insert reflection question]
+
+Week 3 — Focus
+Primary focus or action:
+• [Insert key focus or action]
+
+Reflection:
+• [Insert reflection question]
+
+Week 4 — Focus
+Primary focus or action:
+• [Insert key focus or action]
+
+Reflection:
+• [Insert reflection question]
 
 Instructions:
 – Suggest one key action per week, using the user input and PLAN_7 as a reference
