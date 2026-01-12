@@ -1,14 +1,18 @@
 // api/chat/router.js
+// V2 Router — stage-safe, entry-aware, consent-respecting
 
 const modules = require("../../modules/index.js").default;
 
 /**
- * detectStage
- * Conservative, clarity-first, no forced acceleration
+ * detectStage (FALLBACK ONLY)
+ * Used ONLY when:
+ * - no session.stage
+ * - no declaredStage
+ * - legacy or malformed request
+ *
+ * Must remain conservative.
  */
-function detectStage({ input = "", explicitStage = null }) {
-  if (explicitStage) return explicitStage.toLowerCase();
-
+function detectStage({ input = "" }) {
   const t = input.toLowerCase();
 
   if (
@@ -28,12 +32,14 @@ function detectStage({ input = "", explicitStage = null }) {
     return "planning";
   }
 
+  // Absolute safe default
   return "discovery";
 }
 
 /**
  * detectIntent
- * Stage-agnostic signal detection only
+ * Stage-agnostic signal detection.
+ * Never advances stage.
  */
 function detectIntent(input = "") {
   const t = input.toLowerCase();
@@ -62,7 +68,8 @@ function detectIntent(input = "") {
 
 /**
  * selectModule
- * Explicit, stage-safe, philosophy-encoded
+ * Assumes stage has already been resolved upstream.
+ * Never mutates stage.
  */
 function selectModule(stage, intent) {
   const stageSet = modules[stage];
@@ -104,13 +111,14 @@ function selectModule(stage, intent) {
 
 /**
  * decideModel
+ * Model selection remains module-driven.
  */
 function decideModel(module) {
   return module?.requiresPro ? "PRO" : "CHEAP";
 }
 
 module.exports = {
-  detectStage,
+  detectStage,   // fallback only
   detectIntent,
   selectModule,
   decideModel
