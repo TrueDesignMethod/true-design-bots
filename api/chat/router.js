@@ -1,7 +1,7 @@
 // api/chat/router.js
 // V2 Router — stage-safe, entry-aware, consent-respecting
 
-const modules = require("../../modules/index.js").default;
+const modules = require("../../modules/index.js");
 
 /**
  * detectStage (FALLBACK ONLY)
