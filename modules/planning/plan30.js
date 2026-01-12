@@ -25,7 +25,7 @@ Guidelines:
 – Include reflection prompts for each week
 – Support autonomy and choice
 
-Present a 4-week List (Week 1 → Week 4):
+Present STRICTLY as structured weekly sections (Week 1 → Week 4):
 
 Week 1 — Focus
 Primary focus or action:
