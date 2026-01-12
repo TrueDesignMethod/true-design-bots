@@ -1,7 +1,7 @@
 // modules/discovery/upgrade.js
 // Discovery stage module — UPGRADE
 
-export default {
+module.exports = {
   stage: "discovery",
   name: "UPGRADE",
   requiresPro: false,
