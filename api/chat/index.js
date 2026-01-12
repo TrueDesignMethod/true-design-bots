@@ -8,7 +8,7 @@ const {
   decideModel
 } = require("./router.js");
 
-const { resolveEntryStage } = require("./entryResolver.js"); // V2 CHANGE
+const { resolveEntryStage } = require("./entryResolver.js");
 const { callLLM, MODELS } = require("./llm.js");
 
 const cors = MicroCors();
@@ -32,18 +32,20 @@ async function handlePost(req, res) {
     const {
       input = "",
       messages = [],
-      explicitStage = null,
+      clientStage = null,   // ← IMPORTANT
+      explicitStage = null, // ← ONLY user-declared
       intent = null,
       sessionStage = null,
       consent = false
     } = body;
 
     // ─────────────────────────────────────────────
-    // 1. TRUE ENTRY RESOLUTION (V2)
+    // 1. RESOLVE STAGE (LOCKED, V2)
     // ─────────────────────────────────────────────
     let stage = resolveEntryStage({
-      declaredStage: explicitStage,
       sessionStage,
+      clientStage,
+      declaredStage: explicitStage,
       messages,
       consent
     });
@@ -56,24 +58,24 @@ async function handlePost(req, res) {
     }
 
     // ─────────────────────────────────────────────
-    // 3. Intent detection (stage-agnostic)
+    // 3. INTENT (NON-DESTRUCTIVE)
     // ─────────────────────────────────────────────
     const resolvedIntent = intent || detectIntent(input);
 
     // ─────────────────────────────────────────────
-    // 4. Module selection (single-stage)
+    // 4. MODULE SELECTION (STAGE-SAFE)
     // ─────────────────────────────────────────────
     const module = selectModule(stage, resolvedIntent);
 
     // ─────────────────────────────────────────────
-    // 5. Model selection
+    // 5. MODEL SELECTION
     // ─────────────────────────────────────────────
     const modelTier = decideModel(module);
     const model =
       modelTier === "PRO" ? MODELS.PRO : MODELS.CHEAP;
 
     // ─────────────────────────────────────────────
-    // 6. Build prompt
+    // 6. PROMPT
     // ─────────────────────────────────────────────
     const userPrompt = module.buildPrompt({
       input,
@@ -82,7 +84,7 @@ async function handlePost(req, res) {
     });
 
     // ─────────────────────────────────────────────
-    // 7. Call LLM
+    // 7. CALL LLM
     // ─────────────────────────────────────────────
     const reply = await callLLM({
       model,
@@ -91,7 +93,7 @@ async function handlePost(req, res) {
     });
 
     // ─────────────────────────────────────────────
-    // 8. Respond
+    // 8. RESPONSE (STAGE TAGGED)
     // ─────────────────────────────────────────────
     return res.json({
       stage,
