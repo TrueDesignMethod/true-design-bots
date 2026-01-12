@@ -1,6 +1,6 @@
 // modules/discovery/reflect.js
 
-export default {
+module.exports = {
   stage: "discovery",
   name: "REFLECT",
   requiresPro: false,
