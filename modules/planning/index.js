@@ -7,9 +7,11 @@ const evaluate = require("./evaluate");
 const plan7 = require("./plan7");
 const plan30 = require("./plan30");
 const plan90 = require("./plan90");
+const entry = require("./entry");
 
 module.exports = Object.freeze({
-  index: execute,   // default planning entry point
+  index: entry,    // ⬅ planning now enters through clarification
+  entry,
   execute,
   discipline,
   evaluate,
