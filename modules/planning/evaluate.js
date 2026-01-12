@@ -20,14 +20,52 @@ Encourage reflection on outcomes and patterns to identify successes and opportun
 Support strategic adjustments that align actions with evolving insights and better outcomes.
 Guide the user toward a clearer understanding of progress and how it informs next steps.
 
-Format as a weekly evaluation table:
+Present the evaluation as four clearly labeled weekly review sections (Week 1 → Week 4).
+Each week must include:
+– observed outcome or progress
+– one key insight
+– one adjustment or next step
 
-| Week  | Outcome / Progress | Key Insight | Adjustment / Next Step |
-|-------|-----------------|------------|----------------------|
-| Week 1 | [Insert observed outcome] | [Insert insight] | [Insert adjustment or next step] |
-| Week 2 | [Insert observed outcome] | [Insert insight] | [Insert adjustment or next step] |
-| Week 3 | [Insert observed outcome] | [Insert insight] | [Insert adjustment or next step] |
-| Week 4 | [Insert observed outcome] | [Insert insight] | [Insert adjustment or next step] |
+Week 1 — Review
+Observed outcome or progress:
+• [Insert observed outcome]
+
+Key insight:
+• [Insert insight]
+
+Adjustment or next step:
+• [Insert adjustment or next step]
+
+Week 2 — Review
+Observed outcome or progress:
+• [Insert observed outcome]
+
+Key insight:
+• [Insert insight]
+
+Adjustment or next step:
+• [Insert adjustment or next step]
+
+Week 3 — Review
+Observed outcome or progress:
+• [Insert observed outcome]
+
+Key insight:
+• [Insert insight]
+
+Adjustment or next step:
+• [Insert adjustment or next step]
+
+Week 4 — Review
+Observed outcome or progress:
+• [Insert observed outcome]
+
+Key insight:
+• [Insert insight]
+
+Adjustment or next step:
+• [Insert adjustment or next step]
+
 
 Guidelines:
 – Measure outcomes and review progress
