@@ -25,13 +25,29 @@ Guidelines:
 – Include reflection prompts for each month
 – Support autonomy and choice
 
-Format STRICTLY as a 3-month table:
+Present STRICTLY as three labeled monthly sections:
 
-| Month  | Focus / Action | Reflection Prompt |
-|--------|----------------|-----------------|
-| Month 1 | [Insert key focus or milestone] | [Insert reflection question] |
-| Month 2 | [Insert key focus or milestone] | [Insert reflection question] |
-| Month 3 | [Insert key focus or milestone] | [Insert reflection question] |
+Month 1 — Primary Focus
+Key focus or milestone:
+• [Insert key focus or milestone]
+
+Reflection:
+• [Insert reflection question]
+
+Month 2 — Primary Focus
+Key focus or milestone:
+• [Insert key focus or milestone]
+
+Reflection:
+• [Insert reflection question]
+
+Month 3 — Primary Focus
+Key focus or milestone:
+• [Insert key focus or milestone]
+
+Reflection:
+• [Insert reflection question]
+
 
 Instructions:
 – Suggest one key focus per month, referencing PLAN_30 milestones
