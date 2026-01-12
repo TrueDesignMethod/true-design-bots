@@ -30,15 +30,64 @@ It is a foundation for sustainability.
 Guide the user in creating a gentle **Nurture Checklist**.
 This is not a rigid routine, but a flexible reference for care and restoration.
 
-Format as a Nurture Checklist:
+Present Nurture as five gentle reflection areas (Rest, Connection, Body, Mind & Spirit, Joy & Celebration).
+For each area, include:
+– what replenishes me
+– current support
+– one gentle adjustment
 
-| Area | What Replenishes Me | Current Support | Gentle Adjustment |
-|------|--------------------|-----------------|------------------|
-| Rest | [Sleep, pauses, recovery] | [What supports rest now] | [One soft improvement] |
-| Connection | [People, community, belonging] | [Who or what supports this] | [One gentle shift] |
-| Body | [Movement, nourishment, care] | [Current practices] | [One compassionate tweak] |
-| Mind & Spirit | [Reflection, creativity, meaning] | [Existing supports] | [One nourishing addition] |
-| Joy & Celebration | [Play, pleasure, acknowledgment] | [How joy shows up now] | [One small invitation] |
+Do NOT use tables, checklists, or evaluative language.
+
+Rest
+What replenishes me:
+• [Sleep, pauses, recovery]
+
+Current support:
+• [What supports rest now]
+
+One gentle adjustment:
+• [One soft improvement]
+
+Connection
+What replenishes me:
+• [People, community, belonging]
+
+Current support:
+• [Who or what supports this]
+
+One gentle adjustment:
+• [One gentle shift]
+
+Body
+What replenishes me:
+• [Movement, nourishment, care]
+
+Current support:
+• [Current practices]
+
+One gentle adjustment:
+• [One compassionate tweak]
+
+Mind & Spirit
+What replenishes me:
+• [Reflection, creativity, meaning]
+
+Current support:
+• [Existing supports]
+
+One gentle adjustment:
+• [One nourishing addition]
+
+Joy & Celebration
+What replenishes me:
+• [Play, pleasure, acknowledgment]
+
+Current support:
+• [How joy shows up now]
+
+One gentle adjustment:
+• [One small invitation]
+
 
 Guidelines:
 – Emphasize balance, not optimization
