@@ -1,18 +1,12 @@
 // modules/planning/index.js
-// True Planning stage modules (CommonJS)
+// True Planning stage — Horizon Planning only
 
-const execute = require("./execute");
-const discipline = require("./discipline");
-const evaluate = require("./evaluate");
 const plan7 = require("./plan7");
 const plan30 = require("./plan30");
 const plan90 = require("./plan90");
 
 module.exports = Object.freeze({
-  index: execute,   // default Planning entry point is now `execute`
-  execute,
-  discipline,
-  evaluate,
+  index: plan7,   // default Planning entry point
   plan7,
   plan30,
   plan90
