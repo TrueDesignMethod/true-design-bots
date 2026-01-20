@@ -1,16 +1,17 @@
 // api/chat/router.js
 // TRUE V3 — Router / Module Selector
-// Enforces stage authority, section-level intent only, no silent advancement
+// Stage authority enforced via exit criteria
 
 const modules = require("../../modules/index.js");
+const { canExitStage } = require("../../core/governance/stageExitEvaluator");
 
 /**
  * detectStage (V3)
- * Used ONLY as a hard fallback.
  * TRUE V3 assumes all users begin in Discovery.
+ * Stage progression requires explicit proof.
  */
-function detectStage() {
-  return "discovery";
+function detectStage({ currentStage }) {
+  return currentStage || "discovery";
 }
 
 /**
@@ -44,9 +45,33 @@ function detectIntent(input = "") {
 }
 
 /**
+ * resolveStage (V3)
+ * Determines whether the user may advance stages.
+ * No implicit forward motion allowed.
+ */
+function resolveStage({ currentStage, requestedStage, evidence }) {
+  // Same stage → always allowed
+  if (!requestedStage || requestedStage === currentStage) {
+    return currentStage;
+  }
+
+  // Ask governance layer if exit is permitted
+  const allowed = canExitStage({
+    stage: currentStage,
+    evidence
+  });
+
+  if (!allowed) {
+    // Guardrail: block advancement silently
+    return currentStage;
+  }
+
+  return requestedStage;
+}
+
+/**
  * selectModule (V3)
  * Strictly stage-locked.
- * Exit criteria enforcement happens upstream.
  */
 function selectModule(stage, intent) {
   const stageSet = modules[stage];
@@ -60,8 +85,6 @@ function selectModule(stage, intent) {
     if (intent === "target") return stageSet.target;
     if (intent === "reflect") return stageSet.reflect;
     if (intent === "upgrade") return stageSet.upgrade;
-
-    // Default: Discovery always begins at TARGET
     return stageSet.target;
   }
 
@@ -73,8 +96,6 @@ function selectModule(stage, intent) {
     if (intent === "plan7") return stageSet.plan7;
     if (intent === "plan30") return stageSet.plan30;
     if (intent === "plan90") return stageSet.plan90;
-
-    // Default: Sustainment begins with EXECUTE
     return stageSet.execute;
   }
 
@@ -84,8 +105,6 @@ function selectModule(stage, intent) {
     if (intent === "iterate") return stageSet.iterate;
     if (intent === "grow") return stageSet.grow;
     if (intent === "nurture") return stageSet.nurture;
-
-    // Default: Alignment begins with SIMPLIFY
     return stageSet.simplify;
   }
 
@@ -94,7 +113,7 @@ function selectModule(stage, intent) {
 
 /**
  * decideModel (V3)
- * Model choice is module-driven and MCL-compliant
+ * Module-driven and MCL-compliant
  */
 function decideModel(module) {
   return module?.requiresPro ? "PRO" : "CHEAP";
@@ -103,6 +122,7 @@ function decideModel(module) {
 module.exports = {
   detectStage,
   detectIntent,
+  resolveStage,
   selectModule,
   decideModel
 };
