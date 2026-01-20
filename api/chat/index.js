@@ -1,16 +1,23 @@
 // api/chat/index.js
 // TRUE V3 — Chat Entry Point
-// Enforces stage authority, prevents silent drift, and preserves user agency
+// Single-entry system with exit-criteria–driven progression
 
 const MicroCors = require("micro-cors");
+
 const {
-  detectStage,
-  detectIntent,
+  getCurrentPosition,
+  getNextPosition
+} = require("./progression.js");
+
+const {
+  evaluateExitCriteria
+} = require("./exitCriteria.js");
+
+const {
   selectModule,
   decideModel
 } = require("./router.js");
 
-const { resolveEntryStage } = require("./entryResolver.js");
 const { callLLM, MODELS } = require("./llm.js");
 
 const cors = MicroCors();
@@ -43,73 +50,55 @@ async function handlePost(req, res) {
       input = "",
       messages = [],
 
-      // Stage authority inputs
-      explicitStage = null,   // user-declared (highest authority)
-      sessionStage = null,    // persisted session state
-      clientStage = null,     // UI memory only (non-authoritative)
+      // Persisted progression state
+      sessionProgress = null, // { stage, section }
 
-      intent = null,
       consent = false
     } = body;
 
     // ─────────────────────────────────────────────
-    // 1. RESOLVE STAGE (V3 AUTHORITY CONTRACT)
+    // 1. RESOLVE CURRENT POSITION (V3 RULE)
+    // Everyone starts at TRUE Discovery → Target
     // ─────────────────────────────────────────────
-    const resolution = resolveEntryStage({
-      declaredStage: explicitStage,
-      sessionStage,
-      uiStage: clientStage,
-      messages,
+    const current = getCurrentPosition({
+      sessionProgress,
       consent
     });
 
-    let stage = resolution?.stage || null;
-    let stageSource = resolution?.source || null;
-
-    // ─────────────────────────────────────────────
-    // 2. FALLBACK (ONLY IF NO STAGE CONTEXT EXISTS)
-    // ─────────────────────────────────────────────
-    if (!stage && !sessionStage && !clientStage) {
-      stage = detectStage({ input });
-      stageSource = "fallback";
+    if (!current?.stage || !current?.section) {
+      throw new Error("Unable to resolve user position safely");
     }
 
-    if (!stage) {
-      throw new Error("Unable to resolve stage safely");
-    }
+    const { stage, section } = current;
 
     // ─────────────────────────────────────────────
-    // 3. INTENT DETECTION (NON-DESTRUCTIVE)
+    // 2. SELECT MODULE (POSITION-LOCKED)
     // ─────────────────────────────────────────────
-    const resolvedIntent = intent || detectIntent(input);
-
-    // ─────────────────────────────────────────────
-    // 4. MODULE SELECTION (STAGE-LOCKED)
-    // ─────────────────────────────────────────────
-    const module = selectModule(stage, resolvedIntent);
+    const module = selectModule(stage, section);
 
     if (!module || module.stage !== stage) {
       throw new Error("Stage/module mismatch");
     }
 
     // ─────────────────────────────────────────────
-    // 5. MODEL SELECTION (MCL-AWARE)
+    // 3. MODEL SELECTION
     // ─────────────────────────────────────────────
-    const modelTier = decideModel(module, resolvedIntent);
+    const modelTier = decideModel(module);
     const model =
       modelTier === "PRO" ? MODELS.PRO : MODELS.CHEAP;
 
     // ─────────────────────────────────────────────
-    // 6. PROMPT CONSTRUCTION
+    // 4. PROMPT CONSTRUCTION
     // ─────────────────────────────────────────────
     const userPrompt = module.buildPrompt({
       input,
       messages,
-      stage
+      stage,
+      section
     });
 
     // ─────────────────────────────────────────────
-    // 7. CALL LLM
+    // 5. CALL LLM
     // ─────────────────────────────────────────────
     const reply = await callLLM({
       model,
@@ -118,13 +107,37 @@ async function handlePost(req, res) {
     });
 
     // ─────────────────────────────────────────────
-    // 8. RESPONSE (TRANSPARENT + TAGGED)
+    // 6. EXIT CRITERIA EVALUATION
+    // Determines whether user may advance
+    // ─────────────────────────────────────────────
+    const exitResult = evaluateExitCriteria({
+      stage,
+      section,
+      input,
+      messages,
+      reply
+    });
+
+    let nextPosition = current;
+
+    if (exitResult?.passed === true) {
+      nextPosition = getNextPosition({
+        stage,
+        section
+      });
+    }
+
+    // ─────────────────────────────────────────────
+    // 7. RESPONSE (CLEAR + NON-PUSHY)
     // ─────────────────────────────────────────────
     return res.json({
-      stage,
-      stageSource,           // explicit | session | ui | consent | fallback
+      position: {
+        stage,
+        section
+      },
+      advanced: exitResult?.passed === true,
+      nextPosition,
       module: module.name,
-      intent: resolvedIntent,
       reply
     });
 
