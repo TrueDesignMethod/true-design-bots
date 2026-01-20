@@ -1,4 +1,6 @@
 // api/chat/llm.js
+// TRUE V3 — LLM Boundary Layer
+// The model has no authority over stage, pacing, or progression
 
 const fetch = require("node-fetch");
 const fs = require("fs");
@@ -12,12 +14,12 @@ const SYSTEM_PROMPT = fs.readFileSync(
 );
 
 const MODELS = {
-  CHEAP: "gpt-3.5-turbo",
-  PRO: "gpt-3.5-turbo" // upgrade later if desired
+  STANDARD: "gpt-3.5-turbo",
+  DEPTH: "gpt-3.5-turbo" // reserved for higher nuance when upgraded
 };
 
 async function callLLM({
-  model = MODELS.CHEAP,
+  model = MODELS.STANDARD,
   userPrompt,
   maxTokens = 300
 }) {
@@ -30,10 +32,17 @@ async function callLLM({
     body: JSON.stringify({
       model,
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: userPrompt }
+        {
+          role: "system",
+          content: SYSTEM_PROMPT
+        },
+        {
+          role: "user",
+          content: userPrompt
+        }
       ],
-      max_tokens: maxTokens
+      max_tokens: maxTokens,
+      temperature: 0.4
     })
   });
 
