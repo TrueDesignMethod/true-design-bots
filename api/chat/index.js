@@ -1,30 +1,22 @@
 // api/chat/index.js
 // TRUE V3 — Chat Entry Point
-// Single-entry system with exit-criteria–driven progression
+// Governance-authoritative progression
 
 const MicroCors = require("micro-cors");
 
 const {
-  getCurrentPosition,
-  getNextPosition
-} = require("./progression.js");
-
-const {
-  evaluateExitCriteria
-} = require("./exitCriteria.js");
-
-const {
+  detectIntent,
   selectModule,
   decideModel
-} = require("./router.js");
+} = require("./router");
 
-const { callLLM, MODELS } = require("./llm.js");
+const { resolveStage } = require("../../core/governance/resolveStage");
+const { callLLM, MODELS } = require("./llm");
 
 const cors = MicroCors();
 
 /**
  * parseBody
- * Handles raw Node requests safely
  */
 async function parseBody(req) {
   if (req.body) return req.body;
@@ -50,42 +42,33 @@ async function handlePost(req, res) {
       input = "",
       messages = [],
 
-      // Persisted progression state
-      sessionProgress = null, // { stage, section }
+      // Persisted session state
+      stage: currentStage = "discovery",
 
-      consent = false
+      // Evidence accumulated client-side or server-side
+      evidence = {}
     } = body;
 
     // ─────────────────────────────────────────────
-    // 1. RESOLVE CURRENT POSITION (V3 RULE)
-    // Everyone starts at TRUE Discovery → Target
+    // 1. DETECT INTENT (SECTION ONLY)
     // ─────────────────────────────────────────────
-    const current = getCurrentPosition({
-      sessionProgress,
-      consent
-    });
-
-    if (!current?.stage || !current?.section) {
-      throw new Error("Unable to resolve user position safely");
-    }
-
-    const { stage, section } = current;
+    const intent = detectIntent(input);
 
     // ─────────────────────────────────────────────
-    // 2. SELECT MODULE (POSITION-LOCKED)
+    // 2. SELECT MODULE (STAGE-LOCKED)
     // ─────────────────────────────────────────────
-    const module = selectModule(stage, section);
+    const module = selectModule(currentStage, intent);
 
-    if (!module || module.stage !== stage) {
+    if (!module || module.stage !== currentStage) {
       throw new Error("Stage/module mismatch");
     }
 
     // ─────────────────────────────────────────────
-    // 3. MODEL SELECTION
+    // 3. MODEL SELECTION (MCL-COMPLIANT)
     // ─────────────────────────────────────────────
     const modelTier = decideModel(module);
     const model =
-      modelTier === "PRO" ? MODELS.PRO : MODELS.CHEAP;
+      modelTier === "PRO" ? MODELS.DEPTH : MODELS.STANDARD;
 
     // ─────────────────────────────────────────────
     // 4. PROMPT CONSTRUCTION
@@ -93,8 +76,7 @@ async function handlePost(req, res) {
     const userPrompt = module.buildPrompt({
       input,
       messages,
-      stage,
-      section
+      stage: currentStage
     });
 
     // ─────────────────────────────────────────────
@@ -107,36 +89,21 @@ async function handlePost(req, res) {
     });
 
     // ─────────────────────────────────────────────
-    // 6. EXIT CRITERIA EVALUATION
-    // Determines whether user may advance
+    // 6. GOVERNANCE-STAGE RESOLUTION
     // ─────────────────────────────────────────────
-    const exitResult = evaluateExitCriteria({
-      stage,
-      section,
-      input,
-      messages,
-      reply
+    const nextStage = resolveStage({
+      currentStage,
+      requestedStage: body.requestedStage, // optional
+      evidence
     });
 
-    let nextPosition = current;
-
-    if (exitResult?.passed === true) {
-      nextPosition = getNextPosition({
-        stage,
-        section
-      });
-    }
-
     // ─────────────────────────────────────────────
-    // 7. RESPONSE (CLEAR + NON-PUSHY)
+    // 7. RESPONSE
     // ─────────────────────────────────────────────
     return res.json({
-      position: {
-        stage,
-        section
-      },
-      advanced: exitResult?.passed === true,
-      nextPosition,
+      stage: currentStage,
+      advanced: nextStage !== currentStage,
+      nextStage,
       module: module.name,
       reply
     });
