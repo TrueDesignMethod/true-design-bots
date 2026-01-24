@@ -126,3 +126,33 @@ module.exports = {
   selectModule,
   decideModel
 };
+const { StageTransitionMap } = require("../../core/governance/StageTransitionMap");
+const { canExitStage } = require("../../core/governance/stageExitEvaluator");
+
+function resolveStage({ currentStage, requestedStage, evidence }) {
+  if (!requestedStage || requestedStage === currentStage) {
+    return currentStage;
+  }
+
+  const map = StageTransitionMap[currentStage];
+
+  if (!map) return currentStage;
+
+  // Guardrail 1: Is this transition even allowed?
+  if (!map.canAdvanceTo.includes(requestedStage)) {
+    return currentStage;
+  }
+
+  // Guardrail 2: Has exit been earned?
+  const allowed = canExitStage({
+    stage: currentStage,
+    targetStage: requestedStage,
+    evidence
+  });
+
+  if (!allowed) {
+    return currentStage;
+  }
+
+  return requestedStage;
+}
