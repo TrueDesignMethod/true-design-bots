@@ -1,18 +1,8 @@
 // api/chat/router.js
 // TRUE V3 — Router / Module Selector
-// Stage authority enforced via exit criteria
+// NO governance authority
 
 const modules = require("../../modules/index.js");
-const { canExitStage } = require("../../core/governance/stageExitEvaluator");
-
-/**
- * detectStage (V3)
- * TRUE V3 assumes all users begin in Discovery.
- * Stage progression requires explicit proof.
- */
-function detectStage({ currentStage }) {
-  return currentStage || "discovery";
-}
 
 /**
  * detectIntent (V3)
@@ -42,31 +32,6 @@ function detectIntent(input = "") {
   if (t.includes("nurture") || t.includes("care")) return "nurture";
 
   return null;
-}
-
-/**
- * resolveStage (V3)
- * Determines whether the user may advance stages.
- * No implicit forward motion allowed.
- */
-function resolveStage({ currentStage, requestedStage, evidence }) {
-  // Same stage → always allowed
-  if (!requestedStage || requestedStage === currentStage) {
-    return currentStage;
-  }
-
-  // Ask governance layer if exit is permitted
-  const allowed = canExitStage({
-    stage: currentStage,
-    evidence
-  });
-
-  if (!allowed) {
-    // Guardrail: block advancement silently
-    return currentStage;
-  }
-
-  return requestedStage;
 }
 
 /**
@@ -120,39 +85,7 @@ function decideModel(module) {
 }
 
 module.exports = {
-  detectStage,
   detectIntent,
-  resolveStage,
   selectModule,
   decideModel
 };
-const { StageTransitionMap } = require("../../core/governance/StageTransitionMap");
-const { canExitStage } = require("../../core/governance/stageExitEvaluator");
-
-function resolveStage({ currentStage, requestedStage, evidence }) {
-  if (!requestedStage || requestedStage === currentStage) {
-    return currentStage;
-  }
-
-  const map = StageTransitionMap[currentStage];
-
-  if (!map) return currentStage;
-
-  // Guardrail 1: Is this transition even allowed?
-  if (!map.canAdvanceTo.includes(requestedStage)) {
-    return currentStage;
-  }
-
-  // Guardrail 2: Has exit been earned?
-  const allowed = canExitStage({
-    stage: currentStage,
-    targetStage: requestedStage,
-    evidence
-  });
-
-  if (!allowed) {
-    return currentStage;
-  }
-
-  return requestedStage;
-}
