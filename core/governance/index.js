@@ -4,13 +4,15 @@
 const { StageTransitionMap } = require("./stageTransitionMap");
 const { TargetCriteria } = require("./target");
 const { canExitStage } = require("./stageExitEvaluator");
+const { resolveStage } = require("./resolveStage");
 const { validateGovernance } = require("./validateGovernance");
 
-// Run once at boot
+// Validate once at startup
 validateGovernance();
 
 module.exports = {
   StageTransitionMap,
   TargetCriteria,
-  canExitStage
+  canExitStage,
+  resolveStage
 };
