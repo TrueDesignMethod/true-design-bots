@@ -1,7 +1,7 @@
-// api/chat/resolveStage.js
+// core/governance/resolveStage.js
 // TRUE V3 — Stage Resolution with Guardrails
 
-const { StageTransitionMap } = require("../../core/governance/StageTransitionMap");
+const { StageTransitionMap } = require("./StageTransitionMap");
 const { canExitStage } = require("./stageExitEvaluator");
 
 function resolveStage({ currentStage, requestedStage, evidence }) {
@@ -31,6 +31,4 @@ function resolveStage({ currentStage, requestedStage, evidence }) {
   return requestedStage;
 }
 
-module.exports = {
-  resolveStage
-};
+module.exports = { resolveStage };
