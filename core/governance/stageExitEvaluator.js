@@ -1,66 +1,64 @@
 // core/governance/stageExitEvaluator.js
 // TRUE V3 — Stage Exit Evaluator
-// Enforces Truth & Readiness Gatekeeping defined in target.js
+// Evaluates exit readiness strictly against TargetCriteria
 
 const { TargetCriteria } = require("./target");
 
 /**
- * Evaluates whether a user can exit a given stage
- * based on explicit criteria defined in target.js
+ * Validates a single criterion against provided evidence
+ */
+function evaluateCriterion(criterion, evidence) {
+  const value = evidence[criterion.key];
+
+  switch (criterion.type) {
+    case "boolean":
+      return value === true;
+
+    // Future-proofing hooks
+    case "number":
+      return typeof value === "number";
+
+    case "string":
+      return typeof value === "string" && value.length > 0;
+
+    case "array":
+      return Array.isArray(value) && value.length > 0;
+
+    case "custom":
+      if (typeof criterion.validate === "function") {
+        return criterion.validate(value, evidence);
+      }
+      return false;
+
+    default:
+      return false;
+  }
+}
+
+/**
+ * Determines whether a stage can be exited
  */
 function canExitStage({ stage, targetStage, evidence = {} }) {
-  if (!stage) return false;
+  const stageConfig = TargetCriteria[stage];
 
-  const stageDefinition = TargetCriteria[stage];
+  // Unknown stage → deny
+  if (!stageConfig) return false;
 
-  // Guardrail 1: Stage must exist
-  if (!stageDefinition) {
-    return false;
-  }
+  // Terminal stages cannot be exited
+  if (stageConfig.isTerminal) return false;
 
-  // Guardrail 2: Stage must be allowed to exit
-  if (stageDefinition.isTerminal) {
-    return false;
-  }
-
-  // Guardrail 3: Target stage must be valid (if specified)
+  // Target stage must be allowed
   if (
     targetStage &&
-    Array.isArray(stageDefinition.allowedTransitions) &&
-    !stageDefinition.allowedTransitions.includes(targetStage)
+    !stageConfig.allowedTransitions.includes(targetStage)
   ) {
     return false;
   }
 
-  const requiredCriteria = stageDefinition.exitCriteria || [];
-
-  // Guardrail 4: No criteria = no exit
-  if (requiredCriteria.length === 0) {
-    return false;
-  }
-
-  // Evaluate all exit criteria
-  return requiredCriteria.every((criterion) => {
-    const value = evidence[criterion.key];
-
-    // Simple boolean criteria
-    if (criterion.type === "boolean") {
-      return Boolean(value) === true;
-    }
-
-    // Function-based criteria (future expansion)
-    if (criterion.type === "function" && typeof criterion.evaluate === "function") {
-      return criterion.evaluate(evidence);
-    }
-
-    // Scored criteria (future expansion)
-    if (criterion.type === "score") {
-      return typeof value === "number" && value >= criterion.minimum;
-    }
-
-    // Unknown criterion type → fail safely
-    return false;
-  });
+  // All exit criteria must pass
+  return stageConfig.exitCriteria.every((criterion) =>
+    evaluateCriterion(criterion, evidence)
+  );
 }
 
 module.exports = {
