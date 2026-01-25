@@ -1,13 +1,15 @@
 // modules/sustainment/index.js
-// True Sustainment stage modules
+// True Sustainment stage modules (ES Module)
 
-const execute = require("./execute");
-const discipline = require("./discipline");
-const evaluate = require("./evaluate");
+import execute from "./execute.js";
+import discipline from "./discipline.js";
+import evaluate from "./evaluate.js";
 
-module.exports = Object.freeze({
+const sustainment = Object.freeze({
   index: execute,   // default Sustainment entry point
   execute,
   discipline,
   evaluate
 });
+
+export default sustainment;
