@@ -1,10 +1,10 @@
 // api/chat/llm.js
-// TRUE V3 — LLM Boundary Layer
+// TRUE V3 — LLM Boundary Layer (ESM)
 // The model has no authority over stage, pacing, or progression
 
-const fetch = require("node-fetch");
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
+import fetch from "node-fetch";
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
@@ -13,16 +13,12 @@ const SYSTEM_PROMPT = fs.readFileSync(
   "utf8"
 );
 
-const MODELS = {
+export const MODELS = {
   STANDARD: "gpt-3.5-turbo",
   DEPTH: "gpt-3.5-turbo" // reserved for higher nuance when upgraded
 };
 
-async function callLLM({
-  model = MODELS.STANDARD,
-  userPrompt,
-  maxTokens = 300
-}) {
+export async function callLLM({ model = MODELS.STANDARD, userPrompt, maxTokens = 300 }) {
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -32,14 +28,8 @@ async function callLLM({
     body: JSON.stringify({
       model,
       messages: [
-        {
-          role: "system",
-          content: SYSTEM_PROMPT
-        },
-        {
-          role: "user",
-          content: userPrompt
-        }
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: userPrompt }
       ],
       max_tokens: maxTokens,
       temperature: 0.4
@@ -53,14 +43,7 @@ async function callLLM({
   }
 
   const content = data.choices?.[0]?.message?.content;
-  if (!content) {
-    throw new Error("LLM returned no usable output");
-  }
+  if (!content) throw new Error("LLM returned no usable output");
 
   return content;
 }
-
-module.exports = {
-  callLLM,
-  MODELS
-};
