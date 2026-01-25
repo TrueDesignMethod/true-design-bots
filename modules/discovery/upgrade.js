@@ -1,7 +1,7 @@
 // modules/discovery/upgrade.js
-// Discovery stage module — UPGRADE (V3 corrected)
+// Discovery stage module — UPGRADE (V3, ES Module)
 
-module.exports = {
+const upgrade = Object.freeze({
   stage: "discovery",
   name: "UPGRADE",
   requiresPro: false,
@@ -96,4 +96,6 @@ User input:
 "${input}"
 `;
   }
-};
+});
+
+export default upgrade;
