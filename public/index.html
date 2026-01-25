@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -221,16 +222,7 @@ button.primary {
   background: var(--user-bubble);
   align-self: flex-end;
 }
-.bubble.bot p {
-  margin: 0 0 12px;
-}
 
-.bubble.bot p:last-child {
-  margin-bottom: 0;
-}
-.bubble.bot {
-  white-space: normal;
-}
 .input-bar {
   background: var(--bg);
   padding: 16px;
@@ -336,8 +328,7 @@ button.primary {
   placeholder="What do you need support with?"
 />
 
-         <button class="primary" id="landing-btn" type="button">Next</button>
-
+          <button class="primary" id="landing-btn">Next</button>
         </div>
       </div>
     </div>
@@ -354,8 +345,7 @@ button.primary {
   placeholder="Continue…"
 />
 
-         <button id="send-btn" class="primary" type="button">Next</button>
-
+          <button id="send-btn" class="primary">Next</button>
         </div>
       </div>
     </div>
@@ -368,9 +358,9 @@ button.primary {
 
   <div class="login-card">
     <h2>Want me to remember this?</h2>
-<p>
-Saved reflections are available to members.
-You can continue freely without saving, or sign in to enable memory.
+    <p>
+Create an account to save your reflections.
+Nothing changes if you’d rather continue quietly.
 </p>
 
    <div id="login-form">
@@ -387,8 +377,8 @@ You can continue freely without saving, or sign in to enable memory.
 </p>
 
      <button id="login-btn" class="primary" type="button">
-  Enable saved sessions
-</button>
+    Sign in or create account
+  </button>
 </div>
 <p
   id="save-confirmation"
@@ -398,7 +388,7 @@ You can continue freely without saving, or sign in to enable memory.
 </p>
 
 <p style="font-size:12px; color: var(--muted);">
-Access to saved sessions is enabled after purchase.
+ First time here? We’ll create your account automatically.
 </p>
 
 <p>
@@ -440,34 +430,15 @@ const landingInput = document.getElementById("landing-input");
 const chatInput = document.getElementById("chat-input");
 
 /* ── Bubble renderer (GLOBAL) ── */
-function formatAssistantText(text) {
-  if (!text) return "";
-
-  return text
-    .trim()
-    .split("\n\n") // paragraph breaks
-    .map(p => `<p>${p.replace(/\n/g, "<br>")}</p>`)
-    .join("");
-}
-
-  
-  function bubble(text, role) {
+function bubble(text, role) {
   const div = document.createElement("div");
   div.className = `bubble ${
     role === "assistant" || role === "bot" ? "bot" : "user"
   }`;
-
-  if (role === "assistant" || role === "bot") {
-    div.innerHTML = formatAssistantText(text);
-  } else {
-    div.textContent = text;
-  }
-
+  div.textContent = text;
   messagesEl.appendChild(div);
   messagesEl.scrollTop = messagesEl.scrollHeight;
 }
-
-
 
 function maybePromptAuth() {
  
