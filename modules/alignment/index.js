@@ -1,15 +1,17 @@
 // modules/alignment/index.js
-// True Alignment stage modules (CommonJS)
+// True Alignment stage modules (ESM)
 
-const simplify = require("./simplify");
-const iterate = require("./iterate");
-const grow = require("./grow");
-const nurture = require("./nurture");
+import simplify from "./simplify.js";
+import iterate from "./iterate.js";
+import grow from "./grow.js";
+import nurture from "./nurture.js";
 
-module.exports = Object.freeze({
+const alignment = Object.freeze({
   index: simplify,   // default alignment entry point
   simplify,
   iterate,
   grow,
   nurture
 });
+
+export default alignment;
