@@ -4,7 +4,7 @@
  * Defines what must be proven before advancing stages
  */
 
-export const TARGET = Object.freeze({
+export const TargetCriteria = Object.freeze({
   exitCriteria: {
     // --------------------------------------------------
     // DISCOVERY → SUSTAINMENT
