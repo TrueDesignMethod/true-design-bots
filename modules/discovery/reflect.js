@@ -1,7 +1,7 @@
-```js
 // modules/discovery/reflect.js
+// True Discovery stage — REFLECT (ES Module)
 
-module.exports = {
+const reflect = Object.freeze({
   stage: "discovery",
   name: "REFLECT",
   requiresPro: false,
@@ -98,4 +98,6 @@ User input:
 "${input}"
 `;
   }
-};
+});
+
+export default reflect;
