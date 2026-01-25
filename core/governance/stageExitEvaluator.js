@@ -2,7 +2,7 @@
 // TRUE V3 — Stage Exit Evaluator
 // Evaluates exit readiness strictly against TargetCriteria
 
-const { TargetCriteria } = require("./target");
+import { TargetCriteria } from "./target.js";
 
 /**
  * Validates a single criterion against provided evidence
@@ -38,7 +38,7 @@ function evaluateCriterion(criterion, evidence) {
 /**
  * Determines whether a stage can be exited
  */
-function canExitStage({ stage, targetStage, evidence = {} }) {
+export function canExitStage({ stage, targetStage, evidence = {} }) {
   const stageConfig = TargetCriteria[stage];
 
   // Unknown stage → deny
@@ -60,7 +60,3 @@ function canExitStage({ stage, targetStage, evidence = {} }) {
     evaluateCriterion(criterion, evidence)
   );
 }
-
-module.exports = {
-  canExitStage
-};
