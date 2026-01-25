@@ -9,7 +9,7 @@
  * - All movement must be explicitly allowed
  */
 
-const StageTransitionMap = Object.freeze({
+export const StageTransitionMap = Object.freeze({
   discovery: {
     allowedTransitions: ["sustainment"],
     description: "Clarity, targeting, and self-understanding"
@@ -25,7 +25,3 @@ const StageTransitionMap = Object.freeze({
     description: "Long-term coherence, care, and adaptive growth"
   }
 });
-
-module.exports = {
-  StageTransitionMap
-};
