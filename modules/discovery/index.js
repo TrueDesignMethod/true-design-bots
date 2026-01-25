@@ -1,13 +1,15 @@
 // modules/discovery/index.js
-// Discovery stage modules (CommonJS)
+// Discovery stage modules (ES Module)
 
-const target = require("./target");
-const reflect = require("./reflect");
-const upgrade = require("./upgrade");
+import target from "./target.js";
+import reflect from "./reflect.js";
+import upgrade from "./upgrade.js";
 
-module.exports = Object.freeze({
+const discovery = Object.freeze({
   index: target,     // default discovery entry point
   target,
   reflect,
   upgrade
 });
+
+export default discovery;
