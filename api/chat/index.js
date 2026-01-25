@@ -1,29 +1,18 @@
 // api/chat/index.js
-// TRUE V3 — Chat Entry Point
-// Governance-authoritative progression
+// TRUE V3 — Chat Entry Point (ESM)
 
-const MicroCors = require("micro-cors");
-
-const {
-  detectIntent,
-  selectModule,
-  decideModel
-} = require("./router");
-
-const { resolveStage } = require("../../core/governance/resolveStage");
-const { callLLM, MODELS } = require("./llm");
+import MicroCors from "micro-cors";
+import { detectIntent, selectModule, decideModel } from "./router.js";
+import { resolveStage } from "../../core/governance/resolveStage.js";
+import { callLLM, MODELS } from "./llm.js";
 
 const cors = MicroCors();
 
-/**
- * parseBody
- */
 async function parseBody(req) {
   if (req.body) return req.body;
-
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     let data = "";
-    req.on("data", chunk => (data += chunk));
+    req.on("data", (chunk) => (data += chunk));
     req.on("end", () => {
       try {
         resolve(JSON.parse(data || "{}"));
@@ -37,69 +26,27 @@ async function parseBody(req) {
 async function handlePost(req, res) {
   try {
     const body = await parseBody(req);
-
     const {
       input = "",
       messages = [],
-
-      // Persisted session state
       stage: currentStage = "discovery",
-
-      // Evidence accumulated client-side or server-side
       evidence = {}
     } = body;
 
-    // ─────────────────────────────────────────────
-    // 1. DETECT INTENT (SECTION ONLY)
-    // ─────────────────────────────────────────────
     const intent = detectIntent(input);
-
-    // ─────────────────────────────────────────────
-    // 2. SELECT MODULE (STAGE-LOCKED)
-    // ─────────────────────────────────────────────
     const module = selectModule(currentStage, intent);
 
     if (!module || module.stage !== currentStage) {
       throw new Error("Stage/module mismatch");
     }
 
-    // ─────────────────────────────────────────────
-    // 3. MODEL SELECTION (MCL-COMPLIANT)
-    // ─────────────────────────────────────────────
-    const modelTier = decideModel(module);
-    const model =
-      modelTier === "PRO" ? MODELS.DEPTH : MODELS.STANDARD;
+    const model = decideModel(module) === "PRO" ? MODELS.DEPTH : MODELS.STANDARD;
 
-    // ─────────────────────────────────────────────
-    // 4. PROMPT CONSTRUCTION
-    // ─────────────────────────────────────────────
-    const userPrompt = module.buildPrompt({
-      input,
-      messages,
-      stage: currentStage
-    });
+    const userPrompt = module.buildPrompt({ input, messages, stage: currentStage });
+    const reply = await callLLM({ model, userPrompt, maxTokens: module.tokenCeiling });
 
-    // ─────────────────────────────────────────────
-    // 5. CALL LLM
-    // ─────────────────────────────────────────────
-    const reply = await callLLM({
-      model,
-      userPrompt,
-      maxTokens: module.tokenCeiling
-    });
+    const nextStage = resolveStage({ currentStage, requestedStage: body.requestedStage, evidence });
 
-    // ─────────────────────────────────────────────
-    // 6. GOVERNANCE-STAGE RESOLUTION
-    // ─────────────────────────────────────────────
-    const nextStage = resolveStage({
-      currentStage,
-      requestedStage: body.requestedStage, // optional
-      evidence
-    });
-
-    // ─────────────────────────────────────────────
-    // 7. RESPONSE
-    // ─────────────────────────────────────────────
     return res.json({
       stage: currentStage,
       advanced: nextStage !== currentStage,
@@ -114,7 +61,7 @@ async function handlePost(req, res) {
   }
 }
 
-module.exports = cors((req, res) => {
+export default cors((req, res) => {
   if (req.method === "POST") return handlePost(req, res);
   res.status(405).end();
 });
