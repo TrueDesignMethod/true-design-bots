@@ -1,7 +1,7 @@
 // modules/sustainment/plan30.js
 // True Sustainment stage — PLAN 30 (Optional Orientation)
 
-module.exports = Object.freeze({
+const evaluate = Object.freeze({
   stage: "sustainment",
   name: "PLAN_30",
   requiresPro: false,
@@ -86,3 +86,5 @@ User input:
 `;
   }
 });
+
+export default evaluate;
