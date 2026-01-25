@@ -1,5 +1,5 @@
 // core/governance/stageExitEvaluator.js
-// TRUE V3 — Stage Exit Evaluator
+// TRUE V3 — Stage Exit Evaluator (ES Module)
 // Evaluates exit readiness strictly against TargetCriteria
 
 import { TargetCriteria } from "./target.js";
@@ -8,13 +8,13 @@ import { TargetCriteria } from "./target.js";
  * Validates a single criterion against provided evidence
  */
 function evaluateCriterion(criterion, evidence) {
-  const value = evidence[criterion.key];
+  // Use 'id' instead of 'key' to match your TargetCriteria structure
+  const value = evidence[criterion.id];
 
-  switch (criterion.type) {
-    case "boolean":
+  switch (criterion.proof.type) {
+    case "booleanTrue":
       return value === true;
 
-    // Future-proofing hooks
     case "number":
       return typeof value === "number";
 
@@ -30,6 +30,15 @@ function evaluateCriterion(criterion, evidence) {
       }
       return false;
 
+    case "presence":
+      return value !== undefined && value !== null;
+
+    case "nonEmptyArray":
+      return Array.isArray(value) && value.length > 0;
+
+    case "minCount":
+      return Array.isArray(value) && value.length >= (criterion.proof.min || 1);
+
     default:
       return false;
   }
@@ -39,18 +48,18 @@ function evaluateCriterion(criterion, evidence) {
  * Determines whether a stage can be exited
  */
 export function canExitStage({ stage, targetStage, evidence = {} }) {
-  const stageConfig = TargetCriteria[stage];
+  const stageConfig = TargetCriteria.exitCriteria[stage];
 
   // Unknown stage → deny
   if (!stageConfig) return false;
 
   // Terminal stages cannot be exited
-  if (stageConfig.isTerminal) return false;
+  if (stageConfig.terminal) return false;
 
   // Target stage must be allowed
   if (
     targetStage &&
-    !stageConfig.allowedTransitions.includes(targetStage)
+    !TargetCriteria.exitCriteria[targetStage]
   ) {
     return false;
   }
