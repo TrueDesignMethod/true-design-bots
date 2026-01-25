@@ -1,7 +1,7 @@
 // modules/sustainment/discipline.js
-// True Sustainment stage — DISCIPLINE (V3)
+// True Sustainment stage — DISCIPLINE (V3, ES Module)
 
-module.exports = Object.freeze({
+const discipline = Object.freeze({
   stage: "sustainment",
   name: "DISCIPLINE",
   requiresPro: false,
@@ -86,3 +86,5 @@ User input:
 `;
   }
 });
+
+export default discipline;
