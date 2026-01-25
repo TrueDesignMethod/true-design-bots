@@ -1,16 +1,16 @@
 // core/governance/index.js
-// TRUE V3 — Governance Boundary
+// TRUE V3 — Governance Boundary (ES Module)
 
-const { StageTransitionMap } = require("./stageTransitionMap");
-const { TargetCriteria } = require("./target");
-const { canExitStage } = require("./stageExitEvaluator");
-const { resolveStage } = require("./resolveStage");
-const { validateGovernance } = require("./validateGovernance");
+import { StageTransitionMap } from "./stageTransitionMap.js";
+import { TargetCriteria } from "./target.js";
+import { canExitStage } from "./stageExitEvaluator.js";
+import { resolveStage } from "./resolveStage.js";
+import { validateGovernance } from "./validateGovernance.js";
 
 // Validate once at startup
 validateGovernance();
 
-module.exports = {
+export {
   StageTransitionMap,
   TargetCriteria,
   canExitStage,
