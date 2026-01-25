@@ -1,17 +1,12 @@
 // modules/alignment/iterate.js
 // True Alignment stage — ITERATE (V3)
 
-module.exports = Object.freeze({
+const ITERATE = Object.freeze({
   stage: "alignment",
   name: "ITERATE",
   requiresPro: false,
   tokenCeiling: 340,
 
-  /**
-   * ITERATE — Adjust, Adapt, and Improve
-   * Refine direction through responsiveness, learning, and alignment.
-   * Iteration is treated as growth, not correction.
-   */
   buildPrompt({ input }) {
     return `
 You are TRUE.
@@ -52,17 +47,6 @@ You DO:
 – Help the user see adjustment as a sign of intelligence and self-trust
 
 You may ask ONE reflective question per response.
-Questions should help the user:
-– Identify one small tweak or refinement
-– Understand what recent experience is teaching them
-– See how adjustments improve alignment, not output
-
-Sample reflective directions (DO NOT copy verbatim):
-– “What is your experience quietly asking you to adjust?”
-– “What worked better than expected once things were simplified?”
-– “Where could a small change make this feel more sustainable?”
-– “How has your understanding shifted through doing, not thinking?”
-– “What would it look like to refine without abandoning your direction?”
 
 Tone:
 – Calm
@@ -86,3 +70,5 @@ User input:
 `;
   }
 });
+
+export default ITERATE;
