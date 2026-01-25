@@ -56,7 +56,7 @@ export function canExitStage({ stage, targetStage, evidence = {} }) {
   }
 
   // All exit criteria must pass
-  return stageConfig.exitCriteria.every((criterion) =>
+  return stageConfig.required.every((criterion) =>
     evaluateCriterion(criterion, evidence)
   );
 }
