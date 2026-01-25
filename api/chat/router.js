@@ -1,15 +1,15 @@
 // api/chat/router.js
-// TRUE V3 — Router / Module Selector
+// TRUE V3 — Router / Module Selector (ESM)
 // NO governance authority
 
-const modules = require("../../modules/index.js");
+import modules from "../../modules/index.js";
 
 /**
  * detectIntent (V3)
  * Detects SECTION-LEVEL intent only.
  * Does NOT imply readiness or progression.
  */
-function detectIntent(input = "") {
+export function detectIntent(input = "") {
   const t = input.toLowerCase();
 
   // ───────────── DISCOVERY ─────────────
@@ -38,54 +38,45 @@ function detectIntent(input = "") {
  * selectModule (V3)
  * Strictly stage-locked.
  */
-function selectModule(stage, intent) {
+export function selectModule(stage, intent) {
   const stageSet = modules[stage];
 
   if (!stageSet) {
     throw new Error(`Unknown stage "${stage}"`);
   }
 
-  // ───────────── DISCOVERY ─────────────
-  if (stage === "discovery") {
-    if (intent === "target") return stageSet.target;
-    if (intent === "reflect") return stageSet.reflect;
-    if (intent === "upgrade") return stageSet.upgrade;
-    return stageSet.target;
-  }
+  switch (stage) {
+    case "discovery":
+      if (intent === "target") return stageSet.target;
+      if (intent === "reflect") return stageSet.reflect;
+      if (intent === "upgrade") return stageSet.upgrade;
+      return stageSet.target;
 
-  // ─────────── SUSTAINMENT ─────────────
-  if (stage === "sustainment") {
-    if (intent === "execute") return stageSet.execute;
-    if (intent === "discipline") return stageSet.discipline;
-    if (intent === "evaluate") return stageSet.evaluate;
-    if (intent === "plan7") return stageSet.plan7;
-    if (intent === "plan30") return stageSet.plan30;
-    if (intent === "plan90") return stageSet.plan90;
-    return stageSet.execute;
-  }
+    case "sustainment":
+      if (intent === "execute") return stageSet.execute;
+      if (intent === "discipline") return stageSet.discipline;
+      if (intent === "evaluate") return stageSet.evaluate;
+      if (intent === "plan7") return stageSet.plan7;
+      if (intent === "plan30") return stageSet.plan30;
+      if (intent === "plan90") return stageSet.plan90;
+      return stageSet.execute;
 
-  // ───────────── ALIGNMENT ─────────────
-  if (stage === "alignment") {
-    if (intent === "simplify") return stageSet.simplify;
-    if (intent === "iterate") return stageSet.iterate;
-    if (intent === "grow") return stageSet.grow;
-    if (intent === "nurture") return stageSet.nurture;
-    return stageSet.simplify;
-  }
+    case "alignment":
+      if (intent === "simplify") return stageSet.simplify;
+      if (intent === "iterate") return stageSet.iterate;
+      if (intent === "grow") return stageSet.grow;
+      if (intent === "nurture") return stageSet.nurture;
+      return stageSet.simplify;
 
-  throw new Error(`Unhandled stage "${stage}"`);
+    default:
+      throw new Error(`Unhandled stage "${stage}"`);
+  }
 }
 
 /**
  * decideModel (V3)
  * Module-driven and MCL-compliant
  */
-function decideModel(module) {
+export function decideModel(module) {
   return module?.requiresPro ? "PRO" : "CHEAP";
 }
-
-module.exports = {
-  detectIntent,
-  selectModule,
-  decideModel
-};
