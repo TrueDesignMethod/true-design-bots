@@ -1,11 +1,11 @@
 // modules/index.js
 // Global module registry for TRUE
-// Exposes module namespaces per stage. No routing logic.
+// Exposes module namespaces per stage. No routing logic. (ES Module)
 
-const discovery = require("./discovery");
-const planning = require("./planning");
-const sustainment = require("./sustainment");
-const alignment = require("./alignment");
+import discovery from "./discovery/index.js";
+import planning from "./planning/index.js";
+import sustainment from "./sustainment/index.js";
+import alignment from "./alignment/index.js";
 
 const modules = Object.freeze({
   discovery: Object.freeze(discovery),
@@ -14,4 +14,4 @@ const modules = Object.freeze({
   alignment: Object.freeze(alignment),
 });
 
-module.exports = modules;
+export default modules;
