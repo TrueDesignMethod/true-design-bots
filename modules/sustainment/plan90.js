@@ -1,7 +1,7 @@
 // modules/sustainment/plan90.js
 // True Sustainment stage — PLAN 90 (Optional Seasonal Orientation)
 
-module.exports = Object.freeze({
+const evaluate = Object.freeze({
   stage: "sustainment",
   name: "PLAN_90",
   requiresPro: false,
@@ -81,3 +81,5 @@ User input:
 `;
   }
 });
+
+export default evaluate;
