@@ -9,7 +9,7 @@ export function resolveStage({ currentStage, requestedStage, evidence }) {
     return currentStage;
   }
 
-  const map = StageTransitionMap[currentStage];
+  const map = stageTransitionMap[currentStage];
   if (!map) return currentStage;
 
   // Guardrail 1: Transition must be explicitly allowed
