@@ -221,7 +221,16 @@ button.primary {
   background: var(--user-bubble);
   align-self: flex-end;
 }
+.bubble.bot p {
+  margin: 0 0 12px;
+}
 
+.bubble.bot p:last-child {
+  margin-bottom: 0;
+}
+.bubble.bot {
+  white-space: normal;
+}
 .input-bar {
   background: var(--bg);
   padding: 16px;
@@ -327,7 +336,8 @@ button.primary {
   placeholder="What do you need support with?"
 />
 
-          <button class="primary" id="landing-btn">Next</button>
+         <button class="primary" id="landing-btn" type="button">Next</button>
+
         </div>
       </div>
     </div>
@@ -344,7 +354,8 @@ button.primary {
   placeholder="Continue…"
 />
 
-          <button id="send-btn" class="primary">Next</button>
+         <button id="send-btn" class="primary" type="button">Next</button>
+
         </div>
       </div>
     </div>
@@ -456,16 +467,7 @@ function formatAssistantText(text) {
   messagesEl.scrollTop = messagesEl.scrollHeight;
 }
 
-.bubble.bot p {
-  margin: 0 0 12px;
-}
 
-.bubble.bot p:last-child {
-  margin-bottom: 0;
-}
-.bubble.bot {
-  white-space: normal;
-}
 
 function maybePromptAuth() {
  
