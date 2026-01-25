@@ -1,10 +1,10 @@
 // core/governance/resolveStage.js
-// TRUE V3 — Stage Resolution with Guardrails
+// TRUE V3 — Stage Resolution with Guardrails (ES Module)
 
-const { StageTransitionMap } = require("./StageTransitionMap");
-const { canExitStage } = require("./stageExitEvaluator");
+import { StageTransitionMap } from "./stageTransitionMap.js";
+import { canExitStage } from "./stageExitEvaluator.js";
 
-function resolveStage({ currentStage, requestedStage, evidence }) {
+export function resolveStage({ currentStage, requestedStage, evidence }) {
   if (!requestedStage || requestedStage === currentStage) {
     return currentStage;
   }
@@ -30,5 +30,3 @@ function resolveStage({ currentStage, requestedStage, evidence }) {
 
   return requestedStage;
 }
-
-module.exports = { resolveStage };
