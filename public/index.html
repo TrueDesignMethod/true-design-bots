@@ -357,9 +357,9 @@ button.primary {
 
   <div class="login-card">
     <h2>Want me to remember this?</h2>
-    <p>
-Create an account to save your reflections.
-Nothing changes if you’d rather continue quietly.
+<p>
+Saved reflections are available to members.
+You can continue freely without saving, or sign in to enable memory.
 </p>
 
    <div id="login-form">
@@ -376,8 +376,8 @@ Nothing changes if you’d rather continue quietly.
 </p>
 
      <button id="login-btn" class="primary" type="button">
-    Sign in or create account
-  </button>
+  Enable saved sessions
+</button>
 </div>
 <p
   id="save-confirmation"
@@ -387,7 +387,7 @@ Nothing changes if you’d rather continue quietly.
 </p>
 
 <p style="font-size:12px; color: var(--muted);">
- First time here? We’ll create your account automatically.
+Access to saved sessions is enabled after purchase.
 </p>
 
 <p>
@@ -429,14 +429,42 @@ const landingInput = document.getElementById("landing-input");
 const chatInput = document.getElementById("chat-input");
 
 /* ── Bubble renderer (GLOBAL) ── */
-function bubble(text, role) {
+function formatAssistantText(text) {
+  if (!text) return "";
+
+  return text
+    .trim()
+    .split("\n\n") // paragraph breaks
+    .map(p => `<p>${p.replace(/\n/g, "<br>")}</p>`)
+    .join("");
+}
+
+  
+  function bubble(text, role) {
   const div = document.createElement("div");
   div.className = `bubble ${
     role === "assistant" || role === "bot" ? "bot" : "user"
   }`;
-  div.textContent = text;
+
+  if (role === "assistant" || role === "bot") {
+    div.innerHTML = formatAssistantText(text);
+  } else {
+    div.textContent = text;
+  }
+
   messagesEl.appendChild(div);
   messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+.bubble.bot p {
+  margin: 0 0 12px;
+}
+
+.bubble.bot p:last-child {
+  margin-bottom: 0;
+}
+.bubble.bot {
+  white-space: normal;
 }
 
 function maybePromptAuth() {
