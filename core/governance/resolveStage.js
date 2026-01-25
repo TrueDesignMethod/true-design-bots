@@ -13,7 +13,7 @@ export function resolveStage({ currentStage, requestedStage, evidence }) {
   if (!map) return currentStage;
 
   // Guardrail 1: Transition must be explicitly allowed
-  if (!map.canAdvanceTo.includes(requestedStage)) {
+  if (!map.allowedTransitions.includes(requestedStage)) {
     return currentStage;
   }
 
