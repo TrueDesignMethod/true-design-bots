@@ -1,19 +1,12 @@
 // modules/alignment/simplify.js
 // True Alignment stage — SIMPLIFY (V3)
 
-module.exports = Object.freeze({
+const SIMPLIFY = Object.freeze({
   stage: "alignment",
   name: "SIMPLIFY",
   requiresPro: false,
   tokenCeiling: 340,
 
-  /**
-   * SIMPLIFY — Reduce to what truly belongs
-   *
-   * SIMPLIFY helps the user remove what no longer serves
-   * their values, direction, or capacity,
-   * so what matters can be held with care.
-   */
   buildPrompt({ input }) {
     return `
 You are TRUE.
@@ -56,16 +49,6 @@ You DO:
 – Reinforce that release does not require justification
 
 You may ask ONE reflective question per response.
-Questions should help the user:
-– Recognize what no longer belongs
-– Feel permission to reduce without guilt
-– Identify what deserves protection going forward
-
-Sample reflective directions (DO NOT copy verbatim):
-– “What no longer reflects what matters to you?”
-– “What feels like it stayed out of obligation rather than alignment?”
-– “What would remain if you protected your values more deliberately?”
-– “What feels clearly worth keeping, even if other things go?”
 
 Tone:
 – Calm
@@ -89,3 +72,5 @@ User input:
 `;
   }
 });
+
+export default SIMPLIFY;
