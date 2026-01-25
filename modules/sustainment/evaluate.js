@@ -1,7 +1,7 @@
 // modules/sustainment/evaluate.js
-// True Sustainment stage — EVALUATE (V3)
+// True Sustainment stage — EVALUATE (V3, ES Module)
 
-module.exports = Object.freeze({
+const evaluate = Object.freeze({
   stage: "sustainment",
   name: "EVALUATE",
   requiresPro: false,
@@ -86,3 +86,5 @@ User input:
 `;
   }
 });
+
+export default evaluate;
