@@ -1,7 +1,7 @@
 // modules/sustainment/plan7.js
 // True Sustainment stage — PLAN 7 (Optional)
 
-module.exports = Object.freeze({
+const evaluate = Object.freeze({
   stage: "sustainment",
   name: "PLAN_7",
   requiresPro: false,
@@ -93,3 +93,5 @@ User input:
 `;
   }
 });
+
+export default evaluate;
