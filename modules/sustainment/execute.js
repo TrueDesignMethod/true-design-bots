@@ -1,7 +1,7 @@
 // modules/sustainment/execute.js
 // True Sustainment stage — EXECUTE (V3)
 
-module.exports = Object.freeze({
+const evaluate = Object.freeze({
   stage: "sustainment",
   name: "EXECUTE",
   requiresPro: false,
@@ -85,3 +85,5 @@ User input:
 `;
   }
 });
+
+export default evaluate;
