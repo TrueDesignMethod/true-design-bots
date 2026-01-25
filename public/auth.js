@@ -1,66 +1,80 @@
-// public/auth.js
-// TRUE V3 — Authentication & Persistence Gate
-// Identity determines who you are
-// Entitlement determines whether memory is allowed
+import { supabase } from './supabase.js'
 
-import { supabase } from "./supabase.js";
-import { loadUserSessions, clearLocalSessions } from "./sessions.js";
-
-/**
- * Check whether the signed-in user
- * is entitled to session persistence
- */
-async function hasSessionAccess(user) {
-  if (!user) return false;
-
-  const { data, error } = await supabase
-    .from("user_access")
-    .select("approved, access_level")
-    .eq("user_id", user.id)
-    .single();
-
-  if (error || !data) return false;
-  return data.approved === true && data.access_level === "session_persistence";
+let currentUser = null
+let accessStatus = {
+  signedIn: false,
+  paid: false
 }
 
-/**
- * Initialize auth listener
- */
-export function initAuth({
-  onUserChange,
-  authStatusEl
-}) {
-  supabase.auth.onAuthStateChange(async (_event, session) => {
-    const user = session?.user ?? null;
-    onUserChange(user);
-
-    const logoutBtn = document.getElementById("logout-btn");
-
-    // ─────────────────────────────────────────────
-    // ANONYMOUS USER
-    // ─────────────────────────────────────────────
-    if (!user) {
-      authStatusEl.textContent = "Sessions not saved";
-      if (logoutBtn) logoutBtn.style.display = "none";
-
-      clearLocalSessions();
-      return;
+/* =========================
+   SIGN IN (Magic Link)
+========================= */
+export async function signInWithMagicLink(email) {
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
+    options: {
+      emailRedirectTo: window.location.origin
     }
+  })
 
-    // ─────────────────────────────────────────────
-    // AUTHENTICATED (MAGIC LINK)
-    // ─────────────────────────────────────────────
-    const allowed = await hasSessionAccess(user);
+  if (error) {
+    console.error('Magic link error:', error)
+    throw error
+  }
 
-    if (allowed) {
-      authStatusEl.textContent = `Sessions saved`;
-      loadUserSessions(user.id);
-    } else {
-      // This should almost never happen in magic-link flow
-      authStatusEl.textContent = "Sessions not saved";
-      clearLocalSessions();
-    }
+  return true
+}
 
-    if (logoutBtn) logoutBtn.style.display = "inline";
-  });
+/* =========================
+   AUTH STATE LISTENER
+========================= */
+supabase.auth.onAuthStateChange(async (_event, session) => {
+  if (!session?.user) {
+    currentUser = null
+    accessStatus = { signedIn: false, paid: false }
+    return
+  }
+
+  currentUser = session.user
+  accessStatus.signedIn = true
+
+  await checkPaidStatus()
+})
+
+/* =========================
+   CHECK PAID STATUS
+========================= */
+async function checkPaidStatus() {
+  const { data, error } = await supabase
+    .from('user_access')
+    .select('paid')
+    .eq('id', currentUser.id)
+    .single()
+
+  if (error) {
+    // User exists in auth but not yet in access table
+    accessStatus.paid = false
+    return
+  }
+
+  accessStatus.paid = data.paid === true
+}
+
+/* =========================
+   HELPERS
+========================= */
+export function isSignedIn() {
+  return accessStatus.signedIn
+}
+
+export function canSaveSessions() {
+  return accessStatus.signedIn && accessStatus.paid
+}
+
+export function getCurrentUser() {
+  return currentUser
+}
+
+export async function signOut() {
+  await supabase.auth.signOut()
 }
