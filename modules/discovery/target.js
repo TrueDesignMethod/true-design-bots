@@ -1,6 +1,7 @@
 // modules/discovery/target.js
+// True Discovery stage — TARGET (ES Module)
 
-module.exports = {
+const target = Object.freeze({
   stage: "discovery",
   name: "TARGET",
   requiresPro: false,
@@ -110,4 +111,6 @@ User input:
 "${input}"
 `;
   }
-};
+});
+
+export default target;
