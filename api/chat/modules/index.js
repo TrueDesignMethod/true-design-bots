@@ -1,6 +1,3 @@
-// api/chat/modules/index.js
-// Global module registry for TRUE (ESM)
-
 import discovery from "./discovery/index.js";
 import sustainment from "./sustainment/index.js";
 import alignment from "./alignment/index.js";
