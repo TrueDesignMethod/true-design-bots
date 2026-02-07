@@ -9,7 +9,6 @@ import alignment from "./alignment/index.js";
 
 const modules = Object.freeze({
   discovery: Object.freeze(discovery),
-  planning: Object.freeze(planning),
   sustainment: Object.freeze(sustainment),
   alignment: Object.freeze(alignment),
 });
