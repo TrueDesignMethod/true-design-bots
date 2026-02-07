@@ -32,16 +32,18 @@ export async function getLatestSession(userId) {
   return data;
 }
 
-export async function getAllSessions(userId) {
+export async function getLatestSession(userId) {
   const { data, error } = await supabase
     .from("sessions")
-    .select("id, started_at, current_stage")
+    .select("*")
     .eq("user_id", userId)
-    .order("started_at", { ascending: false });
+    .order("last_active_at", { ascending: false })
+    .limit(1);
 
-  if (error) throw error;
-  return data;
+  if (error || !data || data.length === 0) return null;
+  return data[0];
 }
+
 export async function loadUserSessions(userId) {
   const { data: sessions } = await supabase
     .from("sessions")
@@ -50,7 +52,10 @@ export async function loadUserSessions(userId) {
     .order("created_at", { ascending: false });
 
   const sidebar = document.getElementById("sidebar");
-  sidebar.innerHTML = "<h3>Session History</h3>";
+
+// Preserve header, clear only session entries
+sidebar.querySelectorAll(".session-entry").forEach(el => el.remove());
+
 
   if (!sessions || sessions.length === 0) return;
 
