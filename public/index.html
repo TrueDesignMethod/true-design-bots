@@ -404,13 +404,8 @@ Nothing changes if you’d rather continue quietly.
 import { sendMessage } from "./send.js";
 import { supabase } from "./supabase.js";
 import { initAuth } from "./auth.js";
-import {
-  createSession,
-  getLatestSession,
-  getMessages,
-  saveMessage,
-  loadUserSessions
-} from "./sessions.js";
+import * as Sessions from "./sessions.js";
+
 
 
 /* ── State ── */
@@ -480,12 +475,12 @@ if (pw) pw.value = "";
 
 // 🔑 USER SIGNED IN MID-REFLECTION
 if (!currentSession && conversation.length > 0) {
-  currentSession = await createSession(user.id, currentStage);
+  currentSession = await Sessions.createSession(user.id, currentStage);
 
   for (const msg of conversation) {
-    await saveMessage(currentSession.id, msg.role, msg.content);
+    await Sessions.saveMessage(currentSession.id, msg.role, msg.content);
   }
- await loadUserSessions(user.id);
+ await Sessions.loadUserSessions(user.id);
 
   setTimeout(() => {
   document
@@ -499,14 +494,14 @@ loginOverlay.classList.remove("active");
   return; // DO NOT overwrite UI or reload messages
 }
 
-   const lastSession = await getLatestSession(user.id);
+   const lastSession = await Sessions.getLatestSession(user.id);
 if (!lastSession) return;
 
 currentSession = lastSession;
 currentStage = lastSession.current_stage;
-await loadUserSessions(user.id);
+await Sessions.loadUserSessions(user.id);
 
-const msgs = await getMessages(lastSession.id);
+const msgs = await Sessions.getMessages(lastSession.id);
     
 
 
@@ -594,7 +589,7 @@ bubble(assistantText, "bot");
 conversation.push({ role: "assistant", content: assistantText });
 
 if (currentSession) {
-  await saveMessage(currentSession.id, "assistant", assistantText);
+  await Sessions.saveMessage(currentSession.id, "assistant", assistantText);
 }
 
 // Optional stage sync if server returns it
@@ -631,12 +626,12 @@ document.getElementById("landing-btn").onclick = async () => {
 
   // CREATE SESSION IF SIGNED IN
   if (currentUser && !currentSession) {
-    currentSession = await createSession(currentUser.id, currentStage);
+    currentSession = await Sessions.createSession(currentUser.id, currentStage);
   }
 
   // SAVE USER MESSAGE
   if (currentSession) {
-    await saveMessage(currentSession.id, "user", text);
+    await Sessions.saveMessage(currentSession.id, "user", text);
   }
 
   await assistantReply();
@@ -652,7 +647,7 @@ document.getElementById("send-btn").onclick = async () => {
   conversation.push({ role: "user", content: text });
 
   if (currentSession) {
-    await saveMessage(currentSession.id, "user", text);
+    await Sessions.saveMessage(currentSession.id, "user", text);
   }
 
   await assistantReply();
@@ -683,7 +678,7 @@ document.getElementById("sidebar").addEventListener("click", async (e) => {
   assistantTurns = 0;
 
   // Load messages
-  const msgs = await getMessages(sessionId);
+  const msgs = await Sessions.getMessages(sessionId);
 
   // Restore UI
   landing.style.display = "none";
