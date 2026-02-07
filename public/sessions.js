@@ -19,7 +19,7 @@ export async function createSession(userId, stage = "discovery") {
   return data;
 }
 
-export async function getLatestSession(userId) {
+export async function fetchLatestSession(userId) {
   const { data, error } = await supabase
     .from("sessions")
     .select("*")
