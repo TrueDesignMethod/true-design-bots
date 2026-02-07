@@ -619,6 +619,8 @@ if (assistantTurns === 4) {
 /* Landing */
 document.getElementById("landing-btn").onclick = async () => {
   const text = landingInput.value.trim();
+  landingInput.value = "";
+
   if (!text) return;
 
   landing.style.display = "none";
