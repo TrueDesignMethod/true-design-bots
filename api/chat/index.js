@@ -42,6 +42,8 @@ const currentStage = normalizeStage(declaredStage);
 
     const intent = detectIntent(input);
     const module = selectModule(currentStage, intent);
+    console.log("MODULE SELECTED:", module);
+
 
     if (!module || module.stage !== currentStage) {
       throw new Error("Stage/module mismatch");
@@ -50,7 +52,7 @@ const currentStage = normalizeStage(declaredStage);
     const model = decideModel(module) === "PRO" ? MODELS.DEPTH : MODELS.STANDARD;
 
     const userPrompt = module.buildPrompt({ input, messages, stage: currentStage });
-const reply = "[TEST] Backend reached reply successfully.";
+const reply = await callLLM({ model, userPrompt, maxTokens: module.tokenCeiling });
 
     const nextStage = resolveStage({ currentStage, requestedStage: body.requestedStage, evidence });
 
