@@ -42,7 +42,7 @@ const currentStage = normalizeStage(declaredStage);
 
     const intent = detectIntent(input);
     const module = selectModule(currentStage, intent);
-    console.log("MODULE SELECTED:", module);
+   
 
 
     if (!module || module.stage !== currentStage) {
@@ -51,7 +51,7 @@ const currentStage = normalizeStage(declaredStage);
 
     const model = decideModel(module) === "PRO" ? MODELS.DEPTH : MODELS.STANDARD;
 
-    const userPrompt = module.buildPrompt({ input, messages, stage: currentStage });
+const userPrompt = "[TEST PROMPT]";
 const reply = await callLLM({ model, userPrompt, maxTokens: module.tokenCeiling });
 
     const nextStage = resolveStage({ currentStage, requestedStage: body.requestedStage, evidence });
