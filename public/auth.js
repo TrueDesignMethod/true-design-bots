@@ -78,3 +78,23 @@ export function getCurrentUser() {
 export async function signOut() {
   await supabase.auth.signOut()
 }
+/* =========================
+   INIT AUTH (UI BRIDGE)
+========================= */
+export function initAuth({
+  onUserChange,
+  loginOverlayEl,
+  confirmationEl,
+  authStatusEl
+}) {
+  // Initial user load
+  supabase.auth.getUser().then(({ data }) => {
+    onUserChange(data?.user ?? null)
+  })
+
+  // Listen for auth changes
+  supabase.auth.onAuthStateChange((_event, session) => {
+    const user = session?.user ?? null
+    onUserChange(user)
+  })
+}
