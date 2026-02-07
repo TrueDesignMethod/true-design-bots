@@ -494,7 +494,7 @@ loginOverlay.classList.remove("active");
   return; // DO NOT overwrite UI or reload messages
 }
 
-   const lastSession = await Sessions.getLatestSession(user.id);
+   const lastSession = await Sessions.fetchLatestSession(user.id);
 if (!lastSession) return;
 
 currentSession = lastSession;
