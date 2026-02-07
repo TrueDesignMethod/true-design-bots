@@ -1,12 +1,10 @@
 // api/chat/index.js
 // TRUE V3 — Chat Entry Point (ESM)
 
-import MicroCors from "micro-cors";
 import { detectIntent, selectModule, decideModel } from "./router.js";
 import { resolveStage } from "../../core/governance/resolveStage.js";
 import { callLLM, MODELS } from "./llm.js";
 
-const cors = MicroCors();
 function normalizeStage(stage) {
   if (stage === "planning") return "sustainment";
   return stage;
@@ -75,7 +73,19 @@ const currentStage = normalizeStage(declaredStage);
 
 }
 
-export default cors((req, res) => {
-  if (req.method === "POST") return handlePost(req, res);
-  res.status(405).end();
-});
+export default async function handler(req, res) {
+  // Allow CORS
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
+  if (req.method === "POST") {
+    return handlePost(req, res);
+  }
+
+  return res.status(405).json({ error: "Method not allowed" });
+}
