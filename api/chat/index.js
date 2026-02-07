@@ -64,10 +64,15 @@ const currentStage = normalizeStage(declaredStage);
       reply
     });
 
-  } catch (err) {
-    console.error("TRUE chat error:", err);
-    return res.status(500).json({ error: "Server error" });
-  }
+ } catch (err) {
+  console.error("TRUE chat error:", err);
+
+  return res.status(500).json({
+    error: err.message,
+    stack: err.stack
+  });
+}
+
 }
 
 export default cors((req, res) => {
