@@ -584,20 +584,29 @@ async function assistantReply() {
   const res = await sendMessage(currentStage, conversation);
   messagesEl.lastChild.remove();
 
-  bubble(res.reply, "bot");
-  conversation.push({ role: "assistant", content: res.reply });
+  const assistantText =
+  res.reply ||
+  res.output ||
+  res.message ||
+  "[No response returned]";
+
+bubble(assistantText, "bot");
+conversation.push({ role: "assistant", content: assistantText });
 
 if (currentSession) {
-  await saveMessage(currentSession.id, "assistant", res.reply);
+  await saveMessage(currentSession.id, "assistant", assistantText);
 }
 
-  // ── STAGE TRANSITION LOGIC (THIS IS WHERE IT GOES) ──
-  if (res.requiresConsent) {
-    // Stay in current stage (usually discovery)
-    // Do NOT auto-switch — wait for user response
-  } else if (res.suggestedStage && res.suggestedStage !== currentStage) {
-    currentStage = res.suggestedStage;
-  }
+// Optional stage sync if server returns it
+if (res.stage && res.stage !== currentStage) {
+  currentStage = res.stage;
+}
+
+assistantTurns++;
+if (assistantTurns === 4) {
+  maybePromptAuth();
+}
+
   // ────────────────────────────────────────────────
 
   assistantTurns++;
