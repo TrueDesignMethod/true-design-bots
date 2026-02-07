@@ -7,6 +7,11 @@ import { resolveStage } from "../../core/governance/resolveStage.js";
 import { callLLM, MODELS } from "./llm.js";
 
 const cors = MicroCors();
+function normalizeStage(stage) {
+  if (stage === "planning") return "sustainment";
+  return stage;
+}
+
 
 async function parseBody(req) {
   if (req.body) return req.body;
@@ -26,12 +31,16 @@ async function parseBody(req) {
 async function handlePost(req, res) {
   try {
     const body = await parseBody(req);
-    const {
-      input = "",
-      messages = [],
-      stage: currentStage = "discovery",
-      evidence = {}
-    } = body;
+   const {
+  input = "",
+  messages = [],
+  declaredStage = "discovery",
+  evidence = {}
+} = body;
+
+const currentStage = normalizeStage(declaredStage);
+
+
 
     const intent = detectIntent(input);
     const module = selectModule(currentStage, intent);
