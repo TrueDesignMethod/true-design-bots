@@ -1,8 +1,9 @@
 // api/chat/index.js
 // TRUE V3 — Chat Entry Point (Vercel-safe, ESM)
 
-import { detectIntent, selectModule, decideModel } from "./router.js";
-import { callLLM, MODELS } from "./llm.js";
+import { detectIntent, selectModule, decideModel } from "../../lib/router.js";
+import { callLLM, MODELS } from "../../lib/llm.js";
+
 
 // Translate frontend stages to backend stages
 function normalizeStage(stage) {
