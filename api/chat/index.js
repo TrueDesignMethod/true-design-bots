@@ -50,7 +50,7 @@ const currentStage = normalizeStage(declaredStage);
     const model = decideModel(module) === "PRO" ? MODELS.DEPTH : MODELS.STANDARD;
 
     const userPrompt = module.buildPrompt({ input, messages, stage: currentStage });
-    const reply = await callLLM({ model, userPrompt, maxTokens: module.tokenCeiling });
+const reply = "[TEST] Backend reached reply successfully.";
 
     const nextStage = resolveStage({ currentStage, requestedStage: body.requestedStage, evidence });
 
