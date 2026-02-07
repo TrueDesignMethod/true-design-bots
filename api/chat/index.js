@@ -56,5 +56,8 @@ async function handlePost(req, res) {
     }
 
     // Choose model
-    const model =
-      decideModel(module
+   const model =
+  decideModel(module) === "PRO"
+    ? MODELS.DEPTH
+    : MODELS.STANDARD;
+
