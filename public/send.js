@@ -26,7 +26,7 @@ async function apiPost(body) {
  * It passes context only.
  *
  * @param {string} stage
- *   One of: "discovery" | "planning" | "alignment"
+ *   One of: "discovery" | "sustainment" | "alignment"
  *
  * @param {Array<{ role: "user" | "assistant", content: string }>} conversation
  *
