@@ -3,7 +3,7 @@
 // Exposes module namespaces per stage. No routing logic. (ES Module)
 
 import discovery from "./discovery/index.js";
-import planning from "./planning/index.js";
+import sustainment from "./sustainment/index.js";
 import sustainment from "./sustainment/index.js";
 import alignment from "./alignment/index.js";
 
