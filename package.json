@@ -9,8 +9,10 @@
   },
   "author": "Atyia Police",
   "license": "MIT",
-  "dependencies": {
-    "openai": "^4.9.0",
-    "micro-cors": "^0.1.1"
-  }
+ "dependencies": {
+  "openai": "^4.9.0",
+  "micro-cors": "^0.1.1",
+  "node-fetch": "^3.3.2"
+}
+
 }
