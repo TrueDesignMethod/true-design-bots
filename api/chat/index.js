@@ -30,6 +30,8 @@ async function parseBody(req) {
 }
 
 async function handlePost(req, res) {
+console.log("🔥 /api/chat handler reached");
+
   try {
     const body = await parseBody(req);
     const { input = "", declaredStage = "discovery" } = body;
