@@ -1,6 +1,7 @@
 {
   "name": "true-design-bots",
   "version": "0.1.0",
+  "type": "module",
   "description": "TRUE AI — Discovery, Planning, Alignment chatbot",
   "main": "api/chat/index.js",
   "scripts": {
@@ -9,10 +10,9 @@
   },
   "author": "Atyia Police",
   "license": "MIT",
- "dependencies": {
-  "openai": "^4.9.0",
-  "micro-cors": "^0.1.1",
-  "node-fetch": "^3.3.2"
-}
-
+  "dependencies": {
+    "openai": "^4.9.0",
+    "micro-cors": "^0.1.1",
+    "node-fetch": "^3.3.2"
+  }
 }
