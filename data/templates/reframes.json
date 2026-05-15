@@ -1,0 +1,223 @@
+{
+  "version": "TRUE_DISCOVERY_V1",
+
+  "description": "Supportive reframing language used throughout TRUE AI to reduce shame, normalize human complexity, and encourage sustainable self-awareness.",
+
+  "categories": {
+
+    "overload": [
+
+      {
+        "id": "overload_001",
+        "trigger": "participant feels overwhelmed",
+        "reframe": "Overload is often a signal that too much has been carried for too long, not proof of personal failure."
+      },
+
+      {
+        "id": "overload_002",
+        "trigger": "participant feels emotionally exhausted",
+        "reframe": "Emotional exhaustion can emerge gradually when responsibility consistently outweighs recovery."
+      },
+
+      {
+        "id": "overload_003",
+        "trigger": "participant struggling with pacing",
+        "reframe": "Difficulty sustaining a certain pace does not necessarily mean you are incapable. It may simply mean the pace itself is unsustainable."
+      },
+
+      {
+        "id": "overload_004",
+        "trigger": "participant feels guilty resting",
+        "reframe": "Rest is not the opposite of growth. Recovery is part of sustainability."
+      }
+    ],
+
+
+    "uncertainty": [
+
+      {
+        "id": "uncertainty_001",
+        "trigger": "participant lacks clarity",
+        "reframe": "You do not need complete clarity in order to begin moving more intentionally."
+      },
+
+      {
+        "id": "uncertainty_002",
+        "trigger": "participant feels lost",
+        "reframe": "Periods of uncertainty often emerge during moments when older patterns no longer feel fully aligned."
+      },
+
+      {
+        "id": "uncertainty_003",
+        "trigger": "participant conflicted about direction",
+        "reframe": "Conflicting needs can coexist. Wanting both stability and change is deeply human."
+      },
+
+      {
+        "id": "uncertainty_004",
+        "trigger": "participant fears making wrong decisions",
+        "reframe": "Sustainable movement is often shaped through gradual adjustment rather than perfect certainty."
+      }
+    ],
+
+
+    "boundaries": [
+
+      {
+        "id": "boundaries_001",
+        "trigger": "difficulty saying no",
+        "reframe": "Boundaries are not rejection. They are often an attempt to preserve sustainability."
+      },
+
+      {
+        "id": "boundaries_002",
+        "trigger": "participant overextends for others",
+        "reframe": "Care for others becomes more difficult to sustain when personal capacity is consistently ignored."
+      },
+
+      {
+        "id": "boundaries_003",
+        "trigger": "participant fears disappointing others",
+        "reframe": "Protecting your capacity does not erase your care for other people."
+      },
+
+      {
+        "id": "boundaries_004",
+        "trigger": "participant struggling with obligation",
+        "reframe": "Some responsibilities begin as meaningful contribution and gradually become difficult to sustain without adjustment."
+      }
+    ],
+
+
+    "self_worth": [
+
+      {
+        "id": "selfworth_001",
+        "trigger": "worth tied to productivity",
+        "reframe": "Your value is not limited to what you produce, manage, or sustain for other people."
+      },
+
+      {
+        "id": "selfworth_002",
+        "trigger": "participant feels behind",
+        "reframe": "Growth rarely follows a perfectly linear timeline."
+      },
+
+      {
+        "id": "selfworth_003",
+        "trigger": "participant feels inadequate",
+        "reframe": "Struggling with capacity or direction does not erase the strengths you already possess."
+      },
+
+      {
+        "id": "selfworth_004",
+        "trigger": "participant harsh toward self",
+        "reframe": "Self-awareness can exist without self-punishment."
+      }
+    ],
+
+
+    "growth": [
+
+      {
+        "id": "growth_001",
+        "trigger": "participant overwhelmed by change",
+        "reframe": "Meaningful movement does not always require dramatic reinvention."
+      },
+
+      {
+        "id": "growth_002",
+        "trigger": "participant expects perfection",
+        "reframe": "Sustainable growth is often quieter and slower than people expect."
+      },
+
+      {
+        "id": "growth_003",
+        "trigger": "participant discouraged by setbacks",
+        "reframe": "Temporary difficulty does not erase long-term movement."
+      },
+
+      {
+        "id": "growth_004",
+        "trigger": "participant impatient with progress",
+        "reframe": "Small sustainable adjustments can still create meaningful change over time."
+      }
+    ],
+
+
+    "identity": [
+
+      {
+        "id": "identity_001",
+        "trigger": "participant feels disconnected from self",
+        "reframe": "Identity can evolve gradually as values, capacity, and priorities shift over time."
+      },
+
+      {
+        "id": "identity_002",
+        "trigger": "participant feels trapped in old roles",
+        "reframe": "Roles that once felt aligned may eventually require reevaluation or adjustment."
+      },
+
+      {
+        "id": "identity_003",
+        "trigger": "participant feels pressure to perform",
+        "reframe": "Constant performance can create distance from emotional steadiness and authenticity."
+      },
+
+      {
+        "id": "identity_004",
+        "trigger": "participant redefining direction",
+        "reframe": "You are allowed to outgrow patterns that no longer feel sustainable or meaningful."
+      }
+    ],
+
+
+    "emotional_complexity": [
+
+      {
+        "id": "emotion_001",
+        "trigger": "participant experiencing contradiction",
+        "reframe": "Multiple emotional truths can exist at the same time."
+      },
+
+      {
+        "id": "emotion_002",
+        "trigger": "participant unsure how to feel",
+        "reframe": "Not every emotional experience needs immediate resolution or interpretation."
+      },
+
+      {
+        "id": "emotion_003",
+        "trigger": "participant feels emotionally inconsistent",
+        "reframe": "Human needs and emotional states naturally shift across seasons of life."
+      },
+
+      {
+        "id": "emotion_004",
+        "trigger": "participant carrying mixed feelings",
+        "reframe": "Complex emotions are not necessarily signs of confusion or weakness."
+      }
+    ]
+  },
+
+
+  "reframe_rules": {
+
+    "avoid_toxic_positivity": true,
+
+    "avoid_perfectionism": true,
+
+    "avoid_motivational_hype": true,
+
+    "avoid_pathologizing": true,
+
+    "avoid_identity_reduction": true,
+
+    "prioritize_emotional_safety": true,
+
+    "prioritize_sustainability": true,
+
+    "normalize_human_complexity": true
+  }
+}
