@@ -1,70 +1,140 @@
 // public/send.js
-// TRUE V2 client transport layer
-// Purpose: send user reflection + context to the server
-// This file contains NO routing logic, NO module awareness, NO secrets
+// TRUE AI — Frontend API Client
 
-async function apiPost(body) {
-  const res = await fetch("/api/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
 
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Server error ${res.status}: ${text}`);
-  }
+// --------------------------------------------------
+// Send Message
+// --------------------------------------------------
+// Purpose:
+// Send Discovery conversation data
+// to the backend API.
+//
+// Used by:
+// - index.html
+// - Discovery flow
+//
+// Returns:
+// {
+//   reply,
+//   phase,
+//   state,
+//   lifeprint
+// }
+// --------------------------------------------------
 
-  return res.json();
-}
-
-/**
- * sendMessage (TRUE V2)
- *
- * Called by the UI when the user submits a message.
- * This function does not reason about stages or modules.
- * It passes context only.
- *
- * @param {string} stage
- *   One of: "discovery" | "sustainment" | "alignment"
- *
- * @param {Array<{ role: "user" | "assistant", content: string }>} conversation
- *
- * @param {Object} [options]
- *
- * @param {boolean} [options.allowStageTransition=true]
- *   Whether the server may suggest a stage transition.
- *
- * @param {boolean} [options.consent=false]
- *   Explicit user consent to enact a previously suggested stage change.
- *   This should only be true on the turn AFTER a suggestion.
- *
- * @returns {Promise<{
- *   reply: string,
- *   stage: string,
- *   module: string,
- *   intent: string
- * }>}
- */
 export async function sendMessage(
-  stage,
+
+  phase = "TARGET",
+
   conversation = [],
-  options = {}
+
+  metadata = {}
+
 ) {
-  const lastUser = conversation[conversation.length - 1];
 
-  return apiPost({
-    protocolVersion: "TRUE_V2",
+  try {
 
-    input: lastUser?.content || "",
-    messages: conversation,
+    const response =
+      await fetch("/api/chat", {
 
-    // TRUE ENTRY SIGNALS
-    declaredStage: stage,
-    allowStageTransition:
-      options.allowStageTransition !== false,
+        method: "POST",
 
-    // CONSENT SIGNAL (event-based)
-    consent: options.consent === true
-  });
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+
+        body: JSON.stringify({
+
+          phase,
+
+          conversation,
+
+          metadata
+        })
+      });
+
+
+    // ----------------------------------------------
+    // API Failure
+    // ----------------------------------------------
+    if (!response.ok) {
+
+      const errorText =
+        await response.text();
+
+      console.error(
+        "TRUE AI API error:",
+        errorText
+      );
+
+      return {
+
+        reply:
+`Something interrupted the Discovery process.
+
+Please try again in a moment.`,
+
+        phase
+      };
+    }
+
+
+    // ----------------------------------------------
+    // Parse JSON
+    // ----------------------------------------------
+    const data =
+      await response.json();
+
+
+    // ----------------------------------------------
+    // Validate Reply
+    // ----------------------------------------------
+    if (!data.reply) {
+
+      return {
+
+        reply:
+`No reflective response was returned.`,
+
+        phase
+      };
+    }
+
+
+    // ----------------------------------------------
+    // Success
+    // ----------------------------------------------
+    return {
+
+      reply:
+        data.reply,
+
+      phase:
+        data.phase || phase,
+
+      state:
+        data.state || null,
+
+      lifeprint:
+        data.lifeprint || null
+    };
+
+  } catch (error) {
+
+    console.error(
+      "TRUE AI sendMessage error:",
+      error
+    );
+
+    return {
+
+      reply:
+`The Discovery experience is temporarily unavailable.
+
+Please try again shortly.`,
+
+      phase
+    };
+  }
 }
