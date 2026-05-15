@@ -1,0 +1,233 @@
+{
+  "version": "TRUE_DISCOVERY_V1",
+
+  "description": "Grounded and sustainable upgrade suggestions used during TRUE AI Discovery synthesis. Suggestions are designed to encourage gradual movement, reduced overload, and emotionally sustainable adjustment rather than optimization or performance escalation.",
+
+  "categories": {
+
+    "capacity_support": [
+
+      {
+        "id": "capacity_001",
+        "theme": "reduce overload",
+        "suggestion": "Identify one recurring responsibility that may benefit from reduction, delay, or renegotiation."
+      },
+
+      {
+        "id": "capacity_002",
+        "theme": "recovery",
+        "suggestion": "Create a small recurring period of uninterrupted recovery or emotional quiet each week."
+      },
+
+      {
+        "id": "capacity_003",
+        "theme": "energy awareness",
+        "suggestion": "Begin noticing which environments or interactions most consistently increase emotional depletion."
+      },
+
+      {
+        "id": "capacity_004",
+        "theme": "pacing",
+        "suggestion": "Experiment with a slightly slower pace in one area of life that currently feels rushed or unsustainable."
+      },
+
+      {
+        "id": "capacity_005",
+        "theme": "restoration",
+        "suggestion": "Reintroduce one activity that feels emotionally restorative rather than purely productive."
+      }
+    ],
+
+
+    "boundaries": [
+
+      {
+        "id": "boundaries_001",
+        "theme": "protect capacity",
+        "suggestion": "Practice saying 'not right now' in situations where immediate agreement is not necessary."
+      },
+
+      {
+        "id": "boundaries_002",
+        "theme": "reduce overextension",
+        "suggestion": "Choose one responsibility that may no longer need to be carried entirely alone."
+      },
+
+      {
+        "id": "boundaries_003",
+        "theme": "emotional sustainability",
+        "suggestion": "Notice where guilt appears when protecting your own energy or emotional needs."
+      },
+
+      {
+        "id": "boundaries_004",
+        "theme": "relationship pacing",
+        "suggestion": "Reflect on which relationships feel energizing versus consistently depleting."
+      },
+
+      {
+        "id": "boundaries_005",
+        "theme": "permission",
+        "suggestion": "Allow one small area of life to remain unfinished, delayed, or imperfect temporarily."
+      }
+    ],
+
+
+    "alignment": [
+
+      {
+        "id": "alignment_001",
+        "theme": "values clarity",
+        "suggestion": "Spend time identifying which current commitments still feel emotionally meaningful and which feel primarily obligation-based."
+      },
+
+      {
+        "id": "alignment_002",
+        "theme": "intentional movement",
+        "suggestion": "Choose one decision this week using alignment rather than urgency as the primary filter."
+      },
+
+      {
+        "id": "alignment_003",
+        "theme": "authenticity",
+        "suggestion": "Notice where your behavior feels most emotionally natural versus performative."
+      },
+
+      {
+        "id": "alignment_004",
+        "theme": "environment",
+        "suggestion": "Pay attention to which environments support steadiness, spaciousness, or emotional honesty."
+      },
+
+      {
+        "id": "alignment_005",
+        "theme": "life direction",
+        "suggestion": "Write briefly about what a more sustainable version of your current life might realistically look like."
+      }
+    ],
+
+
+    "self_awareness": [
+
+      {
+        "id": "awareness_001",
+        "theme": "pattern recognition",
+        "suggestion": "Begin noticing recurring emotional or behavioral patterns without immediately trying to fix them."
+      },
+
+      {
+        "id": "awareness_002",
+        "theme": "internal signals",
+        "suggestion": "Track how your body or emotions signal that pressure has been building too long."
+      },
+
+      {
+        "id": "awareness_003",
+        "theme": "emotional honesty",
+        "suggestion": "Practice naming emotional experiences more specifically instead of minimizing or dismissing them."
+      },
+
+      {
+        "id": "awareness_004",
+        "theme": "reflection",
+        "suggestion": "Create a recurring space for reflection that is not focused entirely on productivity or planning."
+      },
+
+      {
+        "id": "awareness_005",
+        "theme": "contradiction tolerance",
+        "suggestion": "Allow conflicting needs or emotions to coexist temporarily without forcing immediate resolution."
+      }
+    ],
+
+
+    "momentum": [
+
+      {
+        "id": "momentum_001",
+        "theme": "small movement",
+        "suggestion": "Choose one small adjustment that feels realistic enough to sustain consistently."
+      },
+
+      {
+        "id": "momentum_002",
+        "theme": "low friction",
+        "suggestion": "Reduce unnecessary complexity in one area of life that currently feels emotionally heavy."
+      },
+
+      {
+        "id": "momentum_003",
+        "theme": "gentle experimentation",
+        "suggestion": "Approach change as experimentation rather than permanent reinvention."
+      },
+
+      {
+        "id": "momentum_004",
+        "theme": "consistency",
+        "suggestion": "Prioritize steadier movement over intense bursts of motivation."
+      },
+
+      {
+        "id": "momentum_005",
+        "theme": "sustainability",
+        "suggestion": "Ask regularly whether your current pace still feels emotionally and practically sustainable."
+      }
+    ],
+
+
+    "support": [
+
+      {
+        "id": "support_001",
+        "theme": "connection",
+        "suggestion": "Identify one person, relationship, or environment where you feel more emotionally understood or supported."
+      },
+
+      {
+        "id": "support_002",
+        "theme": "shared responsibility",
+        "suggestion": "Consider where support, delegation, or collaboration may reduce unnecessary strain."
+      },
+
+      {
+        "id": "support_003",
+        "theme": "permission",
+        "suggestion": "Allow yourself to acknowledge difficulty without immediately turning it into self-criticism."
+      },
+
+      {
+        "id": "support_004",
+        "theme": "stabilization",
+        "suggestion": "Focus first on creating steadiness before pursuing major transformation."
+      },
+
+      {
+        "id": "support_005",
+        "theme": "self-compassion",
+        "suggestion": "Practice responding to emotional difficulty with curiosity rather than harsh evaluation."
+      }
+    ]
+  },
+
+
+  "suggestion_rules": {
+
+    "avoid_overwhelm": true,
+
+    "avoid_hyper_productivity": true,
+
+    "avoid_hustle_language": true,
+
+    "avoid_forced_transformation": true,
+
+    "avoid_perfectionism": true,
+
+    "prioritize_sustainability": true,
+
+    "prioritize_emotional_safety": true,
+
+    "prefer_small_adjustments": true,
+
+    "prefer_low_friction_experiments": true
+  }
+}
