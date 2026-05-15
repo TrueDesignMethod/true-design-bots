@@ -1,0 +1,869 @@
+```html
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1"
+/>
+
+<link
+  href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap"
+  rel="stylesheet"
+/>
+
+<title>TRUE AI — Discovery LifePrint</title>
+
+<style>
+:root {
+
+  --bg: #fbf9f7;
+  --card: #ffffff;
+
+  --text: #1f1a18;
+  --muted: #6b5b54;
+
+  --assistant-bubble: #f4f2ef;
+  --user-bubble: #e5d9d0;
+
+  --input-bg: #f4f2ef;
+  --input-border: rgba(16,18,20,0.08);
+
+  --radius: 14px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+
+  margin: 0;
+  padding: 0;
+
+  background: var(--bg);
+  color: var(--text);
+
+  font-family:
+    "Montserrat",
+    system-ui,
+    sans-serif;
+}
+
+body {
+  min-height: 100svh;
+}
+
+
+/* -------------------------------------------------- */
+/* Header */
+/* -------------------------------------------------- */
+
+header {
+
+  height: 58px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 0 20px;
+
+  border-bottom:
+    1px solid var(--input-border);
+
+  background: var(--bg);
+
+  position: sticky;
+  top: 0;
+
+  z-index: 10;
+}
+
+.logo {
+
+  width: 34px;
+  height: 34px;
+
+  border-radius: 8px;
+
+  background: #000;
+  color: #fff;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: 600;
+}
+
+.brand-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.brand-sub {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.actions {
+  margin-left: auto;
+}
+
+button.download-btn {
+
+  border: none;
+
+  background: #000;
+  color: #fff;
+
+  border-radius: 12px;
+
+  padding: 10px 16px;
+
+  font-family: inherit;
+  font-size: 13px;
+
+  cursor: pointer;
+}
+
+
+/* -------------------------------------------------- */
+/* Main Layout */
+/* -------------------------------------------------- */
+
+main {
+
+  width: 100%;
+  max-width: 920px;
+
+  margin: 0 auto;
+
+  padding: 52px 22px 120px;
+}
+
+
+/* -------------------------------------------------- */
+/* Hero */
+/* -------------------------------------------------- */
+
+.lifeprint-hero {
+
+  margin-bottom: 42px;
+}
+
+.eyebrow {
+
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+
+  color: var(--muted);
+
+  margin-bottom: 14px;
+}
+
+.lifeprint-hero h1 {
+
+  margin: 0 0 18px;
+
+  font-size: 38px;
+  font-weight: 500;
+
+  line-height: 1.2;
+}
+
+.hero-description {
+
+  max-width: 760px;
+
+  font-size: 15px;
+  line-height: 1.9;
+
+  color: var(--muted);
+}
+
+
+/* -------------------------------------------------- */
+/* Discovery Status */
+/* -------------------------------------------------- */
+
+.discovery-status {
+
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  margin-top: 30px;
+}
+
+.status-pill {
+
+  background: var(--assistant-bubble);
+
+  padding: 8px 12px;
+
+  border-radius: 999px;
+
+  font-size: 11px;
+  letter-spacing: 0.03em;
+
+  color: var(--muted);
+}
+
+.status-pill.active {
+  background: #000;
+  color: #fff;
+}
+
+
+/* -------------------------------------------------- */
+/* Sections */
+/* -------------------------------------------------- */
+
+.lifeprint-section {
+
+  margin-bottom: 26px;
+
+  background: var(--card);
+
+  border:
+    1px solid var(--input-border);
+
+  border-radius: 18px;
+
+  padding: 34px;
+}
+
+.section-label {
+
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+
+  color: var(--muted);
+
+  margin-bottom: 14px;
+}
+
+.lifeprint-section h2 {
+
+  margin: 0 0 18px;
+
+  font-size: 24px;
+  font-weight: 500;
+
+  line-height: 1.35;
+}
+
+.section-body {
+
+  font-size: 15px;
+  line-height: 1.95;
+
+  color: var(--text);
+}
+
+.section-body p {
+  margin-top: 0;
+}
+
+.section-body p:last-child {
+  margin-bottom: 0;
+}
+
+
+/* -------------------------------------------------- */
+/* Highlight Lists */
+/* -------------------------------------------------- */
+
+.highlight-list {
+
+  margin-top: 24px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+.highlight-item {
+
+  background: var(--assistant-bubble);
+
+  border-radius: 12px;
+
+  padding: 14px 16px;
+
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+
+/* -------------------------------------------------- */
+/* Momentum Grid */
+/* -------------------------------------------------- */
+
+.momentum-grid {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, 1fr);
+
+  gap: 14px;
+
+  margin-top: 26px;
+}
+
+.momentum-card {
+
+  background: var(--assistant-bubble);
+
+  border-radius: 14px;
+
+  padding: 20px;
+}
+
+.momentum-card h3 {
+
+  margin: 0 0 10px;
+
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.momentum-card p {
+
+  margin: 0;
+
+  font-size: 13px;
+  line-height: 1.8;
+
+  color: var(--muted);
+}
+
+
+/* -------------------------------------------------- */
+/* Closing Reflection */
+/* -------------------------------------------------- */
+
+.closing-reflection {
+
+  margin-top: 42px;
+
+  padding: 34px;
+
+  border-radius: 18px;
+
+  background: var(--assistant-bubble);
+}
+
+.closing-reflection h2 {
+
+  margin: 0 0 18px;
+
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.closing-reflection p {
+
+  margin: 0;
+
+  font-size: 15px;
+  line-height: 1.95;
+
+  color: var(--muted);
+}
+
+
+/* -------------------------------------------------- */
+/* Footer */
+/* -------------------------------------------------- */
+
+footer {
+
+  margin-top: 52px;
+
+  text-align: center;
+
+  font-size: 12px;
+  line-height: 1.8;
+
+  color: var(--muted);
+}
+
+
+/* -------------------------------------------------- */
+/* Mobile */
+/* -------------------------------------------------- */
+
+@media (max-width: 768px) {
+
+  main {
+    padding-top: 34px;
+  }
+
+  .lifeprint-hero h1 {
+    font-size: 30px;
+  }
+
+  .lifeprint-section {
+    padding: 26px 22px;
+  }
+
+  .momentum-grid {
+    grid-template-columns: 1fr;
+  }
+
+  header {
+    padding: 0 14px;
+  }
+
+  button.download-btn {
+    padding: 10px 14px;
+    font-size: 12px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+  <div class="logo">T</div>
+
+  <div class="brand-wrap">
+    <div class="brand">TRUE AI</div>
+    <div class="brand-sub">Discovery LifePrint</div>
+  </div>
+
+  <div class="actions">
+
+    <button
+      class="download-btn"
+      id="download-lifeprint"
+    >
+      Download LifePrint
+    </button>
+
+  </div>
+
+</header>
+
+<main>
+
+  <!-- Hero -->
+  <section class="lifeprint-hero">
+
+    <div class="eyebrow">
+      Discovery Complete
+    </div>
+
+    <h1>
+      Your Discovery LifePrint
+    </h1>
+
+    <p class="hero-description">
+      This LifePrint is a reflective snapshot intended to help you better understand:
+      what may currently support you,
+      what may currently strain you,
+      and what kinds of movement may feel more aligned and sustainable moving forward.
+      <br /><br />
+      It is not a diagnosis,
+      personality label,
+      or final definition of who you are.
+    </p>
+
+
+    <!-- Discovery Phases -->
+    <div class="discovery-status">
+
+      <div class="status-pill active">
+        TARGET Complete
+      </div>
+
+      <div class="status-pill active">
+        REFLECT Complete
+      </div>
+
+      <div class="status-pill active">
+        UPGRADE Complete
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- Summary -->
+  <section class="lifeprint-section">
+
+    <div class="section-label">
+      Discovery Summary
+    </div>
+
+    <h2>
+      Current Alignment Landscape
+    </h2>
+
+    <div class="section-body">
+
+      <p>
+        There appears to be a growing awareness around sustainability,
+        pacing,
+        and the emotional weight of ongoing responsibility.
+        Across your reflections,
+        recurring themes of contribution,
+        steadiness,
+        and emotional honesty emerge alongside tension around capacity,
+        pressure,
+        and the desire for greater spaciousness.
+      </p>
+
+      <p>
+        You may be recognizing that some ways of carrying responsibility no longer feel fully sustainable,
+        even while care,
+        commitment,
+        and thoughtfulness remain deeply important to you.
+        There also appears to be a growing desire for movement that feels more aligned,
+        intentional,
+        and emotionally steady rather than driven entirely by pressure or obligation.
+      </p>
+
+    </div>
+
+  </section>
+
+
+  <!-- Strengths -->
+  <section class="lifeprint-section">
+
+    <div class="section-label">
+      Strength Architecture
+    </div>
+
+    <h2>
+      Supportive Internal Resources
+    </h2>
+
+    <div class="section-body">
+
+      <p>
+        Your reflections suggest meaningful capacities for thoughtfulness,
+        self-awareness,
+        emotional honesty,
+        and sustained responsibility.
+        Even during periods of uncertainty or pressure,
+        there appears to be a willingness to continue reflecting,
+        reconsidering patterns,
+        and searching for more sustainable ways of moving forward.
+      </p>
+
+      <p>
+        You may also possess a strong awareness of how your choices affect other people,
+        which can support empathy,
+        relational care,
+        and contribution.
+        At the same time,
+        some of these strengths may occasionally contribute to overextension when boundaries,
+        pacing,
+        or recovery become more difficult to protect.
+      </p>
+
+    </div>
+
+
+    <div class="highlight-list">
+
+      <div class="highlight-item">
+        Reflective self-awareness during periods of pressure
+      </div>
+
+      <div class="highlight-item">
+        Thoughtful consideration before making decisions
+      </div>
+
+      <div class="highlight-item">
+        Emotional honesty and openness to reflection
+      </div>
+
+      <div class="highlight-item">
+        Persistence and responsibility toward meaningful commitments
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- Friction -->
+  <section class="lifeprint-section">
+
+    <div class="section-label">
+      Friction & Load Patterns
+    </div>
+
+    <h2>
+      Sustainability & Emotional Load
+    </h2>
+
+    <div class="section-body">
+
+      <p>
+        There appears to be recurring tension between ongoing responsibility and available emotional or energetic capacity.
+        Some patterns suggest that pressure may have accumulated gradually over time,
+        potentially making recovery,
+        spaciousness,
+        or boundary maintenance more difficult to sustain consistently.
+      </p>
+
+      <p>
+        Your reflections also suggest that certain responsibilities or expectations may no longer feel fully aligned with the pace,
+        steadiness,
+        or emotional sustainability you want long-term.
+        At times,
+        there may be competing needs around contribution,
+        rest,
+        stability,
+        and personal freedom.
+      </p>
+
+    </div>
+
+
+    <div class="highlight-list">
+
+      <div class="highlight-item">
+        Ongoing responsibility contributing to emotional load
+      </div>
+
+      <div class="highlight-item">
+        Difficulty sustaining current pacing long-term
+      </div>
+
+      <div class="highlight-item">
+        Tension between contribution and recovery needs
+      </div>
+
+      <div class="highlight-item">
+        Pressure accumulation through chronic obligation
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- Upgrade -->
+  <section class="lifeprint-section">
+
+    <div class="section-label">
+      Upgrade Path
+    </div>
+
+    <h2>
+      Sustainable Movement Opportunities
+    </h2>
+
+    <div class="section-body">
+
+      <p>
+        Future movement may benefit less from intensity and more from steadier pacing,
+        clearer boundaries,
+        and realistic emotional sustainability.
+        There appears to be an opportunity to reduce unnecessary pressure while still preserving meaningful contribution,
+        purpose,
+        and growth.
+      </p>
+
+      <p>
+        Smaller,
+        lower-friction adjustments may create more sustainable momentum than dramatic reinvention.
+        Clarifying which responsibilities remain genuinely aligned,
+        where recovery is needed,
+        and what kinds of support create steadiness may become especially important moving forward.
+      </p>
+
+    </div>
+
+
+    <div class="highlight-list">
+
+      <div class="highlight-item">
+        Explore stronger pacing and recovery boundaries
+      </div>
+
+      <div class="highlight-item">
+        Reduce pressure where obligations no longer feel sustainable
+      </div>
+
+      <div class="highlight-item">
+        Create more space for emotional steadiness and reflection
+      </div>
+
+      <div class="highlight-item">
+        Focus on gradual movement rather than dramatic reinvention
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- Momentum -->
+  <section class="lifeprint-section">
+
+    <div class="section-label">
+      Momentum Steps
+    </div>
+
+    <h2>
+      Gentle Next Steps
+    </h2>
+
+    <div class="momentum-grid">
+
+      <div class="momentum-card">
+
+        <h3>
+          Reduce One Source of Pressure
+        </h3>
+
+        <p>
+          Identify one ongoing responsibility,
+          expectation,
+          or demand that may no longer feel fully sustainable.
+          Consider whether a small reduction,
+          pause,
+          or renegotiation is possible.
+        </p>
+
+      </div>
+
+
+      <div class="momentum-card">
+
+        <h3>
+          Notice Capacity Signals
+        </h3>
+
+        <p>
+          Pay attention to the emotional,
+          mental,
+          or physical signals that appear when pressure begins accumulating.
+          Earlier awareness may support steadier pacing.
+        </p>
+
+      </div>
+
+
+      <div class="momentum-card">
+
+        <h3>
+          Clarify What Still Feels Aligned
+        </h3>
+
+        <p>
+          Reflect on which commitments,
+          priorities,
+          or relationships still feel meaningful,
+          and which may now feel more inherited,
+          outdated,
+          or emotionally costly.
+        </p>
+
+      </div>
+
+
+      <div class="momentum-card">
+
+        <h3>
+          Move Gradually
+        </h3>
+
+        <p>
+          Sustainable movement rarely requires complete reinvention.
+          Smaller shifts in pacing,
+          boundaries,
+          or self-awareness can still create meaningful change over time.
+        </p>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- Closing Reflection -->
+  <section class="closing-reflection">
+
+    <h2>
+      Closing Reflection
+    </h2>
+
+    <p>
+      Growth does not require becoming an entirely different person.
+      <br /><br />
+      Often,
+      meaningful movement begins through:
+      clearer awareness,
+      gentler honesty,
+      more sustainable pacing,
+      reduced overload,
+      and stronger alignment between what you carry and what genuinely matters to you.
+      <br /><br />
+      This LifePrint is not a final definition.
+      It is simply a reflective snapshot intended to support greater clarity,
+      emotional steadiness,
+      and sustainable movement moving forward.
+    </p>
+
+  </section>
+
+
+  <!-- Footer -->
+  <footer>
+
+    TRUE AI — Discovery LifePrint
+    <br />
+    Reflective self-awareness for sustainable movement.
+
+  </footer>
+
+</main>
+
+<script>
+const downloadBtn =
+  document.getElementById(
+    "download-lifeprint"
+  );
+
+
+// --------------------------------------------------
+// Placeholder Download Handler
+// --------------------------------------------------
+
+downloadBtn.addEventListener("click", () => {
+
+  alert(
+    "LifePrint download functionality will be connected here."
+  );
+});
+</script>
+
+</body>
+</html>
+```
