@@ -1,0 +1,889 @@
+/* ==================================================
+   TRUE AI — Main Stylesheet
+   Reflective Discovery Interface
+================================================== */
+
+
+/* ==================================================
+   Root Variables
+================================================== */
+
+:root {
+
+  --bg: #fbf9f7;
+  --card: #ffffff;
+
+  --text: #1f1a18;
+  --muted: #6b5b54;
+
+  --assistant-bubble: #f4f2ef;
+  --user-bubble: #e5d9d0;
+
+  --input-bg: #f4f2ef;
+  --input-border: rgba(16,18,20,0.08);
+
+  --shadow:
+    0 2px 12px rgba(0,0,0,0.03);
+
+  --radius-sm: 10px;
+  --radius: 14px;
+  --radius-lg: 18px;
+
+  --transition: 220ms ease;
+
+  --max-width: 920px;
+}
+
+
+/* ==================================================
+   Base Reset
+================================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+
+  margin: 0;
+  padding: 0;
+
+  min-height: 100%;
+
+  background: var(--bg);
+  color: var(--text);
+
+  font-family:
+    "Montserrat",
+    system-ui,
+    sans-serif;
+
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+
+/* ==================================================
+   Typography
+================================================== */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+
+  margin-top: 0;
+
+  font-weight: 500;
+
+  line-height: 1.3;
+}
+
+p {
+
+  line-height: 1.9;
+
+  margin-top: 0;
+}
+
+a {
+
+  color: inherit;
+
+  text-decoration: none;
+}
+
+small {
+  color: var(--muted);
+}
+
+
+/* ==================================================
+   Layout
+================================================== */
+
+.page-shell {
+
+  min-height: 100svh;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.page-content {
+
+  width: 100%;
+  max-width: var(--max-width);
+
+  margin: 0 auto;
+
+  padding: 48px 22px 100px;
+}
+
+
+/* ==================================================
+   Header
+================================================== */
+
+header {
+
+  height: 58px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 0 18px;
+
+  border-bottom:
+    1px solid var(--input-border);
+
+  background: var(--bg);
+
+  position: sticky;
+  top: 0;
+
+  z-index: 20;
+}
+
+.logo {
+
+  width: 34px;
+  height: 34px;
+
+  border-radius: 8px;
+
+  background: #000;
+  color: #fff;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.brand-wrap {
+
+  display: flex;
+  flex-direction: column;
+}
+
+.brand {
+
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.brand-sub {
+
+  font-size: 11px;
+
+  color: var(--muted);
+}
+
+.header-actions {
+
+  margin-left: auto;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+}
+
+
+/* ==================================================
+   Buttons
+================================================== */
+
+button {
+
+  font-family: inherit;
+
+  transition:
+    background var(--transition),
+    opacity var(--transition),
+    transform var(--transition);
+
+  cursor: pointer;
+}
+
+button:disabled {
+
+  opacity: 0.6;
+
+  cursor: not-allowed;
+}
+
+.primary-btn {
+
+  border: none;
+
+  background: #000;
+  color: #fff;
+
+  border-radius: 12px;
+
+  padding: 14px 22px;
+
+  font-size: 14px;
+}
+
+.primary-btn:hover {
+  opacity: 0.94;
+}
+
+.secondary-btn {
+
+  border:
+    1px solid var(--input-border);
+
+  background: var(--card);
+
+  color: var(--text);
+
+  border-radius: 12px;
+
+  padding: 12px 18px;
+
+  font-size: 14px;
+}
+
+.ghost-btn {
+
+  border: none;
+
+  background: transparent;
+
+  color: var(--muted);
+
+  padding: 10px 12px;
+
+  font-size: 13px;
+}
+
+
+/* ==================================================
+   Cards
+================================================== */
+
+.card {
+
+  background: var(--card);
+
+  border:
+    1px solid var(--input-border);
+
+  border-radius: var(--radius-lg);
+
+  box-shadow: var(--shadow);
+}
+
+.section-card {
+
+  padding: 34px;
+
+  margin-bottom: 26px;
+}
+
+
+/* ==================================================
+   Labels / Eyebrows
+================================================== */
+
+.eyebrow,
+.section-label {
+
+  font-size: 11px;
+
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+
+  color: var(--muted);
+}
+
+
+/* ==================================================
+   Inputs
+================================================== */
+
+input,
+textarea {
+
+  width: 100%;
+
+  border:
+    1px solid var(--input-border);
+
+  border-radius: var(--radius);
+
+  background: var(--input-bg);
+
+  color: var(--text);
+
+  font-family: inherit;
+  font-size: 14px;
+
+  transition:
+    border-color var(--transition),
+    background var(--transition);
+}
+
+input {
+
+  height: 52px;
+
+  padding: 0 16px;
+}
+
+textarea {
+
+  min-height: 140px;
+
+  padding: 16px;
+
+  resize: vertical;
+
+  line-height: 1.8;
+}
+
+input:focus,
+textarea:focus {
+
+  outline: none;
+
+  border-color:
+    rgba(0,0,0,0.18);
+}
+
+
+/* ==================================================
+   Form Layout
+================================================== */
+
+.form-stack {
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 28px;
+}
+
+.field-group {
+
+  display: flex;
+  flex-direction: column;
+}
+
+.field-group label {
+
+  margin-bottom: 10px;
+
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.field-group p {
+
+  margin-bottom: 14px;
+
+  font-size: 13px;
+
+  color: var(--muted);
+}
+
+
+/* ==================================================
+   Discovery Phases
+================================================== */
+
+.phase-indicator,
+.discovery-status {
+
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 10px;
+}
+
+.phase-pill,
+.status-pill {
+
+  padding: 7px 12px;
+
+  border-radius: 999px;
+
+  background: var(--assistant-bubble);
+
+  color: var(--muted);
+
+  font-size: 11px;
+  letter-spacing: 0.03em;
+}
+
+.phase-pill.active,
+.status-pill.active {
+
+  background: #000;
+  color: #fff;
+}
+
+
+/* ==================================================
+   Chat Layout
+================================================== */
+
+.chat-layout {
+
+  display: flex;
+
+  min-height: calc(100svh - 58px);
+}
+
+
+/* ==================================================
+   Sidebar
+================================================== */
+
+.sidebar {
+
+  width: 260px;
+
+  background: var(--card);
+
+  border-right:
+    1px solid var(--input-border);
+
+  padding: 18px;
+
+  overflow-y: auto;
+}
+
+.sidebar h3 {
+
+  margin-bottom: 14px;
+
+  font-size: 13px;
+  font-weight: 500;
+
+  color: var(--muted);
+}
+
+.session-entry {
+
+  padding: 10px 0;
+
+  font-size: 13px;
+
+  color: var(--muted);
+
+  cursor: pointer;
+}
+
+.session-entry.active {
+
+  color: var(--text);
+
+  font-weight: 500;
+}
+
+
+/* ==================================================
+   Chat Area
+================================================== */
+
+.chat-area {
+
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+}
+
+.messages {
+
+  flex: 1;
+
+  overflow-y: auto;
+
+  padding: 24px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 16px;
+}
+
+
+/* ==================================================
+   Chat Bubbles
+================================================== */
+
+.bubble {
+
+  max-width: 72%;
+
+  padding: 14px 16px;
+
+  border-radius: 14px;
+
+  font-size: 14px;
+  line-height: 1.75;
+
+  white-space: pre-wrap;
+}
+
+.bubble.bot,
+.bubble.assistant {
+
+  background: var(--assistant-bubble);
+
+  align-self: flex-start;
+}
+
+.bubble.user {
+
+  background: var(--user-bubble);
+
+  align-self: flex-end;
+}
+
+
+/* ==================================================
+   Input Bar
+================================================== */
+
+.input-bar {
+
+  padding: 16px;
+
+  border-top:
+    1px solid var(--input-border);
+
+  background: var(--bg);
+}
+
+.input-row {
+
+  display: flex;
+
+  gap: 12px;
+}
+
+
+/* ==================================================
+   Highlight Lists
+================================================== */
+
+.highlight-list {
+
+  margin-top: 24px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+.highlight-item {
+
+  background: var(--assistant-bubble);
+
+  border-radius: 12px;
+
+  padding: 14px 16px;
+
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+
+/* ==================================================
+   Momentum Grid
+================================================== */
+
+.momentum-grid {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, 1fr);
+
+  gap: 14px;
+
+  margin-top: 24px;
+}
+
+.momentum-card {
+
+  background: var(--assistant-bubble);
+
+  border-radius: 14px;
+
+  padding: 20px;
+}
+
+.momentum-card h3 {
+
+  margin-bottom: 10px;
+
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.momentum-card p {
+
+  margin: 0;
+
+  font-size: 13px;
+  line-height: 1.8;
+
+  color: var(--muted);
+}
+
+
+/* ==================================================
+   Notice / Reflection Blocks
+================================================== */
+
+.notice,
+.reflection-block {
+
+  background: var(--assistant-bubble);
+
+  border-radius: var(--radius);
+
+  padding: 22px;
+}
+
+.notice h4,
+.reflection-block h4 {
+
+  margin-bottom: 10px;
+
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.notice p,
+.reflection-block p {
+
+  margin-bottom: 0;
+
+  font-size: 13px;
+
+  color: var(--muted);
+}
+
+
+/* ==================================================
+   LifePrint Hero
+================================================== */
+
+.lifeprint-hero {
+
+  margin-bottom: 42px;
+}
+
+.lifeprint-hero h1 {
+
+  margin:
+    14px 0 18px;
+
+  font-size: 38px;
+  font-weight: 500;
+
+  line-height: 1.2;
+}
+
+.hero-description {
+
+  max-width: 760px;
+
+  font-size: 15px;
+  line-height: 1.9;
+
+  color: var(--muted);
+}
+
+
+/* ==================================================
+   Closing Reflection
+================================================== */
+
+.closing-reflection {
+
+  margin-top: 42px;
+
+  background: var(--assistant-bubble);
+
+  border-radius: var(--radius-lg);
+
+  padding: 34px;
+}
+
+
+/* ==================================================
+   Footer
+================================================== */
+
+footer {
+
+  margin-top: 52px;
+
+  text-align: center;
+
+  font-size: 12px;
+  line-height: 1.8;
+
+  color: var(--muted);
+}
+
+
+/* ==================================================
+   Login Overlay
+================================================== */
+
+.overlay {
+
+  position: fixed;
+  inset: 0;
+
+  z-index: 100;
+
+  display: none;
+  place-items: center;
+
+  background:
+    rgba(251,249,247,0.84);
+}
+
+.overlay.active {
+  display: grid;
+}
+
+.overlay-card {
+
+  width: 92%;
+  max-width: 380px;
+
+  padding: 26px;
+
+  background: var(--card);
+
+  border-radius: var(--radius-lg);
+
+  border:
+    1px solid var(--input-border);
+}
+
+.overlay-card h2 {
+
+  margin-bottom: 10px;
+
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.overlay-card p {
+
+  font-size: 13px;
+
+  color: var(--muted);
+}
+
+
+/* ==================================================
+   Utility
+================================================== */
+
+.hidden {
+  display: none !important;
+}
+
+.center {
+  text-align: center;
+}
+
+.mt-sm {
+  margin-top: 10px;
+}
+
+.mt-md {
+  margin-top: 20px;
+}
+
+.mt-lg {
+  margin-top: 36px;
+}
+
+
+/* ==================================================
+   Responsive
+================================================== */
+
+@media (max-width: 768px) {
+
+  .page-content {
+
+    padding:
+      34px 18px 80px;
+  }
+
+  .section-card {
+
+    padding: 26px 22px;
+  }
+
+  .chat-layout {
+
+    flex-direction: column;
+  }
+
+  .sidebar {
+
+    width: 100%;
+
+    border-right: none;
+
+    border-bottom:
+      1px solid var(--input-border);
+  }
+
+  .bubble {
+
+    max-width: 88%;
+  }
+
+  .momentum-grid {
+
+    grid-template-columns: 1fr;
+  }
+
+  .lifeprint-hero h1 {
+
+    font-size: 30px;
+  }
+
+  .input-row {
+
+    flex-direction: column;
+  }
+
+  .primary-btn {
+
+    width: 100%;
+  }
+}
