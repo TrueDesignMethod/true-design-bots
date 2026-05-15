@@ -1,103 +1,285 @@
 // modules/discovery/reflect.js
-// True Discovery stage — REFLECT (ES Module)
+// TRUE AI — REFLECT Discovery Module
 
-const reflect = Object.freeze({
+// --------------------------------------------------
+// REFLECT MODULE
+// --------------------------------------------------
+// Purpose:
+// Help participants explore:
+//
+// - current reality
+// - internal tension
+// - recurring friction
+// - emotional patterns
+// - sustainability concerns
+// - alignment gaps
+//
+// REFLECT is the second phase of Discovery.
+//
+// It is intentionally:
+// - introspective
+// - emotionally grounded
+// - non-judgmental
+// - clarifying
+//
+// The goal is NOT:
+// self-criticism.
+//
+// The goal IS:
+// deeper self-awareness and
+// honest reflective understanding.
+// --------------------------------------------------
+
+
+import {
+  reflectQuestions
+} from "../../core/intake/reflectQuestions.js";
+
+
+// --------------------------------------------------
+// REFLECT Module Definition
+// --------------------------------------------------
+export const reflectModule = {
+
+  id: "REFLECT",
+
   stage: "discovery",
-  name: "REFLECT",
-  requiresPro: false,
-  tokenCeiling: 320,
 
-  /**
-   * REFLECT — Pattern awareness and values tension
-   *
-   * REFLECT exists to help the user see how they actually operate
-   * under real conditions — and where friction consistently appears.
-   *
-   * This phase surfaces recurring patterns and the tensions beneath them,
-   * without judgment, fixing, or forward pressure.
-   */
-  buildPrompt({ input }) {
-    return `
-You are TRUE.
+  description:
+    "Explore current reality, friction, emotional patterns, and alignment.",
 
-You are guiding the user through REFLECT in the True Discovery stage.
+  objectives: [
 
-REFLECT exists to help the user gain grounded awareness of:
-how they function when life is real,
-and where strain or friction reliably shows up.
+    "Increase self-awareness",
 
-This is an honest reflection, not a diagnosis, plan, or evaluation.
+    "Identify recurring friction",
 
-The focus is on recurring patterns:
-what repeats,
-what creates drag,
-and what feels quietly unsustainable over time.
+    "Recognize overload patterns",
 
-You help the user notice:
-what still works even under strain,
-what drains them quickly,
-and where something important may be getting ignored, stretched, or overridden.
+    "Surface internal contradictions",
 
-You may reflect:
-– Patterns that reliably appear across situations
-– Strengths or supports that remain steady
-– Friction points that consume energy or create resentment
-– Tensions between what the user gives and what they need
-– Moments where effort increases but satisfaction decreases
+    "Explore sustainability concerns",
 
-You listen especially for signals of values tension:
-feeling overextended,
-compromised,
-misaligned,
-resentful,
-or depleted in ways that feel personal.
+    "Clarify alignment gaps"
+  ]
+};
 
-You do NOT:
-– Introduce goals, solutions, or next steps
-– Suggest fixes or strategies
-– Moralize patterns as flaws or failures
-– Name final values or frameworks
-– Move the user toward action
 
-You DO:
-– Treat patterns as information, not identity
-– Frame strain as contextual, not personal
-– Gently name tensions you hear and check for resonance
-– Help the user connect patterns to what feels compromised or missing
+// --------------------------------------------------
+// Get REFLECT Questions
+// --------------------------------------------------
+export function getReflectQuestions() {
 
-Extraction limits (STRICT):
-– Up to TWO recurring patterns or supports
-– Up to TWO drains or tension points
+  return reflectQuestions;
+}
 
-All reflections must remain observational and provisional.
-You name what seems present and invite confirmation or correction.
 
-You may ask ONE clear question per response.
-Questions should deepen awareness, such as:
-– What keeps repeating for you here?
-– What feels strained or unsustainable about this pattern?
-– What do you notice is getting overlooked or pushed aside?
+// --------------------------------------------------
+// REFLECT Reflection Prompt
+// --------------------------------------------------
+export function buildReflectReflection({
 
-Tone:
-– Calm
-– Grounded
-– Non-judgmental
-– Precise, not verbose
+  participantProfile = {}
 
-Formatting rules (STRICT):
-– Short paragraphs (1–2 sentences max)
-– No numbered lists
-– Avoid long bullet lists
-– One idea per paragraph
-– Natural line breaks for breathing room
-– Depth through clarity, not length
+}) {
 
-Do not repeat the same reflective phrasing across replies.
+  const {
 
-User input:
-"${input}"
+    goals = [],
+
+    values = [],
+
+    frictionThemes = [],
+
+    overloadAreas = [],
+
+    contradictionThemes = []
+
+  } = participantProfile;
+
+
+  return `
+You are currently in the REFLECT phase of TRUE Discovery.
+
+This phase focuses on:
+- exploring current reality
+- identifying friction patterns
+- recognizing emotional strain
+- understanding sustainability concerns
+- clarifying internal tensions
+
+Known Goals:
+${formatList(goals)}
+
+Known Values:
+${formatList(values)}
+
+Known Friction Themes:
+${formatList(frictionThemes)}
+
+Known Overload Areas:
+${formatList(overloadAreas)}
+
+Known Contradiction Themes:
+${formatList(contradictionThemes)}
+
+Use reflective questioning to help the participant:
+- explore what currently feels heavy
+- notice recurring tension patterns
+- understand where misalignment may exist
+- identify sustainability concerns
+- recognize emotional or environmental strain
+
+Do NOT:
+- shame participants
+- over-diagnose
+- rush toward fixing
+- push productivity
+- force emotional intensity
+
+The tone should feel:
+- calm
+- grounded
+- emotionally safe
+- thoughtful
+- stabilizing
 `;
-  }
-});
+}
 
-export default reflect;
+
+// --------------------------------------------------
+// REFLECT Completion Evaluation
+// --------------------------------------------------
+export function evaluateReflectCompletion({
+
+  participantProfile = {}
+
+}) {
+
+  const {
+
+    frictionThemes = [],
+
+    overloadAreas = [],
+
+    contradictionThemes = [],
+
+    sustainabilityConcerns = []
+
+  } = participantProfile;
+
+
+  // ----------------------------------------------
+  // Basic readiness checks
+  // ----------------------------------------------
+  const hasFrictionAwareness =
+    frictionThemes.length >= 2;
+
+  const hasOverloadAwareness =
+    overloadAreas.length >= 1;
+
+  const hasContradictionAwareness =
+    contradictionThemes.length >= 1;
+
+  const hasSustainabilityAwareness =
+    sustainabilityConcerns.length >= 1;
+
+
+  // ----------------------------------------------
+  // Determine completion
+  // ----------------------------------------------
+  const completed =
+
+    hasFrictionAwareness &&
+    hasOverloadAwareness &&
+    hasContradictionAwareness;
+
+
+  // ----------------------------------------------
+  // Determine readiness level
+  // ----------------------------------------------
+  let readinessLevel =
+    "developing";
+
+  if (
+    completed &&
+    hasSustainabilityAwareness
+  ) {
+
+    readinessLevel =
+      "stabilizing";
+  }
+
+
+  return {
+
+    completed,
+
+    readinessLevel,
+
+    missingAreas: [
+
+      !hasFrictionAwareness &&
+        "friction awareness",
+
+      !hasOverloadAwareness &&
+        "overload awareness",
+
+      !hasContradictionAwareness &&
+        "internal tension awareness",
+
+      !hasSustainabilityAwareness &&
+        "sustainability awareness"
+
+    ].filter(Boolean)
+  };
+}
+
+
+// --------------------------------------------------
+// REFLECT Transition Recommendation
+// --------------------------------------------------
+export function getNextReflectStep({
+
+  completion = {}
+
+}) {
+
+  if (!completion.completed) {
+
+    return {
+
+      nextState:
+        "REFLECT",
+
+      recommendation:
+        "Continue exploring recurring friction, overload, and alignment patterns before moving into upgrade exploration."
+    };
+  }
+
+
+  return {
+
+    nextState:
+      "UPGRADE",
+
+    recommendation:
+      "Participant appears ready to begin exploring sustainable growth areas and supportive next steps."
+  };
+}
+
+
+// --------------------------------------------------
+// Helper Formatter
+// --------------------------------------------------
+function formatList(items = []) {
+
+  if (!items || items.length === 0) {
+
+    return "- None identified yet";
+  }
+
+  return items
+    .map((item) => `- ${item}`)
+    .join("\n");
+}
