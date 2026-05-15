@@ -1,0 +1,669 @@
+```html
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1"
+/>
+
+<link
+  href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap"
+  rel="stylesheet"
+/>
+
+<title>TRUE AI — Discovery Intake</title>
+
+<style>
+:root {
+
+  --bg: #fbf9f7;
+  --card: #ffffff;
+
+  --text: #1f1a18;
+  --muted: #6b5b54;
+
+  --assistant-bubble: #f4f2ef;
+  --user-bubble: #e5d9d0;
+
+  --input-bg: #f4f2ef;
+  --input-border: rgba(16,18,20,0.08);
+
+  --radius: 12px;
+  --transition: 240ms ease;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+
+  background: var(--bg);
+  color: var(--text);
+
+  font-family:
+    "Montserrat",
+    system-ui,
+    sans-serif;
+}
+
+body {
+
+  min-height: 100svh;
+
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* -------------------------------------------------- */
+/* Header */
+/* -------------------------------------------------- */
+
+header {
+
+  height: 56px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 0 18px;
+
+  border-bottom:
+    1px solid var(--input-border);
+
+  background: var(--bg);
+}
+
+.logo {
+
+  width: 34px;
+  height: 34px;
+
+  border-radius: 8px;
+
+  background: #000;
+  color: #fff;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: 600;
+}
+
+.brand-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.brand-sub {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+
+/* -------------------------------------------------- */
+/* Main */
+/* -------------------------------------------------- */
+
+main {
+
+  flex: 1;
+
+  display: flex;
+  justify-content: center;
+
+  padding: 48px 20px 80px;
+}
+
+
+/* -------------------------------------------------- */
+/* Intake Card */
+/* -------------------------------------------------- */
+
+.intake-card {
+
+  width: 100%;
+  max-width: 760px;
+
+  background: var(--card);
+
+  border:
+    1px solid var(--input-border);
+
+  border-radius: 18px;
+
+  padding: 40px;
+}
+
+.intake-eyebrow {
+
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+
+  color: var(--muted);
+
+  margin-bottom: 14px;
+}
+
+.intake-card h1 {
+
+  margin: 0 0 16px;
+
+  font-size: 32px;
+  font-weight: 500;
+
+  line-height: 1.25;
+}
+
+.intake-description {
+
+  max-width: 620px;
+
+  font-size: 15px;
+  line-height: 1.8;
+
+  color: var(--muted);
+
+  margin-bottom: 36px;
+}
+
+
+/* -------------------------------------------------- */
+/* Discovery Flow */
+/* -------------------------------------------------- */
+
+.discovery-flow {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap: 14px;
+
+  margin-bottom: 42px;
+}
+
+.flow-card {
+
+  background: var(--assistant-bubble);
+
+  border-radius: 14px;
+
+  padding: 18px;
+}
+
+.flow-label {
+
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+
+  color: var(--muted);
+
+  margin-bottom: 10px;
+}
+
+.flow-card h3 {
+
+  margin: 0 0 10px;
+
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.flow-card p {
+
+  margin: 0;
+
+  font-size: 13px;
+  line-height: 1.7;
+
+  color: var(--muted);
+}
+
+
+/* -------------------------------------------------- */
+/* Form */
+/* -------------------------------------------------- */
+
+form {
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 28px;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.field-group label {
+
+  font-size: 14px;
+  font-weight: 500;
+
+  margin-bottom: 10px;
+}
+
+.field-group p {
+
+  margin: 0 0 14px;
+
+  font-size: 13px;
+  line-height: 1.7;
+
+  color: var(--muted);
+}
+
+textarea,
+input[type="text"] {
+
+  width: 100%;
+
+  border:
+    1px solid var(--input-border);
+
+  border-radius: var(--radius);
+
+  background: var(--input-bg);
+
+  padding: 16px;
+
+  font-family: inherit;
+  font-size: 14px;
+
+  color: var(--text);
+}
+
+textarea {
+
+  min-height: 140px;
+
+  resize: vertical;
+
+  line-height: 1.7;
+}
+
+textarea:focus,
+input:focus {
+
+  outline: none;
+
+  border-color:
+    rgba(0,0,0,0.18);
+}
+
+.helper-text {
+
+  margin-top: 10px;
+
+  font-size: 12px;
+  line-height: 1.6;
+
+  color: var(--muted);
+}
+
+
+/* -------------------------------------------------- */
+/* Reflection Notice */
+/* -------------------------------------------------- */
+
+.notice {
+
+  background: var(--assistant-bubble);
+
+  border-radius: 14px;
+
+  padding: 20px;
+
+  margin-top: 8px;
+}
+
+.notice h4 {
+
+  margin: 0 0 10px;
+
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.notice p {
+
+  margin: 0;
+
+  font-size: 13px;
+  line-height: 1.8;
+
+  color: var(--muted);
+}
+
+
+/* -------------------------------------------------- */
+/* Actions */
+/* -------------------------------------------------- */
+
+.actions {
+
+  display: flex;
+  justify-content: flex-end;
+
+  margin-top: 12px;
+}
+
+button.primary {
+
+  border: none;
+
+  border-radius: var(--radius);
+
+  background: #000;
+  color: #fff;
+
+  padding: 14px 22px;
+
+  font-family: inherit;
+  font-size: 14px;
+
+  cursor: pointer;
+}
+
+button.primary:hover {
+  opacity: 0.95;
+}
+
+
+/* -------------------------------------------------- */
+/* Mobile */
+/* -------------------------------------------------- */
+
+@media (max-width: 768px) {
+
+  .intake-card {
+    padding: 28px 22px;
+  }
+
+  .intake-card h1 {
+    font-size: 26px;
+  }
+
+  .discovery-flow {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+  <div class="logo">T</div>
+
+  <div class="brand-wrap">
+    <div class="brand">TRUE AI</div>
+    <div class="brand-sub">Discovery Intake</div>
+  </div>
+
+</header>
+
+<main>
+
+  <div class="intake-card">
+
+    <div class="intake-eyebrow">
+      Discovery Intake
+    </div>
+
+    <h1>
+      Begin your Discovery LifePrint
+    </h1>
+
+    <p class="intake-description">
+      This intake is designed to help clarify what currently feels
+      most important, what may be creating friction,
+      and what kinds of movement might feel more aligned and sustainable.
+      <br /><br />
+      You do not need perfect clarity.
+      Thoughtful honesty is enough.
+    </p>
+
+
+    <!-- Discovery Flow -->
+    <div class="discovery-flow">
+
+      <div class="flow-card">
+
+        <div class="flow-label">
+          Phase One
+        </div>
+
+        <h3>TARGET</h3>
+
+        <p>
+          Clarify values, goals,
+          desired direction,
+          and the kinds of experiences or ways of living
+          that feel meaningful.
+        </p>
+
+      </div>
+
+      <div class="flow-card">
+
+        <div class="flow-label">
+          Phase Two
+        </div>
+
+        <h3>REFLECT</h3>
+
+        <p>
+          Explore recurring friction,
+          emotional load,
+          sustainability concerns,
+          and areas where tension may be building.
+        </p>
+
+      </div>
+
+      <div class="flow-card">
+
+        <div class="flow-label">
+          Phase Three
+        </div>
+
+        <h3>UPGRADE</h3>
+
+        <p>
+          Identify grounded next steps,
+          supportive adjustments,
+          and sustainable ways of moving forward.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- Intake Form -->
+    <form id="discovery-intake-form">
+
+      <div class="field-group">
+
+        <label for="current-focus">
+          What feels most important for you to better understand right now?
+        </label>
+
+        <p>
+          This could relate to direction,
+          pressure,
+          uncertainty,
+          relationships,
+          identity,
+          pacing,
+          or something more difficult to name clearly.
+        </p>
+
+        <textarea
+          id="current-focus"
+          placeholder="You can begin wherever feels most honest or relevant."
+        ></textarea>
+
+      </div>
+
+
+      <div class="field-group">
+
+        <label for="desired-direction">
+          What kinds of experiences, states, or ways of living feel meaningful to you right now?
+        </label>
+
+        <p>
+          You do not need a perfect life plan.
+          Emotional clarity is equally valuable.
+        </p>
+
+        <textarea
+          id="desired-direction"
+          placeholder="Examples might include steadiness, spaciousness, creativity, belonging, freedom, contribution, rest, or clarity."
+        ></textarea>
+
+      </div>
+
+
+      <div class="field-group">
+
+        <label for="current-friction">
+          What currently feels difficult to sustain?
+        </label>
+
+        <p>
+          Consider responsibilities,
+          expectations,
+          pacing,
+          emotional load,
+          or recurring pressures.
+        </p>
+
+        <textarea
+          id="current-friction"
+          placeholder="There is no need to organize this perfectly."
+        ></textarea>
+
+      </div>
+
+
+      <div class="field-group">
+
+        <label for="supportive-strengths">
+          What qualities or patterns have helped you continue moving through difficult periods?
+        </label>
+
+        <p>
+          These do not need to feel extraordinary.
+          Grounded strengths matter.
+        </p>
+
+        <textarea
+          id="supportive-strengths"
+          placeholder="Examples may include thoughtfulness, persistence, adaptability, creativity, care for others, or emotional honesty."
+        ></textarea>
+
+      </div>
+
+
+      <div class="notice">
+
+        <h4>
+          A note before you continue
+        </h4>
+
+        <p>
+          TRUE AI is not attempting to diagnose,
+          optimize,
+          or redefine you.
+          <br /><br />
+          The goal of Discovery is to help you better understand:
+          what feels aligned,
+          what feels heavy,
+          and what kinds of movement may feel more sustainable moving forward.
+        </p>
+
+      </div>
+
+
+      <div class="actions">
+
+        <button
+          type="submit"
+          class="primary"
+        >
+          Begin Discovery
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</main>
+
+<script>
+const form =
+  document.getElementById(
+    "discovery-intake-form"
+  );
+
+form.addEventListener("submit", (e) => {
+
+  e.preventDefault();
+
+  const intakeData = {
+
+    currentFocus:
+      document.getElementById("current-focus").value,
+
+    desiredDirection:
+      document.getElementById("desired-direction").value,
+
+    currentFriction:
+      document.getElementById("current-friction").value,
+
+    supportiveStrengths:
+      document.getElementById("supportive-strengths").value
+  };
+
+  console.log(
+    "Discovery Intake Submitted:",
+    intakeData
+  );
+
+  // Future:
+  // send to API
+  // begin Discovery session
+  // generate participant profile
+  // transition into TARGET phase
+});
+</script>
+
+</body>
+</html>
+```
