@@ -1,0 +1,298 @@
+{
+  "version": "TRUE_DISCOVERY_V1",
+
+  "description": "Weighted indicators used to evaluate alignment between participant values, goals, pacing, responsibilities, emotional capacity, and current life direction during Discovery analysis.",
+
+  "categories": {
+
+    "values_alignment": {
+
+      "baseWeight": 1.5,
+
+      "signals": [
+
+        {
+          "name": "clear_values_language",
+          "weight": 1.7,
+          "examples": [
+            "what matters most",
+            "important to me",
+            "I value",
+            "meaningful to me",
+            "what I care about"
+          ]
+        },
+
+        {
+          "name": "intentional_direction",
+          "weight": 1.4,
+          "examples": [
+            "moving toward",
+            "want my life to feel",
+            "trying to create",
+            "working toward"
+          ]
+        },
+
+        {
+          "name": "inner_congruence",
+          "weight": 1.5,
+          "examples": [
+            "feels right",
+            "more aligned",
+            "emotionally honest",
+            "feels true to me"
+          ]
+        }
+      ]
+    },
+
+
+    "capacity_alignment": {
+
+      "baseWeight": 1.4,
+
+      "signals": [
+
+        {
+          "name": "realistic_pacing",
+          "weight": 1.5,
+          "examples": [
+            "slowing down",
+            "sustainable pace",
+            "more balance",
+            "protecting my energy"
+          ]
+        },
+
+        {
+          "name": "recovery_awareness",
+          "weight": 1.4,
+          "examples": [
+            "need rest",
+            "need recovery",
+            "need space",
+            "need breathing room"
+          ]
+        },
+
+        {
+          "name": "capacity_honesty",
+          "weight": 1.6,
+          "examples": [
+            "I can't keep carrying this",
+            "this isn't sustainable",
+            "I'm at capacity",
+            "too much pressure"
+          ]
+        }
+      ]
+    },
+
+
+    "relational_alignment": {
+
+      "baseWeight": 1.1,
+
+      "signals": [
+
+        {
+          "name": "boundary_awareness",
+          "weight": 1.5,
+          "examples": [
+            "need stronger boundaries",
+            "saying yes too often",
+            "need more space",
+            "protect my energy"
+          ]
+        },
+
+        {
+          "name": "mutuality_language",
+          "weight": 1.3,
+          "examples": [
+            "healthy relationships",
+            "mutual support",
+            "balanced connection",
+            "being understood"
+          ]
+        }
+      ]
+    },
+
+
+    "identity_alignment": {
+
+      "baseWeight": 1.2,
+
+      "signals": [
+
+        {
+          "name": "authenticity_language",
+          "weight": 1.5,
+          "examples": [
+            "be myself",
+            "more authentic",
+            "less performative",
+            "stop pretending"
+          ]
+        },
+
+        {
+          "name": "internal_consistency",
+          "weight": 1.4,
+          "examples": [
+            "living in a way that feels right",
+            "consistent with my values",
+            "emotionally honest",
+            "who I want to become"
+          ]
+        },
+
+        {
+          "name": "reduced_external_validation",
+          "weight": 1.3,
+          "examples": [
+            "stop proving myself",
+            "less focused on approval",
+            "not defined by productivity",
+            "less pressure to perform"
+          ]
+        }
+      ]
+    },
+
+
+    "purpose_alignment": {
+
+      "baseWeight": 1.0,
+
+      "signals": [
+
+        {
+          "name": "meaning_orientation",
+          "weight": 1.4,
+          "examples": [
+            "meaningful work",
+            "purpose",
+            "contribution",
+            "making a difference"
+          ]
+        },
+
+        {
+          "name": "sustainable_contribution",
+          "weight": 1.5,
+          "examples": [
+            "help without burning out",
+            "contribute sustainably",
+            "give without depletion",
+            "support others realistically"
+          ]
+        }
+      ]
+    },
+
+
+    "misalignment_indicators": {
+
+      "baseWeight": -1.2,
+
+      "signals": [
+
+        {
+          "name": "internal_disconnect",
+          "weight": -1.5,
+          "examples": [
+            "feels wrong",
+            "not myself",
+            "disconnected",
+            "empty"
+          ]
+        },
+
+        {
+          "name": "unsustainable_obligation",
+          "weight": -1.6,
+          "examples": [
+            "trapped by responsibility",
+            "can't keep doing this",
+            "too much expected of me",
+            "constant pressure"
+          ]
+        },
+
+        {
+          "name": "identity_performance",
+          "weight": -1.4,
+          "examples": [
+            "always performing",
+            "trying to prove myself",
+            "can't slow down",
+            "worth tied to productivity"
+          ]
+        }
+      ]
+    }
+  },
+
+
+  "alignment_constraints": {
+
+    "avoid_binary_labels": true,
+
+    "avoid_identity_definitions": true,
+
+    "avoid_perfectionism": true,
+
+    "avoid_forced_clarity": true,
+
+    "require_contextual_interpretation": true,
+
+    "minimum_signal_threshold": 2
+  },
+
+
+  "interpretation_rules": {
+
+    "alignment_is_dynamic": true,
+
+    "allow_conflicting_needs": true,
+
+    "allow_partial_alignment": true,
+
+    "recognize_environmental_constraints": true,
+
+    "prioritize_sustainability": true,
+
+    "prioritize_emotional_safety": true,
+
+    "avoid_moralizing_misalignment": true
+  },
+
+
+  "score_ranges": {
+
+    "strong_alignment": {
+      "min": 7,
+      "description": "Participant reflections suggest meaningful congruence between values, pacing, and desired direction."
+    },
+
+    "moderate_alignment": {
+      "min": 3,
+      "max": 6,
+      "description": "Participant appears partially aligned but may be experiencing recurring tension or sustainability strain."
+    },
+
+    "mixed_alignment": {
+      "min": -2,
+      "max": 2,
+      "description": "Participant reflections suggest competing needs, unclear direction, or fluctuating alignment."
+    },
+
+    "significant_misalignment": {
+      "max": -3,
+      "description": "Participant reflections suggest recurring disconnection, overload, or sustained tension between values and lived experience."
+    }
+  }
+}
