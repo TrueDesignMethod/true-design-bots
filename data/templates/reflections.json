@@ -1,0 +1,271 @@
+{
+  "version": "TRUE_DISCOVERY_V1",
+
+  "description": "Reflective prompts and guided participant exercises used throughout the TRUE AI Discovery experience.",
+
+  "categories": {
+
+    "target": {
+
+      "title": "TARGET",
+
+      "description": "Clarifying values, direction, goals, and meaningful movement.",
+
+      "reflections": [
+
+        {
+          "id": "target_001",
+          "prompt": "What currently feels most important for you to better understand about yourself or your life direction?"
+        },
+
+        {
+          "id": "target_002",
+          "prompt": "What kinds of experiences, environments, or ways of living feel most meaningful to you right now?"
+        },
+
+        {
+          "id": "target_003",
+          "prompt": "When do you feel most emotionally steady, grounded, or aligned?"
+        },
+
+        {
+          "id": "target_004",
+          "prompt": "What values or priorities feel especially important to protect moving forward?"
+        },
+
+        {
+          "id": "target_005",
+          "prompt": "What would a more sustainable version of your current life look like?"
+        },
+
+        {
+          "id": "target_006",
+          "prompt": "What kinds of pressure or expectations most interfere with your sense of alignment?"
+        },
+
+        {
+          "id": "target_007",
+          "prompt": "What are you hoping feels different one year from now?"
+        }
+      ]
+    },
+
+
+    "reflect": {
+
+      "title": "REFLECT",
+
+      "description": "Exploring recurring friction, emotional load, sustainability, and internal tension.",
+
+      "reflections": [
+
+        {
+          "id": "reflect_001",
+          "prompt": "What currently feels most difficult to sustain emotionally, mentally, or practically?"
+        },
+
+        {
+          "id": "reflect_002",
+          "prompt": "Where do you feel pressure accumulating most consistently?"
+        },
+
+        {
+          "id": "reflect_003",
+          "prompt": "What responsibilities or expectations feel heavier than they once did?"
+        },
+
+        {
+          "id": "reflect_004",
+          "prompt": "What patterns tend to appear when you become overwhelmed or emotionally depleted?"
+        },
+
+        {
+          "id": "reflect_005",
+          "prompt": "What parts of your life currently feel aligned, and what parts feel increasingly strained?"
+        },
+
+        {
+          "id": "reflect_006",
+          "prompt": "What needs or feelings do you most often set aside to continue functioning?"
+        },
+
+        {
+          "id": "reflect_007",
+          "prompt": "If one source of pressure disappeared tomorrow, what would change most for you?"
+        }
+      ]
+    },
+
+
+    "upgrade": {
+
+      "title": "UPGRADE",
+
+      "description": "Identifying sustainable movement, supportive adjustments, and grounded next steps.",
+
+      "reflections": [
+
+        {
+          "id": "upgrade_001",
+          "prompt": "What would creating slightly more space or steadiness in your life look like right now?"
+        },
+
+        {
+          "id": "upgrade_002",
+          "prompt": "What is one small adjustment that might make your current pace feel more sustainable?"
+        },
+
+        {
+          "id": "upgrade_003",
+          "prompt": "What responsibilities or expectations may need clearer boundaries?"
+        },
+
+        {
+          "id": "upgrade_004",
+          "prompt": "What kinds of support, recovery, or pacing have you been needing more consistently?"
+        },
+
+        {
+          "id": "upgrade_005",
+          "prompt": "What strengths or qualities could support more aligned movement moving forward?"
+        },
+
+        {
+          "id": "upgrade_006",
+          "prompt": "What are you beginning to realize you may no longer want to carry?"
+        },
+
+        {
+          "id": "upgrade_007",
+          "prompt": "What would gentler, more sustainable growth look like for you personally?"
+        }
+      ]
+    },
+
+
+    "capacity": {
+
+      "title": "Capacity Reflection",
+
+      "description": "Helping participants recognize emotional and energetic sustainability realities.",
+
+      "reflections": [
+
+        {
+          "id": "capacity_001",
+          "prompt": "What situations most quickly drain your emotional or mental energy?"
+        },
+
+        {
+          "id": "capacity_002",
+          "prompt": "How do you usually recognize that you are approaching overload?"
+        },
+
+        {
+          "id": "capacity_003",
+          "prompt": "What helps you recover when pressure has been building for a long time?"
+        },
+
+        {
+          "id": "capacity_004",
+          "prompt": "What forms of rest or spaciousness feel genuinely restorative for you?"
+        },
+
+        {
+          "id": "capacity_005",
+          "prompt": "What has become harder to sustain recently that once felt manageable?"
+        }
+      ]
+    },
+
+
+    "strengths": {
+
+      "title": "Strength Reflection",
+
+      "description": "Helping participants identify grounded supportive internal resources.",
+
+      "reflections": [
+
+        {
+          "id": "strengths_001",
+          "prompt": "What qualities have helped you continue moving through difficult seasons?"
+        },
+
+        {
+          "id": "strengths_002",
+          "prompt": "What strengths do other people consistently seem to recognize in you?"
+        },
+
+        {
+          "id": "strengths_003",
+          "prompt": "What kinds of situations bring out the best or most grounded version of you?"
+        },
+
+        {
+          "id": "strengths_004",
+          "prompt": "What personal qualities help you create stability or care for others?"
+        },
+
+        {
+          "id": "strengths_005",
+          "prompt": "Which strengths may sometimes become overextended or emotionally costly?"
+        }
+      ]
+    },
+
+
+    "alignment": {
+
+      "title": "Alignment Reflection",
+
+      "description": "Exploring congruence between values, direction, pacing, and lived experience.",
+
+      "reflections": [
+
+        {
+          "id": "alignment_001",
+          "prompt": "Where in your life do you currently feel most aligned?"
+        },
+
+        {
+          "id": "alignment_002",
+          "prompt": "What parts of your life currently feel disconnected from your deeper values?"
+        },
+
+        {
+          "id": "alignment_003",
+          "prompt": "What expectations or patterns feel increasingly inconsistent with who you want to become?"
+        },
+
+        {
+          "id": "alignment_004",
+          "prompt": "What environments or relationships help you feel more emotionally steady and authentic?"
+        },
+
+        {
+          "id": "alignment_005",
+          "prompt": "What would a more emotionally honest version of your current life look like?"
+        }
+      ]
+    }
+  },
+
+
+  "reflection_rules": {
+
+    "avoid_shaming_language": true,
+
+    "avoid_forced_vulnerability": true,
+
+    "avoid_performance_pressure": true,
+
+    "allow_partial_answers": true,
+
+    "allow_uncertainty": true,
+
+    "prioritize_emotional_safety": true,
+
+    "prioritize_reflective_pacing": true
+  }
+}
