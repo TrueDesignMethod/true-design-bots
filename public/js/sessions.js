@@ -1,105 +1,432 @@
-// sessions.js
-// Handles all Supabase persistence for TRUE sessions + messages
+// public/sessions.js
+// TRUE AI — Discovery Session Manager
 
-import { supabase } from "./supabase.js";
+import { supabase }
+  from "./supabase.js";
 
-/* ───────── Sessions ───────── */
+import {
+  getCurrentUser
+} from "./auth.js";
 
-export async function createSession(userId, stage = "discovery") {
-  const { data, error } = await supabase
-    .from("sessions")
-    .insert({
-      user_id: userId,
-      current_stage: stage
-    })
-    .select()
-    .single();
 
-  if (error) throw error;
+// --------------------------------------------------
+// Create Session
+// --------------------------------------------------
+// Creates a new Discovery session
+// in Supabase.
+//
+// Returns:
+// {
+//   id,
+//   created_at,
+//   ...
+// }
+// --------------------------------------------------
+
+export async function createSession({
+
+  title = "Untitled Discovery",
+
+  phase = "TARGET"
+
+} = {}) {
+
+  const user =
+    getCurrentUser();
+
+  if (!user) {
+
+    console.warn(
+      "TRUE AI: Cannot create session without user."
+    );
+
+    return null;
+  }
+
+
+  const { data, error } =
+    await supabase
+
+      .from("discovery_sessions")
+
+      .insert({
+
+        user_id:
+          user.id,
+
+        title,
+
+        current_phase:
+          phase
+      })
+
+      .select()
+
+      .single();
+
+
+  if (error) {
+
+    console.error(
+      "TRUE AI createSession error:",
+      error
+    );
+
+    return null;
+  }
+
   return data;
 }
 
-export async function fetchLatestSession(userId) {
-  const { data, error } = await supabase
-    .from("sessions")
-    .select("*")
-    .eq("user_id", userId)
-    .order("last_active_at", { ascending: false })
-    .limit(1)
-    .single();
 
-  if (error) return null;
+// --------------------------------------------------
+// Save Conversation Message
+// --------------------------------------------------
+// Saves a Discovery message
+// to the database.
+//
+// Roles:
+// - user
+// - assistant
+// --------------------------------------------------
+
+export async function saveMessage({
+
+  sessionId,
+
+  role,
+
+  content,
+
+  phase = "TARGET"
+
+}) {
+
+  if (!sessionId) {
+
+    console.warn(
+      "TRUE AI: Missing session ID."
+    );
+
+    return;
+  }
+
+
+  const { error } =
+    await supabase
+
+      .from("discovery_messages")
+
+      .insert({
+
+        session_id:
+          sessionId,
+
+        role,
+
+        content,
+
+        phase
+      });
+
+
+  if (error) {
+
+    console.error(
+      "TRUE AI saveMessage error:",
+      error
+    );
+  }
+}
+
+
+// --------------------------------------------------
+// Update Session Phase
+// --------------------------------------------------
+
+export async function updateSessionPhase({
+
+  sessionId,
+
+  phase
+
+}) {
+
+  if (!sessionId) return;
+
+
+  const { error } =
+    await supabase
+
+      .from("discovery_sessions")
+
+      .update({
+
+        current_phase:
+          phase
+      })
+
+      .eq("id", sessionId);
+
+
+  if (error) {
+
+    console.error(
+      "TRUE AI updateSessionPhase error:",
+      error
+    );
+  }
+}
+
+
+// --------------------------------------------------
+// Save LifePrint
+// --------------------------------------------------
+// Stores completed LifePrint narrative.
+// --------------------------------------------------
+
+export async function saveLifePrint({
+
+  sessionId,
+
+  narrative,
+
+  structured = {}
+
+}) {
+
+  if (!sessionId) return;
+
+
+  const { error } =
+    await supabase
+
+      .from("lifeprints")
+
+      .insert({
+
+        session_id:
+          sessionId,
+
+        narrative,
+
+        structured_data:
+          structured
+      });
+
+
+  if (error) {
+
+    console.error(
+      "TRUE AI saveLifePrint error:",
+      error
+    );
+  }
+}
+
+
+// --------------------------------------------------
+// Load User Sessions
+// --------------------------------------------------
+// Returns:
+// [
+//   {
+//     id,
+//     title,
+//     current_phase,
+//     created_at
+//   }
+// ]
+// --------------------------------------------------
+
+export async function loadSessions() {
+
+  const user =
+    getCurrentUser();
+
+  if (!user) return [];
+
+
+  const { data, error } =
+    await supabase
+
+      .from("discovery_sessions")
+
+      .select("*")
+
+      .eq("user_id", user.id)
+
+      .order(
+        "created_at",
+        { ascending: false }
+      );
+
+
+  if (error) {
+
+    console.error(
+      "TRUE AI loadSessions error:",
+      error
+    );
+
+    return [];
+  }
+
+  return data || [];
+}
+
+
+// --------------------------------------------------
+// Load Session Messages
+// --------------------------------------------------
+// Returns Discovery conversation.
+// --------------------------------------------------
+
+export async function loadMessages(
+  sessionId
+) {
+
+  if (!sessionId) return [];
+
+
+  const { data, error } =
+    await supabase
+
+      .from("discovery_messages")
+
+      .select("*")
+
+      .eq("session_id", sessionId)
+
+      .order(
+        "created_at",
+        { ascending: true }
+      );
+
+
+  if (error) {
+
+    console.error(
+      "TRUE AI loadMessages error:",
+      error
+    );
+
+    return [];
+  }
+
+  return data || [];
+}
+
+
+// --------------------------------------------------
+// Load LifePrint
+// --------------------------------------------------
+
+export async function loadLifePrint(
+  sessionId
+) {
+
+  if (!sessionId) return null;
+
+
+  const { data, error } =
+    await supabase
+
+      .from("lifeprints")
+
+      .select("*")
+
+      .eq("session_id", sessionId)
+
+      .single();
+
+
+  if (error) {
+
+    console.error(
+      "TRUE AI loadLifePrint error:",
+      error
+    );
+
+    return null;
+  }
+
   return data;
 }
 
-export async function getLatestSession(userId) {
-  const { data, error } = await supabase
-    .from("sessions")
-    .select("*")
-    .eq("user_id", userId)
-    .order("last_active_at", { ascending: false })
-    .limit(1);
 
-  if (error || !data || data.length === 0) return null;
-  return data[0];
+// --------------------------------------------------
+// Delete Session
+// --------------------------------------------------
+
+export async function deleteSession(
+  sessionId
+) {
+
+  if (!sessionId) return;
+
+
+  const { error } =
+    await supabase
+
+      .from("discovery_sessions")
+
+      .delete()
+
+      .eq("id", sessionId);
+
+
+  if (error) {
+
+    console.error(
+      "TRUE AI deleteSession error:",
+      error
+    );
+  }
 }
 
-export async function loadUserSessions(userId) {
-  const { data: sessions } = await supabase
-    .from("sessions")
-    .select("id, title, current_stage, created_at")
-    .eq("user_id", userId)
-    .order("created_at", { ascending: false });
 
-  const sidebar = document.getElementById("sidebar");
+// --------------------------------------------------
+// Render Sidebar Sessions
+// --------------------------------------------------
+// Utility helper for UI.
+// --------------------------------------------------
 
-// Preserve header, clear only session entries
-sidebar.querySelectorAll(".session-entry").forEach(el => el.remove());
+export function renderSessionList({
 
+  sessions = [],
 
-  if (!sessions || sessions.length === 0) return;
+  container,
+
+  onSelect
+
+}) {
+
+  if (!container) return;
+
+  container.innerHTML = "";
+
 
   sessions.forEach((session) => {
-    const div = document.createElement("div");
-    div.className = "session-entry";
-    div.textContent = session.title || "Untitled reflection";
 
-    div.dataset.sessionId = session.id;
-    div.dataset.stage = session.current_stage;
+    const entry =
+      document.createElement("div");
 
-    sidebar.appendChild(div);
+    entry.className =
+      "session-entry";
+
+    entry.textContent =
+      session.title ||
+      "Untitled Discovery";
+
+    entry.onclick = () => {
+
+      if (onSelect) {
+
+        onSelect(session);
+      }
+    };
+
+    container.appendChild(entry);
   });
-
-  // ✅ ADD THIS BLOCK — RIGHT HERE
-  sidebar
-    .querySelector(".session-entry")
-    ?.classList.add("active");
-}
-
-
-
-
-/* ───────── Messages ───────── */
-
-export async function saveMessage(sessionId, role, content) {
-  const { error } = await supabase
-    .from("messages")
-    .insert({
-      session_id: sessionId,
-      role,
-      content
-    });
-
-  if (error) throw error;
-}
-
-export async function getMessages(sessionId) {
-  const { data, error } = await supabase
-    .from("messages")
-    .select("*")
-    .eq("session_id", sessionId)
-    .order("created_at");
-
-  if (error) throw error;
-  return data;
 }
