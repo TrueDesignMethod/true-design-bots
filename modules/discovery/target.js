@@ -1,116 +1,248 @@
 // modules/discovery/target.js
-// True Discovery stage — TARGET (ES Module)
+// TRUE AI — TARGET Discovery Module
 
-const target = Object.freeze({
+// --------------------------------------------------
+// TARGET MODULE
+// --------------------------------------------------
+// Purpose:
+// Help participants clarify:
+//
+// - what they want
+// - what matters to them
+// - desired direction
+// - desired emotional states
+// - meaningful goals
+// - alignment priorities
+//
+// TARGET is the opening phase of Discovery.
+//
+// It is intentionally:
+// - exploratory
+// - reflective
+// - clarifying
+// - non-performative
+//
+// The goal is NOT:
+// aggressive goal-setting.
+//
+// The goal IS:
+// helping participants articulate
+// meaningful direction with greater clarity.
+// --------------------------------------------------
+
+
+import {
+  targetQuestions
+} from "../../core/intake/targetQuestions.js";
+
+
+// --------------------------------------------------
+// TARGET Module Definition
+// --------------------------------------------------
+export const targetModule = {
+
+  id: "TARGET",
+
   stage: "discovery",
-  name: "TARGET",
-  requiresPro: false,
-  tokenCeiling: 320,
 
-  /**
-   * TARGET — Orient and surface what feels meaningful
-   *
-   * TARGET exists to help the user orient themselves toward
-   * what they want to engage with and why it matters to them.
-   *
-   * This phase surfaces signals of meaning, relevance, and
-   * personal importance — not final values, plans, or decisions.
-   *
-   * Goals may appear here only as containers for meaning,
-   * not as commitments or action targets.
-   */
-  buildPrompt({ input }) {
-    return `
-You are TRUE.
+  description:
+    "Clarify values, direction, goals, and desired states.",
 
-You are guiding the user through TARGET in the True Discovery stage.
+  objectives: [
 
-TARGET exists to help the user:
-orient toward what they want to engage with,
-notice what feels meaningful rather than impressive,
-and sense what feels supportive rather than demanding.
+    "Identify meaningful goals",
 
-The purpose is to surface:
-signals of importance,
-felt relevance,
-and early clues about what might matter —
-without naming, defining, or finalizing values.
+    "Clarify desired direction",
 
-Any goals mentioned here are explored only to understand:
-why they feel important,
-what feels missing or threatened,
-and whether the direction feels grounding over time.
+    "Surface internal priorities",
 
-This phase builds orientation and intrinsic motivation.
-It does NOT produce plans, steps, timelines, or commitments.
+    "Explore emotional alignment",
 
-You do NOT:
-– Teach or explain concepts
-– Introduce planning, execution, or optimization language
-– Translate signals into action
-– Name final values or frameworks
-– Move the user forward without consent
+    "Increase self-awareness"
+  ]
+};
 
-You DO:
-– Respond directly to what the user says
-– Reflect emotional and motivational signals using their own words
-– Keep language calm, human, and non-instructional
-– Ask only ONE clear question per response
 
-You listen especially for signals of:
-joy
-ease
-energy
-curiosity
-relief
-longing
-fulfillment
-meaning
-a sense of “this matters”
+// --------------------------------------------------
+// Get TARGET Questions
+// --------------------------------------------------
+export function getTargetQuestions() {
 
-Exploration rules:
-– Ask exploratory questions lightly and conversationally
-– Do not interrogate or exhaust the user
-– When meaning signals feel clear, stop probing
+  return targetQuestions;
+}
 
-When appropriate, you may:
-– Gently name up to THREE signals you hear emerging
-– Use simple, human language
-– Ask whether they resonate with the user
 
-If resonance is confirmed, you may:
-– Reflect an emerging direction or focus
-– Explore why it feels important
-– Check whether it feels grounding or supportive over time
+// --------------------------------------------------
+// TARGET Reflection Prompt
+// --------------------------------------------------
+export function buildTargetReflection({
 
-Examples of acceptable anchoring (DO NOT copy verbatim):
-– “There’s a sense that steadiness matters more than speed here.”
-– “This seems connected to wanting things to feel sustainable.”
-– “Something about this direction feels relieving rather than pressuring.”
+  participantProfile = {}
 
-You must NOT:
-– Suggest what the user should do next
-– Imply readiness for Sustainment or Alignment
-– Frame clarity as something that must be acted on
+}) {
 
-Closing behavior (only when appropriate):
-– Ask whether this focus feels like a solid anchor for now
-– Ask whether the user feels complete in this exploration
+  const {
 
-Formatting rules (STRICT):
-– Short paragraphs (1–2 sentences max)
-– No numbered lists
-– Avoid long bullet lists
-– One idea per paragraph
-– Natural line breaks for breathing room
-– Depth through clarity, not length
+    goals = [],
 
-Do not begin consecutive replies with the same reflective phrasing.
+    values = [],
 
-User input:
-"${input}"
+    desiredStates = []
+
+  } = participantProfile;
+
+
+  return `
+You are currently in the TARGET phase of TRUE Discovery.
+
+This phase focuses on:
+- clarifying direction
+- identifying meaningful goals
+- understanding personal values
+- exploring desired ways of living
+
+Current Known Goals:
+${formatList(goals)}
+
+Current Values:
+${formatList(values)}
+
+Desired States:
+${formatList(desiredStates)}
+
+Use reflective questioning to help the participant:
+- clarify what matters most
+- explore alignment
+- identify meaningful direction
+- distinguish external expectations from internal priorities
+
+Do NOT:
+- pressure performance
+- encourage unrealistic ambition
+- force certainty
+- rush toward planning
+
+The tone should feel:
+- thoughtful
+- grounded
+- emotionally safe
+- exploratory
 `;
-  }
-});
+}
 
-export default target;
+
+// --------------------------------------------------
+// TARGET Completion Evaluation
+// --------------------------------------------------
+export function evaluateTargetCompletion({
+
+  participantProfile = {}
+
+}) {
+
+  const {
+
+    goals = [],
+
+    values = [],
+
+    desiredStates = []
+
+  } = participantProfile;
+
+
+  // ----------------------------------------------
+  // Basic readiness checks
+  // ----------------------------------------------
+  const hasGoals =
+    goals.length >= 2;
+
+  const hasValues =
+    values.length >= 3;
+
+  const hasDesiredStates =
+    desiredStates.length >= 1;
+
+
+  // ----------------------------------------------
+  // Determine completion
+  // ----------------------------------------------
+  const completed =
+
+    hasGoals &&
+    hasValues &&
+    hasDesiredStates;
+
+
+  return {
+
+    completed,
+
+    readinessLevel:
+      completed
+        ? "developing"
+        : "emerging",
+
+    missingAreas: [
+
+      !hasGoals &&
+        "meaningful goals",
+
+      !hasValues &&
+        "core values",
+
+      !hasDesiredStates &&
+        "desired emotional states"
+
+    ].filter(Boolean)
+  };
+}
+
+
+// --------------------------------------------------
+// TARGET Transition Recommendation
+// --------------------------------------------------
+export function getNextTargetStep({
+
+  completion = {}
+
+}) {
+
+  if (!completion.completed) {
+
+    return {
+
+      nextState:
+        "TARGET",
+
+      recommendation:
+        "Continue clarifying direction, values, and desired states before moving deeper into reflection."
+    };
+  }
+
+
+  return {
+
+    nextState:
+      "REFLECT",
+
+    recommendation:
+      "Participant appears ready to begin deeper reflection around current reality, friction, and alignment."
+  };
+}
+
+
+// --------------------------------------------------
+// Helper Formatter
+// --------------------------------------------------
+function formatList(items = []) {
+
+  if (!items || items.length === 0) {
+
+    return "- None identified yet";
+  }
+
+  return items
+    .map((item) => `- ${item}`)
+    .join("\n");
+}
