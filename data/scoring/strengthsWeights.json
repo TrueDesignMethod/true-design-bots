@@ -1,0 +1,235 @@
+{
+  "version": "TRUE_DISCOVERY_V1",
+
+  "description": "Weighted indicators used to identify grounded strengths and supportive internal resources during Discovery analysis.",
+
+  "categories": {
+
+    "self_awareness": {
+
+      "baseWeight": 1.2,
+
+      "signals": [
+
+        {
+          "name": "reflective_language",
+          "weight": 1.4,
+          "examples": [
+            "I've been noticing",
+            "I realize",
+            "I think",
+            "I’ve reflected",
+            "I’m becoming aware"
+          ]
+        },
+
+        {
+          "name": "pattern_recognition",
+          "weight": 1.5,
+          "examples": [
+            "this keeps happening",
+            "recurring pattern",
+            "I notice a cycle",
+            "over time"
+          ]
+        },
+
+        {
+          "name": "emotional_honesty",
+          "weight": 1.6,
+          "examples": [
+            "I feel overwhelmed",
+            "I feel uncertain",
+            "I’ve been struggling",
+            "I’m tired"
+          ]
+        }
+      ]
+    },
+
+
+    "adaptability": {
+
+      "baseWeight": 1.1,
+
+      "signals": [
+
+        {
+          "name": "willingness_to_adjust",
+          "weight": 1.4,
+          "examples": [
+            "I want to change",
+            "I’m trying to improve",
+            "I’m reconsidering",
+            "I’m open to"
+          ]
+        },
+
+        {
+          "name": "navigation_under_pressure",
+          "weight": 1.3,
+          "examples": [
+            "despite everything",
+            "even though it’s difficult",
+            "I’ve continued",
+            "I’m still trying"
+          ]
+        }
+      ]
+    },
+
+
+    "responsibility": {
+
+      "baseWeight": 1.0,
+
+      "signals": [
+
+        {
+          "name": "commitment_language",
+          "weight": 1.2,
+          "examples": [
+            "people rely on me",
+            "I feel responsible",
+            "I need to show up",
+            "I care deeply"
+          ]
+        },
+
+        {
+          "name": "care_for_others",
+          "weight": 1.3,
+          "examples": [
+            "support others",
+            "help people",
+            "care for",
+            "take care of"
+          ]
+        }
+      ]
+    },
+
+
+    "curiosity": {
+
+      "baseWeight": 0.9,
+
+      "signals": [
+
+        {
+          "name": "exploration_language",
+          "weight": 1.2,
+          "examples": [
+            "I want to understand",
+            "I’m curious",
+            "I’ve been exploring",
+            "trying to figure out"
+          ]
+        },
+
+        {
+          "name": "growth_orientation",
+          "weight": 1.1,
+          "examples": [
+            "move forward",
+            "grow",
+            "learn more",
+            "improve"
+          ]
+        }
+      ]
+    },
+
+
+    "resilience": {
+
+      "baseWeight": 1.0,
+
+      "signals": [
+
+        {
+          "name": "continued_engagement",
+          "weight": 1.4,
+          "examples": [
+            "I’m still here",
+            "I keep going",
+            "I’ve continued trying",
+            "I haven’t given up"
+          ]
+        },
+
+        {
+          "name": "recovery_awareness",
+          "weight": 1.2,
+          "examples": [
+            "I need rest",
+            "I need space",
+            "I’m trying to recover",
+            "I need balance"
+          ]
+        }
+      ]
+    },
+
+
+    "relational_awareness": {
+
+      "baseWeight": 0.9,
+
+      "signals": [
+
+        {
+          "name": "interpersonal_reflection",
+          "weight": 1.2,
+          "examples": [
+            "my relationships",
+            "how people feel",
+            "affect others",
+            "connection"
+          ]
+        },
+
+        {
+          "name": "boundary_awareness",
+          "weight": 1.3,
+          "examples": [
+            "I need boundaries",
+            "I overextend",
+            "I say yes too often",
+            "I carry too much"
+          ]
+        }
+      ]
+    }
+  },
+
+
+  "strength_constraints": {
+
+    "avoid_overinflation": true,
+
+    "avoid_identity_labels": true,
+
+    "avoid_diagnostic_language": true,
+
+    "avoid_superiority_language": true,
+
+    "require_multi_signal_support": true,
+
+    "minimum_signal_threshold": 2
+  },
+
+
+  "interpretation_rules": {
+
+    "allow_contextual_strengths": true,
+
+    "allow_overextended_strengths": true,
+
+    "allow_contradictory_traits": true,
+
+    "require_emotional_safety": true,
+
+    "prefer_reflective_language": true
+  }
+}
