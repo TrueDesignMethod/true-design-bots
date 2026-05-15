@@ -1,101 +1,301 @@
 // modules/discovery/upgrade.js
-// Discovery stage module — UPGRADE (V3, ES Module)
+// TRUE AI — UPGRADE Discovery Module
 
-const upgrade = Object.freeze({
+// --------------------------------------------------
+// UPGRADE MODULE
+// --------------------------------------------------
+// Purpose:
+// Help participants explore:
+//
+// - sustainable growth areas
+// - supportive adjustments
+// - realistic next steps
+// - mindset reframes
+// - boundary strengthening
+// - aligned movement
+//
+// UPGRADE is the third phase of Discovery.
+//
+// It is intentionally:
+// - grounded
+// - sustainability-oriented
+// - non-performative
+// - supportive
+//
+// The goal is NOT:
+// radical self-reinvention.
+//
+// The goal IS:
+// helping participants identify
+// sustainable pathways toward
+// greater alignment and coherence.
+// --------------------------------------------------
+
+
+import {
+  behavioralQuestions
+} from "../../core/intake/behavioralQuestions.js";
+
+import {
+  capacityQuestions
+} from "../../core/intake/capacityQuestions.js";
+
+
+// --------------------------------------------------
+// UPGRADE Module Definition
+// --------------------------------------------------
+export const upgradeModule = {
+
+  id: "UPGRADE",
+
   stage: "discovery",
-  name: "UPGRADE",
-  requiresPro: false,
-  tokenCeiling: 340,
 
-  /**
-   * UPGRADE — Values clarification and reframing
-   *
-   * UPGRADE exists to help the user move from implicit values
-   * to explicitly named ones, and to reframe their focus,
-   * goal, or struggle through that values lens.
-   *
-   * This is not execution.
-   * It is clarity that removes false pressure.
-   */
-  buildPrompt({ input }) {
-    return `
-You are TRUE.
+  description:
+    "Explore sustainable growth, supportive adjustments, and aligned next steps.",
 
-You are guiding the user through UPGRADE in the True Discovery stage.
+  objectives: [
 
-UPGRADE exists to help the user clarify what actually matters,
-name it plainly,
-and understand how it reshapes their goals, effort, and stress.
+    "Identify realistic growth priorities",
 
-The purpose is to shift from:
-“I should be able to do this”
-to
-“This makes sense given what I value.”
+    "Strengthen sustainability awareness",
 
-You help the user:
-– Name 2–3 provisional core values that are already present in their experience
-– Distinguish lived values from aspirational or inherited ones
-– See how those values influence what feels draining, sustaining, or misaligned
-– Reframe their original focus or goal as a values match or mismatch
+    "Explore supportive boundaries",
 
-Values should be:
-– Grounded in lived experience
-– Evident in patterns already discussed
-– Named in simple, human language
+    "Encourage aligned experimentation",
 
-You may reflect values you hear emerging,
-and gently ask whether they feel accurate or incomplete.
+    "Support gentle momentum",
 
-Once values are named, you may help the user reframe:
-– Why a goal feels heavy or unsustainable
-– Why certain patterns keep repeating
-– Why motivation has felt unreliable
+    "Increase self-trust"
+  ]
+};
 
-This reframing should make the issue feel:
-more understandable,
-less personal,
-and less force-driven.
 
-You may introduce structure ONLY as a reflective aid,
-such as noticing which goals honor values and which violate them.
-Structure exists to protect values, not to optimize output.
+// --------------------------------------------------
+// Get UPGRADE Questions
+// --------------------------------------------------
+export function getUpgradeQuestions() {
 
-You do NOT:
-– Create plans, steps, or timelines
-– Translate values into actions
-– Introduce discipline or accountability
-– Push toward the next stage
-– Frame values as something to live up to
+  return [
 
-You may ask ONE clear question per response.
-Questions should help the user:
-– Confirm or refine their values
-– See how values explain their patterns
-– Reinterpret their goal through a values lens
+    ...behavioralQuestions,
 
-Tone:
-– Clarifying
-– Grounded
-– Non-judgmental
-– Relieving rather than motivating
+    ...capacityQuestions
+  ];
+}
 
-By the end of UPGRADE, the user should be able to say:
-“This issue makes sense once I see what I value.”
 
-Formatting rules (STRICT):
-– Short paragraphs (1–2 sentences max)
-– No numbered lists
-– Avoid long bullet lists
-– One idea per paragraph
-– Natural line breaks for breathing room
-– Depth through clarity, not length
+// --------------------------------------------------
+// UPGRADE Reflection Prompt
+// --------------------------------------------------
+export function buildUpgradeReflection({
 
-Do not imply readiness for Sustainment unless the user explicitly signals it.
+  participantProfile = {}
 
-User input:
-"${input}"
+}) {
+
+  const {
+
+    strengths = [],
+
+    frictionThemes = [],
+
+    contradictionThemes = [],
+
+    sustainabilityConcerns = [],
+
+    pacingConsiderations = [],
+
+    upgradeThemes = []
+
+  } = participantProfile;
+
+
+  return `
+You are currently in the UPGRADE phase of TRUE Discovery.
+
+This phase focuses on:
+- sustainable growth
+- supportive adjustments
+- realistic movement
+- boundary strengthening
+- aligned experimentation
+- gentle momentum
+
+Known Strengths:
+${formatList(strengths)}
+
+Known Friction Themes:
+${formatList(frictionThemes)}
+
+Known Contradiction Themes:
+${formatList(contradictionThemes)}
+
+Known Sustainability Concerns:
+${formatList(sustainabilityConcerns)}
+
+Known Pacing Considerations:
+${formatList(pacingConsiderations)}
+
+Current Upgrade Themes:
+${formatList(upgradeThemes)}
+
+Use reflective questioning to help the participant:
+- identify realistic next steps
+- strengthen sustainability awareness
+- explore supportive boundaries
+- consider low-friction adjustments
+- recognize strengths that may support movement
+
+Do NOT:
+- overwhelm participants
+- pressure transformation
+- create rigid action plans
+- encourage over-optimization
+- glorify productivity
+
+The tone should feel:
+- calm
+- grounded
+- supportive
+- realistic
+- emotionally steady
 `;
-  }
-});
+}
 
-export default upgrade;
+
+// --------------------------------------------------
+// UPGRADE Completion Evaluation
+// --------------------------------------------------
+export function evaluateUpgradeCompletion({
+
+  participantProfile = {}
+
+}) {
+
+  const {
+
+    upgradeThemes = [],
+
+    pacingConsiderations = [],
+
+    sustainabilityConcerns = [],
+
+    supportFactors = []
+
+  } = participantProfile;
+
+
+  // ----------------------------------------------
+  // Basic readiness checks
+  // ----------------------------------------------
+  const hasGrowthAwareness =
+    upgradeThemes.length >= 2;
+
+  const hasPacingAwareness =
+    pacingConsiderations.length >= 1;
+
+  const hasSustainabilityAwareness =
+    sustainabilityConcerns.length >= 1;
+
+  const hasSupportAwareness =
+    supportFactors.length >= 1;
+
+
+  // ----------------------------------------------
+  // Determine completion
+  // ----------------------------------------------
+  const completed =
+
+    hasGrowthAwareness &&
+    hasPacingAwareness &&
+    hasSustainabilityAwareness;
+
+
+  // ----------------------------------------------
+  // Determine readiness level
+  // ----------------------------------------------
+  let readinessLevel =
+    "stabilizing";
+
+  if (
+    completed &&
+    hasSupportAwareness
+  ) {
+
+    readinessLevel =
+      "ready";
+  }
+
+
+  return {
+
+    completed,
+
+    readinessLevel,
+
+    missingAreas: [
+
+      !hasGrowthAwareness &&
+        "growth priorities",
+
+      !hasPacingAwareness &&
+        "pacing awareness",
+
+      !hasSustainabilityAwareness &&
+        "sustainability awareness",
+
+      !hasSupportAwareness &&
+        "support awareness"
+
+    ].filter(Boolean)
+  };
+}
+
+
+// --------------------------------------------------
+// UPGRADE Transition Recommendation
+// --------------------------------------------------
+export function getNextUpgradeStep({
+
+  completion = {}
+
+}) {
+
+  if (!completion.completed) {
+
+    return {
+
+      nextState:
+        "UPGRADE",
+
+      recommendation:
+        "Continue exploring sustainable movement, pacing, and supportive adjustments before finalizing Discovery."
+    };
+  }
+
+
+  return {
+
+    nextState:
+      "COMPLETE",
+
+    recommendation:
+      "Participant appears ready for LifePrint synthesis and transition into future planning or support pathways."
+  };
+}
+
+
+// --------------------------------------------------
+// Helper Formatter
+// --------------------------------------------------
+function formatList(items = []) {
+
+  if (!items || items.length === 0) {
+
+    return "- None identified yet";
+  }
+
+  return items
+    .map((item) => `- ${item}`)
+    .join("\n");
+}
