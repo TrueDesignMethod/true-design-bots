@@ -1,20 +1,27 @@
-
 <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1"
+/>
 
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+<link
+  href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap"
+  rel="stylesheet"
+/>
 
-<title>TrueDesign</title>
+<title>TRUE AI — Discovery</title>
 
 <style>
 :root {
+
   --bg: #fbf9f7;
   --card: #ffffff;
-  --muted: #6b5b54;
+
   --text: #1f1a18;
+  --muted: #6b5b54;
 
   --assistant-bubble: #f4f2ef;
   --user-bubble: #e5d9d0;
@@ -26,257 +33,485 @@
   --transition: 240ms ease;
 }
 
-html, body {
+html,
+body {
   max-width: 100vw;
   overflow-x: hidden;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
   height: 100svh;
   min-height: -webkit-fill-available;
-  font-family: 'Montserrat', system-ui, sans-serif;
+
+  font-family:
+    "Montserrat",
+    system-ui,
+    sans-serif;
+
   background: var(--bg);
   color: var(--text);
+
   display: flex;
   flex-direction: column;
 }
-#auth-status:hover {
-  opacity: 0.8;
-}
-/* ───────── Header ───────── */
+
+
+/* -------------------------------------------------- */
+/* Header */
+/* -------------------------------------------------- */
+
 header {
+
   height: 56px;
+
   display: flex;
   align-items: center;
-  padding: 0 16px;
+
   gap: 12px;
-  border-bottom: 1px solid var(--input-border);
+
+  padding: 0 16px;
+
+  border-bottom:
+    1px solid var(--input-border);
 }
 
 .menu-btn {
+
   display: none;
+
   font-size: 20px;
+
   background: none;
   border: none;
+
   cursor: pointer;
 }
 
 .logo {
+
   width: 34px;
   height: 34px;
+
+  border-radius: 8px;
+
   background: #000;
   color: #fff;
-  border-radius: 8px;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   font-weight: 600;
 }
 
+.brand-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
 .brand {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 500;
 }
 
-/* ───────── Layout ───────── */
+.brand-sub {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+#auth-status {
+
+  margin-left: auto;
+
+  font-size: 13px;
+  color: var(--muted);
+
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+
+/* -------------------------------------------------- */
+/* Layout */
+/* -------------------------------------------------- */
+
 main {
+
   flex: 1;
+
   display: flex;
+
   overflow: hidden;
 }
 
-/* ───────── Sidebar ───────── */
+
+/* -------------------------------------------------- */
+/* Sidebar */
+/* -------------------------------------------------- */
+
 aside {
+
   width: 260px;
+
   background: var(--card);
-  border-right: 1px solid var(--input-border);
+
+  border-right:
+    1px solid var(--input-border);
+
   padding: 16px;
+
   overflow-y: auto;
-  transition: transform var(--transition);
+
+  transition:
+    transform var(--transition);
 }
 
 aside h3 {
+
   margin: 0 0 12px;
+
   font-size: 13px;
   font-weight: 500;
+
   color: var(--muted);
 }
 
 .session-entry {
-  font-size: 13px;
-  color: var(--muted);
+
   margin-bottom: 10px;
+
+  font-size: 13px;
+
+  color: var(--muted);
+
+  cursor: pointer;
 }
-  .session-entry.active {
+
+.session-entry.active {
+
   color: var(--text);
+
   font-weight: 500;
 }
 
 
-/* ───────── Content ───────── */
+/* -------------------------------------------------- */
+/* Content */
+/* -------------------------------------------------- */
+
 section.content {
+
   flex: 1;
+
   display: flex;
   flex-direction: column;
 }
 
-/* ───────── Landing ───────── */
+
+/* -------------------------------------------------- */
+/* Landing */
+/* -------------------------------------------------- */
+
 #landing {
+
   flex: 1;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   padding: 24px;
 }
 
 .landing-card {
-  max-width: 520px;
+
   width: 100%;
+  max-width: 560px;
+
   display: flex;
   flex-direction: column;
   align-items: center;
+
   text-align: center;
 }
 
 .landing-card h1 {
-  font-size: 24px;
+
+  margin-bottom: 10px;
+
+  font-size: 28px;
   font-weight: 500;
-  margin-bottom: 8px;
+
+  line-height: 1.3;
 }
 
 .landing-card p {
+
+  max-width: 520px;
+
+  margin-bottom: 24px;
+
   font-size: 14px;
+  line-height: 1.7;
+
   color: var(--muted);
-  margin-bottom: 20px;
 }
 
 .landing-input {
-  display: flex;
-  gap: 12px;
+
   width: 100%;
   max-width: 520px;
-  margin: 0 auto;
+
+  display: flex;
   align-items: center;
+
+  gap: 12px;
 }
 
 input[type="text"] {
+
   width: 100%;
   height: 52px;
+
   padding: 0 16px;
+
   border-radius: var(--radius);
-  border: 1px solid var(--input-border);
+
+  border:
+    1px solid var(--input-border);
+
   background: var(--input-bg);
+
   font-family: inherit;
   font-size: 15px;
 }
 
-  input[type="text"]:focus {
+input[type="text"]:focus {
+
   outline: none;
-  border-color: rgba(0,0,0,0.2);
+
+  border-color:
+    rgba(0,0,0,0.18);
 }
 
 button.primary {
+
+  min-width: 110px;
+
+  padding: 14px 20px;
+
+  border: none;
+  border-radius: var(--radius);
+
   background: #000;
   color: #fff;
-  border: none;
-  padding: 14px 20px;
-  border-radius: var(--radius);
+
   cursor: pointer;
-  min-width: 72px;
+
+  font-family: inherit;
 }
 
-/* ───────── Chat ───────── */
+
+/* -------------------------------------------------- */
+/* Chat */
+/* -------------------------------------------------- */
+
 #chat {
+
   flex: 1;
+
   display: none;
   flex-direction: column;
-  overflow: hidden; /* CRITICAL */
+
+  overflow: hidden;
 }
 
+
+/* -------------------------------------------------- */
+/* Discovery Phase Indicator */
+/* -------------------------------------------------- */
+
+#phase-indicator {
+
+  display: flex;
+
+  gap: 8px;
+
+  padding: 18px 24px 0;
+}
+
+.phase {
+
+  padding: 6px 10px;
+
+  border-radius: 999px;
+
+  background: var(--assistant-bubble);
+
+  color: var(--muted);
+
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+
+.phase.active {
+
+  background: #000;
+  color: #fff;
+}
+
+
+/* -------------------------------------------------- */
+/* Messages */
+/* -------------------------------------------------- */
+
 #messages {
+
   flex: 1;
-  min-height: 0; /* 🔑 REQUIRED FOR FLEX SCROLLING */
-  padding: 24px;
+  min-height: 0;
+
   overflow-y: auto;
+
+  padding: 24px;
+
   display: flex;
   flex-direction: column;
+
   gap: 16px;
 }
 
 .bubble {
-  max-width: 70%;
+
+  max-width: 72%;
+
   padding: 14px 16px;
+
   border-radius: 14px;
-  line-height: 1.55;
+
+  line-height: 1.65;
+
+  font-size: 14px;
+
+  white-space: pre-wrap;
 }
 
 .bubble.bot {
+
   background: var(--assistant-bubble);
+
   align-self: flex-start;
 }
 
 .bubble.user {
+
   background: var(--user-bubble);
+
   align-self: flex-end;
 }
 
+
+/* -------------------------------------------------- */
+/* Input Bar */
+/* -------------------------------------------------- */
+
 .input-bar {
-  background: var(--bg);
+
+  flex-shrink: 0;
+
   padding: 16px;
-  border-top: 1px solid var(--input-border);
-  flex-shrink: 0; /* CRITICAL */
+
+  border-top:
+    1px solid var(--input-border);
+
+  background: var(--bg);
 }
 
-/* ───────── Login Overlay ───────── */
+
+/* -------------------------------------------------- */
+/* Login Overlay */
+/* -------------------------------------------------- */
+
 #login-overlay {
+
   position: fixed;
   inset: 0;
-  background: rgba(251,249,247,0.85);
-  place-items: center;
+
   z-index: 20;
-  display: none; /* JS controls visibility */
+
+  display: none;
+  place-items: center;
+
+  background:
+    rgba(251,249,247,0.85);
 }
 
-#login-overlay.active { display: grid; }
+#login-overlay.active {
+  display: grid;
+}
 
 .login-card {
-  background: var(--card);
-  padding: 24px;
-  border-radius: var(--radius);
-  max-width: 360px;
+
   width: 90%;
+  max-width: 360px;
+
+  padding: 24px;
+
+  border-radius: var(--radius);
+
+  background: var(--card);
+
   text-align: center;
 }
 
 .login-card h2 {
-  font-size: 16px;
+
+  font-size: 17px;
   font-weight: 500;
+
+  margin-bottom: 8px;
 }
 
 .login-card p {
+
   font-size: 13px;
+  line-height: 1.6;
+
   color: var(--muted);
-  margin-bottom: 16px;
 }
 
 .login-card input {
+
   width: 100%;
+
   padding: 12px;
+
   margin-bottom: 12px;
 }
 
-/* ───────── Mobile ───────── */
+
+/* -------------------------------------------------- */
+/* Mobile */
+/* -------------------------------------------------- */
+
 @media (max-width: 768px) {
+
   aside {
+
     position: fixed;
+
     top: 56px;
     left: 0;
     bottom: 0;
-    transform: translateX(-100%);
+
     z-index: 10;
+
+    transform:
+      translateX(-100%);
   }
 
   aside.open {
@@ -286,6 +521,10 @@ button.primary {
   .menu-btn {
     display: block;
   }
+
+  .bubble {
+    max-width: 88%;
+  }
 }
 </style>
 </head>
@@ -293,445 +532,470 @@ button.primary {
 <body>
 
 <header>
-  <button class="menu-btn">☰</button>
-  <div class="logo">T</div>
-  <div class="brand">TrueDesign</div>
- <div
-  id="auth-status"
-  aria-live="polite"
-  style="margin-left:auto; font-size:13px; color: var(--muted);"
-></div>
 
-  
+  <button class="menu-btn">☰</button>
+
+  <div class="logo">T</div>
+
+  <div class="brand-wrap">
+    <div class="brand">TRUE AI</div>
+    <div class="brand-sub">Discovery</div>
+  </div>
+
+  <div
+    id="auth-status"
+    aria-live="polite"
+  >
+    Sign in
+  </div>
 
 </header>
 
 <main>
 
+  <!-- Sidebar -->
   <aside id="sidebar">
-    <h3>Session History</h3>
-   
+
+    <h3>Your Reflections</h3>
+
   </aside>
 
+  <!-- Main Content -->
   <section class="content">
 
     <!-- Landing -->
     <div id="landing">
+
       <div class="landing-card">
-        <h1>What feels unfinished right now?</h1>
-        <p>You don’t need clarity yet, just honesty.</p>
+
+        <h1>
+          Begin your Discovery LifePrint
+        </h1>
+
+        <p>
+          A reflective experience designed to help you clarify
+          your values, recurring friction, strengths,
+          and sustainable direction.
+        </p>
 
         <div class="landing-input">
-          <input
-  id="landing-input"
-  type="text"
-  placeholder="What do you need support with?"
-/>
 
-          <button class="primary" id="landing-btn">Next</button>
+          <input
+            id="landing-input"
+            type="text"
+            placeholder="What feels most important for you to understand right now?"
+          />
+
+          <button
+            id="landing-btn"
+            class="primary"
+          >
+            Begin
+          </button>
+
         </div>
+
       </div>
+
     </div>
 
     <!-- Chat -->
     <div id="chat">
+
+      <!-- Discovery Phases -->
+      <div id="phase-indicator">
+
+        <span
+          class="phase active"
+          data-phase="TARGET"
+        >
+          TARGET
+        </span>
+
+        <span
+          class="phase"
+          data-phase="REFLECT"
+        >
+          REFLECT
+        </span>
+
+        <span
+          class="phase"
+          data-phase="UPGRADE"
+        >
+          UPGRADE
+        </span>
+
+      </div>
+
+      <!-- Messages -->
       <div id="messages"></div>
 
+      <!-- Input -->
       <div class="input-bar">
-        <div class="landing-input">
-         <input
-  id="chat-input"
-  type="text"
-  placeholder="Continue…"
-/>
 
-          <button id="send-btn" class="primary">Next</button>
+        <div class="landing-input">
+
+          <input
+            id="chat-input"
+            type="text"
+            placeholder="Continue reflecting…"
+          />
+
+          <button
+            id="send-btn"
+            class="primary"
+          >
+            Continue
+          </button>
+
         </div>
+
       </div>
+
     </div>
 
   </section>
+
 </main>
 
 <!-- Login Overlay -->
 <div id="login-overlay">
 
   <div class="login-card">
-    <h2>Want me to remember this?</h2>
+
+    <h2>
+      Save your Discovery?
+    </h2>
+
     <p>
-Create an account to save your reflections.
-Nothing changes if you’d rather continue quietly.
-</p>
+      Create an account to save your reflections
+      and LifePrint.
+      <br /><br />
+      You can continue privately if you prefer.
+    </p>
 
-   <div id="login-form">
-  <input type="email" id="login-email" placeholder="Email" />
-  <input type="password" id="login-password" placeholder="Password" />
- <p style="font-size:12px; margin-top:4px;">
-  <button
-    id="reset-password"
-    type="button"
-    style="background:none; border:none; color: var(--muted); cursor:pointer;"
-  >
-    Forgot password?
-  </button>
-</p>
+    <div id="login-form">
 
-     <button id="login-btn" class="primary" type="button">
-    Sign in or create account
-  </button>
-</div>
-<p
-  id="save-confirmation"
-  style="display:none; font-size:12px; color: var(--muted);"
->
-  This reflection is now saved to your account.
-</p>
+      <input
+        type="email"
+        id="login-email"
+        placeholder="Email"
+      />
 
-<p style="font-size:12px; color: var(--muted);">
- First time here? We’ll create your account automatically.
-</p>
+      <input
+        type="password"
+        id="login-password"
+        placeholder="Password"
+      />
 
-<p>
-  <button id="continue-guest" type="button">
-    Continue without saving
-  </button>
-</p>
+      <p style="font-size:12px; margin-top:4px;">
+
+        <button
+          id="reset-password"
+          type="button"
+          style="
+            background:none;
+            border:none;
+            color: var(--muted);
+            cursor:pointer;
+          "
+        >
+          Forgot password?
+        </button>
+
+      </p>
+
+      <button
+        id="login-btn"
+        class="primary"
+        type="button"
+      >
+        Sign in or create account
+      </button>
+
+    </div>
+
+    <p
+      id="save-confirmation"
+      style="
+        display:none;
+        font-size:12px;
+        color: var(--muted);
+      "
+    >
+      Your Discovery session has been saved.
+    </p>
+
+    <p
+      style="
+        font-size:12px;
+        color: var(--muted);
+      "
+    >
+      First time here?
+      Your account will be created automatically.
+    </p>
+
+    <p>
+
+      <button
+        id="continue-guest"
+        type="button"
+      >
+        Continue privately
+      </button>
+
+    </p>
 
   </div>
+
 </div>
 
 <script type="module">
-import { sendMessage } from "./send.js";
-import { supabase } from "./supabase.js";
-import { initAuth } from "./auth.js";
-import * as Sessions from "./sessions.js";
+
+import { sendMessage }
+  from "./send.js";
+
+import { supabase }
+  from "./supabase.js";
+
+import { initAuth }
+  from "./auth.js";
+
+import * as Sessions
+  from "./sessions.js";
 
 
+// --------------------------------------------------
+// State
+// --------------------------------------------------
 
-/* ── State ── */
 let currentUser = null;
+
 let conversation = [];
+
 let assistantTurns = 0;
+
 let hasPromptedLogin = false;
- let currentStage = "discovery"; // allowed: discovery | sustainment | alignment
+
+let currentPhase = "TARGET";
+
 let currentSession = null;
 
-/* ── UI refs ── */
-const landing = document.getElementById("landing");
-const chat = document.getElementById("chat");
-const messagesEl = document.getElementById("messages");
-const loginOverlay = document.getElementById("login-overlay");
-const landingInput = document.getElementById("landing-input");
-const chatInput = document.getElementById("chat-input");
 
-/* ── Bubble renderer (GLOBAL) ── */
+// --------------------------------------------------
+// UI Refs
+// --------------------------------------------------
+
+const landing =
+  document.getElementById("landing");
+
+const chat =
+  document.getElementById("chat");
+
+const messagesEl =
+  document.getElementById("messages");
+
+const loginOverlay =
+  document.getElementById("login-overlay");
+
+
+// --------------------------------------------------
+// Bubble Renderer
+// --------------------------------------------------
+
 function bubble(text, role) {
-  const div = document.createElement("div");
-  div.className = `bubble ${
-    role === "assistant" || role === "bot" ? "bot" : "user"
-  }`;
+
+  const div =
+    document.createElement("div");
+
+  div.className =
+    `bubble ${
+      role === "assistant" || role === "bot"
+        ? "bot"
+        : "user"
+    }`;
+
   div.textContent = text;
+
   messagesEl.appendChild(div);
-  messagesEl.scrollTop = messagesEl.scrollHeight;
+
+  messagesEl.scrollTop =
+    messagesEl.scrollHeight;
 }
 
+
+// --------------------------------------------------
+// Discovery Phase UI
+// --------------------------------------------------
+
+function setPhase(phase) {
+
+  currentPhase = phase;
+
+  document
+    .querySelectorAll(".phase")
+    .forEach(el => {
+
+      el.classList.remove("active");
+
+      if (
+        el.dataset.phase === phase
+      ) {
+        el.classList.add("active");
+      }
+    });
+}
+
+
+// --------------------------------------------------
+// Login Prompt Logic
+// --------------------------------------------------
+
 function maybePromptAuth() {
- 
+
   if (currentUser) return;
+
   if (hasPromptedLogin) return;
-  if (loginOverlay.classList.contains("active")) return;
+
+  if (
+    loginOverlay.classList.contains("active")
+  ) return;
 
   loginOverlay.classList.add("active");
 }
 
-/* ── Auth init (ONCE) ── */
-initAuth({
-  onUserChange: async (user) => {
-    currentUser = user;
-if (!user) {
-  loginOverlay.classList.remove("active");
-}
 
-   const authStatus = document.getElementById("auth-status");
+// --------------------------------------------------
+// Assistant Reply
+// --------------------------------------------------
 
-if (user) {
-  authStatus.textContent = "Log out";
-  authStatus.dataset.state = "signed-in";
-  authStatus.style.cursor = "pointer";
-  authStatus.style.textDecoration = "underline";
-} else {
-  authStatus.textContent = "Sign in";
-  authStatus.dataset.state = "signed-out";
-  authStatus.style.cursor = "pointer";
-  authStatus.style.textDecoration = "underline";
-}
-
-
-
-    if (!user) return;
-
-const pw = document.getElementById("login-password");
-if (pw) pw.value = "";
-
-// 🔑 USER SIGNED IN MID-REFLECTION
-if (!currentSession && conversation.length > 0) {
-  currentSession = await Sessions.createSession(user.id, currentStage);
-
-  for (const msg of conversation) {
-    await Sessions.saveMessage(currentSession.id, msg.role, msg.content);
-  }
- await Sessions.loadUserSessions(user.id);
-
-  setTimeout(() => {
-  document
-    .querySelector(".session-entry")
-    ?.classList.add("active");
-}, 0);
-
-document.getElementById("save-confirmation").style.display = "block";
-loginOverlay.classList.remove("active");
-
-  return; // DO NOT overwrite UI or reload messages
-}
-
-   const lastSession = await Sessions.fetchLatestSession(user.id);
-if (!lastSession) return;
-
-currentSession = lastSession;
-currentStage = lastSession.current_stage;
-await Sessions.loadUserSessions(user.id);
-
-const msgs = await Sessions.getMessages(lastSession.id);
-    
-
-
-    // Restore UI
-    landing.style.display = "none";
-    chat.style.display = "flex";
-    messagesEl.innerHTML = "";
-    conversation = [];
-
-    msgs.forEach((msg) => {
-      bubble(msg.content, msg.role);
-      conversation.push({ role: msg.role, content: msg.content });
-    });
-assistantTurns = msgs.filter(m => m.role === "assistant").length;
-
-  },
-  loginOverlayEl: loginOverlay,
-  confirmationEl: document.getElementById("save-confirmation"),
-  authStatusEl: document.getElementById("auth-status")
-});
-
- document.getElementById("continue-guest").onclick = () => {
-  hasPromptedLogin = true;
-  loginOverlay.classList.remove("active");
-   currentSession = null;
-assistantTurns = 0;
-
-};
-
-document.getElementById("auth-status").onclick = async () => {
-  const authStatus = document.getElementById("auth-status");
-
-  if (authStatus.dataset.state === "signed-in") {
-  hasPromptedLogin = true; // suppress re-prompt this session
-  await supabase.auth.signOut();
-}
- else {
-    if (!currentUser) {
-      loginOverlay.classList.add("active");
-    }
-  }
-};
-
-
-  
- document.getElementById("reset-password").onclick = async () => {
-  const email = document.getElementById("login-email").value.trim();
-
-  if (!email) {
-    alert("Enter your email first.");
-    return;
-  }
-
-  const btn = document.getElementById("reset-password");
-  btn.disabled = true;
-
-  setTimeout(() => {
-    btn.disabled = false;
-  }, 3000);
-
-  const { error } = await supabase.auth.resetPasswordForEmail(email);
-
-  if (error) {
-    alert(error.message);
-  } else {
-    alert("Check your inbox for a password reset link.");
-  }
-};
-
-
-/* ── Assistant ── */
 async function assistantReply() {
+
   bubble("Reflecting…", "bot");
 
-  const res = await sendMessage(currentStage, conversation);
+  const res =
+    await sendMessage(
+      currentPhase,
+      conversation
+    );
+
   messagesEl.lastChild.remove();
 
   const assistantText =
-  res.reply ||
-  res.output ||
-  res.message ||
-  "[No response returned]";
 
-bubble(assistantText, "bot");
-conversation.push({ role: "assistant", content: assistantText });
+    res.reply ||
+    res.output ||
+    "[No response returned]";
 
-if (currentSession) {
-  await Sessions.saveMessage(currentSession.id, "assistant", assistantText);
-}
+  bubble(assistantText, "assistant");
 
-// Optional stage sync if server returns it
-if (res.stage && res.stage !== currentStage) {
-  currentStage = res.stage;
-}
+  conversation.push({
+    role: "assistant",
+    content: assistantText
+  });
 
-assistantTurns++;
-if (assistantTurns === 4) {
-  maybePromptAuth();
-}
-
-  // ────────────────────────────────────────────────
+  if (res.phase) {
+    setPhase(res.phase);
+  }
 
   assistantTurns++;
 
   if (assistantTurns === 4) {
-  maybePromptAuth();
+    maybePromptAuth();
+  }
 }
-} 
 
-/* Landing */
-document.getElementById("landing-btn").onclick = async () => {
-  const text = landingInput.value.trim();
-  landingInput.value = "";
 
-  if (!text) return;
+// --------------------------------------------------
+// Landing Start
+// --------------------------------------------------
 
-  landing.style.display = "none";
-  chat.style.display = "flex";
+document
+  .getElementById("landing-btn")
+  .onclick = async () => {
 
-  bubble(text, "user");
-  conversation.push({ role: "user", content: text });
+    const input =
+      document
+        .getElementById("landing-input");
 
-  // CREATE SESSION IF SIGNED IN
-  if (currentUser && !currentSession) {
-    currentSession = await Sessions.createSession(currentUser.id, currentStage);
-  }
+    const text =
+      input.value.trim();
 
-  // SAVE USER MESSAGE
-  if (currentSession) {
-    await Sessions.saveMessage(currentSession.id, "user", text);
-  }
+    if (!text) return;
 
-  await assistantReply();
-};
+    input.value = "";
 
-/* Chat */
-document.getElementById("send-btn").onclick = async () => {
-  const text = chatInput.value.trim();
-  if (!text) return;
+    landing.style.display = "none";
 
-  chatInput.value = "";
-  bubble(text, "user");
-  conversation.push({ role: "user", content: text });
+    chat.style.display = "flex";
 
-  if (currentSession) {
-    await Sessions.saveMessage(currentSession.id, "user", text);
-  }
+    bubble(`
+We’ll move gradually through three Discovery phases:
 
-  await assistantReply();
-};
+• TARGET — clarifying values and direction
 
-/* Sidebar */
-document.querySelector(".menu-btn").onclick = () =>
-  document.getElementById("sidebar").classList.toggle("open");
+• REFLECT — exploring friction and sustainability
 
-document.getElementById("sidebar").addEventListener("click", async (e) => {
-  const entry = e.target.closest(".session-entry");
-  if (!entry) return;
+• UPGRADE — identifying realistic next steps
 
-  // Active state
-  document
-    .querySelectorAll(".session-entry")
-    .forEach(el => el.classList.remove("active"));
-  entry.classList.add("active");
+You do not need perfect clarity to begin.
+    `.trim(), "assistant");
 
-  const sessionId = entry.dataset.sessionId;
-  const stage = entry.dataset.stage;
-  if (!sessionId) return;
+    bubble(text, "user");
 
-  // Reset state
-  currentSession = { id: sessionId };
-  currentStage = stage;
-  conversation = [];
-  assistantTurns = 0;
-
-  // Load messages
-  const msgs = await Sessions.getMessages(sessionId);
-
-  // Restore UI
-  landing.style.display = "none";
-  chat.style.display = "flex";
-  messagesEl.innerHTML = "";
-
- msgs.forEach((msg) => {
-  bubble(msg.content, msg.role);
-  conversation.push({ role: msg.role, content: msg.content });
-});
-
-assistantTurns = msgs.filter(m => m.role === "assistant").length;
-
-  // Mobile UX
-  document.getElementById("sidebar").classList.remove("open");
-});
-
-/* Login */
-document.getElementById("login-btn").onclick = async () => {
-  const btn = document.getElementById("login-btn");
-  const email = document.getElementById("login-email").value.trim();
-  const password = document.getElementById("login-password").value;
-
-  if (!email || !password) {
-    alert("Please enter both email and password.");
-    return;
-  }
-
-  // 🔑 IMMEDIATELY return user to their reflection
-  loginOverlay.classList.remove("active");
-
-  btn.disabled = true;
-  btn.textContent = "Signing in…";
-
-  // Try signing in first
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-
-  if (error) {
-    const { error: signUpError } = await supabase.auth.signUp({
-      email,
-      password
+    conversation.push({
+      role: "user",
+      content: text
     });
 
-    if (signUpError) {
-      alert(signUpError.message);
-      btn.disabled = false;
-      btn.textContent = "Sign in or create account";
-      loginOverlay.classList.add("active"); // reopen only on failure
-      return;
-    }
-   
-  }
+    await assistantReply();
 };
+
+
+// --------------------------------------------------
+// Chat Send
+// --------------------------------------------------
+
+document
+  .getElementById("send-btn")
+  .onclick = async () => {
+
+    const input =
+      document
+        .getElementById("chat-input");
+
+    const text =
+      input.value.trim();
+
+    if (!text) return;
+
+    input.value = "";
+
+    bubble(text, "user");
+
+    conversation.push({
+      role: "user",
+      content: text
+    });
+
+    await assistantReply();
+};
+
+
+// --------------------------------------------------
+// Sidebar Mobile Toggle
+// --------------------------------------------------
+
+document
+  .querySelector(".menu-btn")
+  .onclick = () => {
+
+    document
+      .getElementById("sidebar")
+      .classList.toggle("open");
+  };
 
 </script>
 
