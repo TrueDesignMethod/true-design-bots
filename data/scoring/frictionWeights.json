@@ -1,0 +1,248 @@
+{
+  "version": "TRUE_DISCOVERY_V1",
+
+  "description": "Weighted indicators used to identify recurring friction, emotional load, sustainability concerns, and alignment strain during Discovery analysis.",
+
+  "categories": {
+
+    "overload": {
+
+      "baseWeight": 1.4,
+
+      "signals": [
+
+        {
+          "name": "capacity_exceeded",
+          "weight": 1.7,
+          "examples": [
+            "too much",
+            "I can't keep up",
+            "overwhelmed",
+            "burnt out",
+            "stretched thin"
+          ]
+        },
+
+        {
+          "name": "chronic_pressure",
+          "weight": 1.5,
+          "examples": [
+            "constant pressure",
+            "always busy",
+            "never stopping",
+            "everything feels urgent"
+          ]
+        },
+
+        {
+          "name": "recovery_deficit",
+          "weight": 1.6,
+          "examples": [
+            "no time to recover",
+            "never rested",
+            "emotionally exhausted",
+            "always tired"
+          ]
+        }
+      ]
+    },
+
+
+    "misalignment": {
+
+      "baseWeight": 1.2,
+
+      "signals": [
+
+        {
+          "name": "value_tension",
+          "weight": 1.5,
+          "examples": [
+            "this no longer feels right",
+            "something feels off",
+            "I feel disconnected",
+            "not aligned anymore"
+          ]
+        },
+
+        {
+          "name": "role_expansion",
+          "weight": 1.3,
+          "examples": [
+            "doing too much",
+            "taking on everything",
+            "my role keeps expanding",
+            "too many responsibilities"
+          ]
+        },
+
+        {
+          "name": "inherited_expectations",
+          "weight": 1.4,
+          "examples": [
+            "expected of me",
+            "supposed to",
+            "what people want from me",
+            "family expectations"
+          ]
+        }
+      ]
+    },
+
+
+    "boundary_erosion": {
+
+      "baseWeight": 1.1,
+
+      "signals": [
+
+        {
+          "name": "difficulty_saying_no",
+          "weight": 1.5,
+          "examples": [
+            "I say yes too often",
+            "hard to say no",
+            "I feel guilty resting",
+            "I overcommit"
+          ]
+        },
+
+        {
+          "name": "emotional_absorption",
+          "weight": 1.4,
+          "examples": [
+            "carry everyone's problems",
+            "emotionally drained",
+            "absorb other people's emotions",
+            "take on too much emotionally"
+          ]
+        }
+      ]
+    },
+
+
+    "identity_pressure": {
+
+      "baseWeight": 1.0,
+
+      "signals": [
+
+        {
+          "name": "performance_identity",
+          "weight": 1.4,
+          "examples": [
+            "need to prove myself",
+            "always performing",
+            "can't slow down",
+            "my worth depends on"
+          ]
+        },
+
+        {
+          "name": "fear_of_disappointing",
+          "weight": 1.3,
+          "examples": [
+            "don't want to let people down",
+            "afraid of disappointing others",
+            "people depend on me",
+            "I can't fail"
+          ]
+        }
+      ]
+    },
+
+
+    "uncertainty": {
+
+      "baseWeight": 0.9,
+
+      "signals": [
+
+        {
+          "name": "direction_confusion",
+          "weight": 1.2,
+          "examples": [
+            "I don't know what I want",
+            "feeling lost",
+            "uncertain about direction",
+            "confused about next steps"
+          ]
+        },
+
+        {
+          "name": "internal_conflict",
+          "weight": 1.4,
+          "examples": [
+            "part of me wants",
+            "conflicted",
+            "torn between",
+            "mixed feelings"
+          ]
+        }
+      ]
+    },
+
+
+    "emotional_fatigue": {
+
+      "baseWeight": 1.3,
+
+      "signals": [
+
+        {
+          "name": "persistent_exhaustion",
+          "weight": 1.6,
+          "examples": [
+            "emotionally exhausted",
+            "drained",
+            "numb",
+            "running on empty"
+          ]
+        },
+
+        {
+          "name": "hopelessness_language",
+          "weight": 1.5,
+          "examples": [
+            "what's the point",
+            "nothing changes",
+            "stuck",
+            "I can't do this forever"
+          ]
+        }
+      ]
+    }
+  },
+
+
+  "friction_constraints": {
+
+    "avoid_pathologizing": true,
+
+    "avoid_diagnostic_language": true,
+
+    "avoid_catastrophizing": true,
+
+    "avoid_identity_reduction": true,
+
+    "require_contextual_interpretation": true,
+
+    "minimum_signal_threshold": 2
+  },
+
+
+  "interpretation_rules": {
+
+    "allow_environmental_pressure": true,
+
+    "allow_systemic_context": true,
+
+    "allow_conflicting_needs": true,
+
+    "prioritize_emotional_safety": true,
+
+    "normalize_human_complexity": true,
+
+    "avoid_moral_judgment": true
+  }
+}
