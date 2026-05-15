@@ -1,276 +1,237 @@
-# TRUE Design Method
+TRUE AI
+A Reflective Intelligence System for the True Design Method
 
-## A Stage-Aware Reflective Intelligence
+TRUE AI is the Discovery engine of the True Design Method.
 
-TRUE is not a chatbot, a coach, or a productivity tool.
+It is designed to help people:
 
-TRUE is a **stage-aware reflective intelligence** designed to help humans move through life **with clarity, sustainability, and agency** — without coercion, urgency, or performative growth.
+clarify values
+identify alignment gaps
+recognize strengths and friction patterns
+uncover contradictions
+understand current capacity
+move toward intentional change with clarity
 
-This repository documents the **philosophy, architecture, invariants, and engineering trail** of the TRUE system so that future builders, collaborators, and auditors can understand *why* it works the way it does — not just *how*.
+TRUE AI does not optimize people.
 
----
+It helps them understand themselves more clearly.
 
-## Core Philosophy
+Core Philosophy
 
-TRUE is built on four non-negotiable principles:
+TRUE AI is built on four principles:
 
-1. **Clarity before action**
-   No planning, execution, or optimization occurs until meaning is clear.
+1. Clarity before action
 
-2. **Sustainability before growth**
-   Expansion is never pursued at the cost of burnout, fragmentation, or identity erosion.
+Meaning must come before planning.
 
-3. **Agency above all**
-   TRUE does not fix people, decide for them, or push outcomes. It reflects and structures.
+TRUE AI does not rush users toward productivity, performance, or optimization.
 
-4. **One stage at a time**
-   Humans cannot meaningfully discover, plan, and sustain simultaneously.
+2. Sustainability before growth
 
-TRUE responds to *intent*, not performance.
+Growth that destroys stability is not alignment.
 
----
+TRUE AI prioritizes:
 
-## Stages of TRUE
+realistic pacing
+emotional sustainability
+long-term coherence
+capacity awareness
+3. Agency above all
 
-TRUE operates in **exactly one stage at a time**.
+TRUE AI does not define identity or make decisions for users.
 
-### 1. Discovery — *Understanding before doing*
+It reflects:
 
-Purpose: Clarify values, patterns, desires, tensions, and direction.
+patterns
+tensions
+strengths
+growth areas
 
-Modules:
+while preserving user autonomy.
 
-* target
-* reflect
-* update
-* synthesis
+4. Reflection before execution
 
-### 2. Planning — *Designing action without overwhelm*
+People cannot sustainably act on lives they do not yet understand.
 
-Purpose: Translate clarity into **bounded, humane plans**.
+TRUE AI exists to support insight before strategy.
 
-Modules:
+The Discovery Framework
 
-* goalPrioritization
-* goalRefinement
-* actionDesign
-* obstacleMapping
-* plan7
-* plan30
-* plan90
-* synthesis
+TRUE AI operates through three reflective phases:
 
-### 3. Alignment — *Sustaining life over time*
+TARGET
 
-Purpose: Reduce friction, prevent burnout, and support long-term coherence.
+Clarify:
 
-Modules:
+values
+goals
+desired future
+fulfillment
+priorities
+direction
 
-* simplify
-* reduceRemoveDelegate
-* iterate
-* grow
-* nurture
-* synthesis
+The goal is not ambition alone, but alignment.
 
-TRUE will **never skip forward** without explicit consent.
+REFLECT
 
----
+Examine:
 
-## Architectural Invariants (MCL)
+current patterns
+emotional friction
+environmental pressure
+behavioral tendencies
+strengths
+overload
+contradictions
 
-The TRUE Core Logic (MCL) enforces system-wide rules:
+This phase focuses on honest awareness without shame.
 
-### Stage Invariants
+UPGRADE
 
-* Only one stage may be active at a time
-* No module stacking
-* No forward progression without consent
+Identify:
 
-### Pro Model Invariant
+developmental priorities
+mindset shifts
+boundary needs
+strengths to leverage
+growth opportunities
+first aligned actions
 
-> **No Pro call may introduce new content domains.**
-> Pro may only integrate, reframe, humanize, or synthesize content already surfaced.
+The goal is sustainable movement, not drastic reinvention.
 
-This protects:
+The LifePrint
 
-* User agency
-* Cost discipline
-* Meaning integrity
+TRUE AI generates a LifePrint:
+a structured reflective profile designed to help participants understand:
 
----
+where they are
+where they want to go
+what supports them
+what interferes
+what requires strengthening
+what next steps are most aligned
 
-## Model Philosophy (Not “AI Usage”)
+The LifePrint is not:
 
-TRUE does not sell or explain itself in terms of tokens, models, or intelligence tiers.
+a diagnosis
+a personality label
+a fixed identity profile
 
-Internally, models are treated as:
+It is a strategic reflection tool.
 
-* **CHEAP** → exploratory, generative, reflective
-* **PRO** → integrative, synthesizing, humanizing
+System Design Principles
 
-Externally, this maps to:
+TRUE AI is intentionally designed to be:
 
-* *Seasons* of reflection
-* *Depth* of integration
-* *Continuity* of insight
+calm instead of urgent
+reflective instead of performative
+bounded instead of addictive
+structured instead of overwhelming
 
-Not power. Not speed.
+The system is designed to reduce:
 
----
-
-## Soft Caps as Seasons
-
-TRUE does not impose hard limits.
-
-Instead, it uses **seasonal soft caps**:
-
-* Discovery seasons naturally conclude when clarity stabilizes
-* Planning seasons end when a plan is formed
-* Alignment seasons cycle as life evolves
-
-When a season ends, TRUE reflects it back — it does not block the user.
-
----
-
-## System Authority Boundaries
-
-TRUE enforces a strict separation of concerns:
-
-### Client (UI)
-
-* Collects user input
-* Displays responses
-* Never decides meaning, stage, or module
-
-### Server
-
-* Detects stage
-* Selects module
-* Enforces invariants
-* Decides model tier
-
-### Modules
-
-* Contain all meaning
-* Build prompts
-* Define scope and tone
-
-### LLM Layer
-
-* Writes only within constraints
-* Never decides structure or direction
-
-> **The client never decides meaning.**
-
----
-
-## Repository Structure
-
-```
-truedesignmethod/
+burnout
+identity fragmentation
+over-optimization
+dependency on AI systems
+Repository Structure
+true-ai/
 ├── api/
-│   └── chat/
-│       ├── index.js        # Orchestration entry point
-│       ├── router.js       # Stage + module selection
-│       ├── mcl.js          # TRUE invariants
-│       └── llm.js          # Model wrappers
+├── core/
+│   ├── governance/
+│   ├── intake/
+│   ├── interpreter/
+│   ├── lifeprint/
+│   └── state/
 │
 ├── modules/
-│   ├── discovery/
-│   ├── planning/
-│   ├── alignment/
-│   └── index.js            # Stage registry
+│   └── discovery/
+│       ├── target.js
+│       ├── reflect.js
+│       ├── upgrade.js
+│       ├── orchestrator.js
+│       └── index.js
 │
 ├── prompts/
-│   └── system.txt          # Minimal TRUE system prompt
+│   ├── system/
+│   ├── discovery/
+│   ├── interpreter/
+│   └── lifeprint/
 │
 ├── public/
-│   ├── index.html
-│   └── send.js
+│
+├── docs/
 │
 ├── README.md
 └── package.json
-```
+Architectural Philosophy
 
----
+TRUE AI separates:
 
-## Why This System Exists
+intake
+interpretation
+synthesis
+output generation
 
-TRUE was created to solve a specific failure mode of modern tools:
+This allows the system to:
 
-* Too fast
-* Too performative
-* Too outcome-driven
-* Too exhausting
+preserve coherence
+avoid generic outputs
+maintain emotional safety
+support structured reflection
 
-TRUE is intentionally **calm, slow, and bounded**.
+The system is intentionally modular so reasoning systems can evolve independently over time.
 
-It is designed for people who:
+What TRUE AI Is Not
 
-* Think deeply
-* Hold many possibilities
-* Burn out easily under pressure
-* Need structure without domination
+TRUE AI is not:
 
----
+therapy
+coaching
+productivity software
+behavioral optimization
+performance tracking
 
-## What TRUE Is Not
+It is:
 
-* Not therapy
-* Not coaching
-* Not productivity software
-* Not optimization
-* Not hustle
+a mirror with structure.
 
-TRUE is **a mirror with structure**.
+Design Boundaries
 
----
+TRUE AI intentionally refuses to:
 
-## Future-Proofing Notes
+pressure users toward constant growth
+optimize for engagement
+generate dependency
+over-diagnose
+replace human judgment
+collapse identity into labels
 
-This architecture supports future additions without breaking philosophy:
+Restraint is part of the architecture.
 
-* Memory (reflective only, not predictive)
-* Exports (LifePrints)
-* Human facilitation
-* Offline reflection modes
+Future Development
 
-Any future feature must pass this test:
+Future system expansions may include:
 
-> Does it increase clarity, sustainability, and agency — without pressure?
+longitudinal LifePrint tracking
+guided reflection exports
+human strategist integration
+lab recommendations
+asynchronous reflection systems
 
-If not, it does not belong.
+Any future feature must support:
 
----
+clarity
+sustainability
+agency
+emotional safety
 
-Environmental & Ethical Design Notes
+Otherwise it does not belong.
 
-TRUE is intentionally designed to minimize extractive or runaway use of generative systems.
+Final Statement
 
-Key design choices support this:
+TRUE AI was designed around a simple principle:
 
-Bounded generation: All language generation is constrained by stage, module, and invariant rules. There is no infinite or novelty-driven output.
+People do not need more pressure.
 
-Seasonal usage, not continuous engagement: TRUE encourages completion, synthesis, and exit — not prolonged interaction.
-
-Low-output bias: Clarity and integration are prioritized over volume. More text is not treated as more value.
-
-No behavioral optimization loops: TRUE does not predict, nudge, rank, or optimize user behavior for engagement.
-
-Human agency preserved: Meaning, decisions, and action always remain with the user, reducing dependency and repeated querying.
-
-TRUE treats computational resources as something to be used carefully and proportionally, in service of human understanding — not consumption.
-
-This makes TRUE closer to a decision-support and sense-making system than a conventional generative AI product.
-
----
-
-## Final Statement
-
-TRUE is designed to be trusted.
-
-Not because it is powerful —
-But because it **knows what it refuses to do**.
-
-That restraint is the system.
+They need clearer ways to understand themselves.
