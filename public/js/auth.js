@@ -1,100 +1,268 @@
-import { supabase } from './supabase.js'
+// public/auth.js
+// TRUE AI — Authentication Layer
+// Supabase + Discovery Session Auth
 
-let currentUser = null
-let accessStatus = {
+import { supabase } from "./supabase.js";
+
+
+// --------------------------------------------------
+// Internal State
+// --------------------------------------------------
+
+let currentUser = null;
+
+let authState = {
+
   signedIn: false,
-  paid: false
-}
 
-/* =========================
-   SIGN IN (Magic Link)
-========================= */
+  initialized: false
+};
+
+
+// --------------------------------------------------
+// Send Magic Link
+// --------------------------------------------------
+
 export async function signInWithMagicLink(email) {
-  const { error } = await supabase.auth.signInWithOtp({
-    email,
-    options: {
-      emailRedirectTo: window.location.origin
-    }
-  })
+
+  const { error } =
+    await supabase.auth.signInWithOtp({
+
+      email,
+
+      options: {
+
+        emailRedirectTo:
+          window.location.origin
+      }
+    });
 
   if (error) {
-    console.error('Magic link error:', error)
-    throw error
+
+    console.error(
+      "TRUE AI auth error:",
+      error
+    );
+
+    throw error;
   }
 
-  return true
+  return true;
 }
 
-/* =========================
-   AUTH STATE LISTENER
-========================= */
-supabase.auth.onAuthStateChange(async (_event, session) => {
-  if (!session?.user) {
-    currentUser = null
-    accessStatus = { signedIn: false, paid: false }
-    return
-  }
 
-  currentUser = session.user
-  accessStatus.signedIn = true
-
-  await checkPaidStatus()
-})
-
-/* =========================
-   CHECK PAID STATUS
-========================= */
-async function checkPaidStatus() {
-  const { data, error } = await supabase
-    .from('user_access')
-    .select('paid')
-    .eq('id', currentUser.id)
-    .single()
-
-  if (error) {
-    // User exists in auth but not yet in access table
-    accessStatus.paid = false
-    return
-  }
-
-  accessStatus.paid = data.paid === true
-}
-
-/* =========================
-   HELPERS
-========================= */
-export function isSignedIn() {
-  return accessStatus.signedIn
-}
-
-export function canSaveSessions() {
-  return accessStatus.signedIn && accessStatus.paid
-}
-
-export function getCurrentUser() {
-  return currentUser
-}
+// --------------------------------------------------
+// Sign Out
+// --------------------------------------------------
 
 export async function signOut() {
-  await supabase.auth.signOut()
-}
-/* =========================
-   INIT AUTH (UI BRIDGE)
-========================= */
-export function initAuth({
-  onUserChange,
-  loginOverlayEl,
-  confirmationEl,
-  authStatusEl
-}) {
-  // Initial user load
-  supabase.auth.getUser().then(({ data }) => {
-    onUserChange(data?.user ?? null)
-  })
 
-  // Listen for auth changes
-  supabase.auth.onAuthStateChange((_event, session) => {
-    const user = session?.user ?? null
-    onUserChange(user)
-  })
+  const { error } =
+    await supabase.auth.signOut();
+
+  if (error) {
+
+    console.error(
+      "TRUE AI sign out error:",
+      error
+    );
+
+    throw error;
+  }
+
+  currentUser = null;
+
+  authState = {
+
+    signedIn: false,
+
+    initialized: true
+  };
+}
+
+
+// --------------------------------------------------
+// Current User
+// --------------------------------------------------
+
+export function getCurrentUser() {
+  return currentUser;
+}
+
+
+// --------------------------------------------------
+// Signed In State
+// --------------------------------------------------
+
+export function isSignedIn() {
+  return authState.signedIn;
+}
+
+
+// --------------------------------------------------
+// Auth Ready State
+// --------------------------------------------------
+
+export function isAuthInitialized() {
+  return authState.initialized;
+}
+
+
+// --------------------------------------------------
+// Initialize Auth
+// --------------------------------------------------
+
+export async function initAuth({
+
+  onUserChange,
+
+  loginOverlayEl,
+
+  confirmationEl,
+
+  authStatusEl
+
+}) {
+
+  // ----------------------------------------------
+  // Initial Session Load
+  // ----------------------------------------------
+  const {
+
+    data: { session },
+
+    error
+
+  } = await supabase.auth.getSession();
+
+  if (error) {
+
+    console.error(
+      "TRUE AI auth session error:",
+      error
+    );
+  }
+
+  currentUser =
+    session?.user || null;
+
+  authState.signedIn =
+    !!currentUser;
+
+  authState.initialized = true;
+
+
+  // ----------------------------------------------
+  // Update UI
+  // ----------------------------------------------
+  updateAuthUI({
+
+    authStatusEl,
+
+    confirmationEl,
+
+    loginOverlayEl
+  });
+
+
+  // ----------------------------------------------
+  // Notify App
+  // ----------------------------------------------
+  if (onUserChange) {
+
+    onUserChange(currentUser);
+  }
+
+
+  // ----------------------------------------------
+  // Auth Listener
+  // ----------------------------------------------
+  supabase.auth.onAuthStateChange(
+
+    async (_event, session) => {
+
+      currentUser =
+        session?.user || null;
+
+      authState.signedIn =
+        !!currentUser;
+
+      authState.initialized = true;
+
+
+      updateAuthUI({
+
+        authStatusEl,
+
+        confirmationEl,
+
+        loginOverlayEl
+      });
+
+
+      if (onUserChange) {
+
+        onUserChange(currentUser);
+      }
+    }
+  );
+}
+
+
+// --------------------------------------------------
+// UI Updater
+// --------------------------------------------------
+
+function updateAuthUI({
+
+  authStatusEl,
+
+  confirmationEl,
+
+  loginOverlayEl
+
+}) {
+
+  // ----------------------------------------------
+  // Signed In
+  // ----------------------------------------------
+  if (currentUser) {
+
+    if (authStatusEl) {
+
+      authStatusEl.textContent =
+        "Signed in";
+    }
+
+    if (confirmationEl) {
+
+      confirmationEl.style.display =
+        "block";
+    }
+
+    if (loginOverlayEl) {
+
+      loginOverlayEl.classList.remove(
+        "active"
+      );
+    }
+
+    return;
+  }
+
+
+  // ----------------------------------------------
+  // Signed Out
+  // ----------------------------------------------
+  if (authStatusEl) {
+
+    authStatusEl.textContent =
+      "Sign in";
+  }
+
+  if (confirmationEl) {
+
+    confirmationEl.style.display =
+      "none";
+  }
 }
