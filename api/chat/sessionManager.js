@@ -1,87 +1,72 @@
 // api/chat/sessionManager.js
-// TRUE AI — Lightweight Session State Manager
+// TRUE AI — Supabase Session Manager
+
+import { supabase } from "../../lib/supabase.js";
+
 
 // --------------------------------------------------
-// In-memory session store
+// Get Session
 // --------------------------------------------------
-// NOTE:
-// This is intentionally lightweight for early development.
-//
-// In production, replace with:
-// - Supabase
-// - Redis
-// - Postgres
-// - Durable KV storage
-//
-// This file only manages:
-// - conversational continuity
-// - discovery state persistence
-// - lightweight participant context
-//
-// It should NOT contain:
-// - interpretation logic
-// - synthesis logic
-// - LifePrint generation
-// --------------------------------------------------
+export async function getSession(sessionId) {
 
-const sessions = new Map();
+  const { data, error } = await supabase
+    .from("sessions")
+    .select("*")
+    .eq("session_id", sessionId)
+    .single();
+
+  if (error) {
+    return null;
+  }
+
+  return data;
+}
 
 
 // --------------------------------------------------
 // Create Session
 // --------------------------------------------------
-export function createSession(sessionId) {
+export async function createSession(sessionId) {
 
-  if (!sessionId) {
-    throw new Error("Session ID required.");
-  }
+  const payload = {
+    session_id: sessionId,
 
-  const session = {
-    id: sessionId,
+    discovery_state: "reflect",
 
-    createdAt: Date.now(),
-
-    updatedAt: Date.now(),
-
-    discoveryState: "reflect",
-
-    history: [],
-
-    participantProfile: {},
+    participant_profile: {},
 
     metadata: {
       readinessLevel: "emerging"
     }
   };
 
-  sessions.set(sessionId, session);
+  const { data, error } = await supabase
+    .from("sessions")
+    .insert(payload)
+    .select()
+    .single();
 
-  return session;
-}
-
-
-// --------------------------------------------------
-// Get Session
-// --------------------------------------------------
-export function getSession(sessionId) {
-
-  if (!sessionId) {
-    return null;
+  if (error) {
+    throw new Error(
+      "Unable to create session."
+    );
   }
 
-  return sessions.get(sessionId) || null;
+  return data;
 }
 
 
 // --------------------------------------------------
 // Get Or Create Session
 // --------------------------------------------------
-export function getOrCreateSession(sessionId) {
+export async function getOrCreateSession(
+  sessionId
+) {
 
-  let session = getSession(sessionId);
+  let session = await getSession(sessionId);
 
   if (!session) {
-    session = createSession(sessionId);
+    session = await createSession(sessionId);
   }
 
   return session;
@@ -91,135 +76,150 @@ export function getOrCreateSession(sessionId) {
 // --------------------------------------------------
 // Update Discovery State
 // --------------------------------------------------
-export function updateDiscoveryState(
+export async function updateDiscoveryState(
   sessionId,
   discoveryState
 ) {
 
-  const session = getOrCreateSession(sessionId);
+  const { data, error } = await supabase
+    .from("sessions")
+    .update({
+      discovery_state: discoveryState,
+      updated_at: new Date().toISOString()
+    })
+    .eq("session_id", sessionId)
+    .select()
+    .single();
 
-  session.discoveryState = discoveryState;
+  if (error) {
+    throw new Error(
+      "Unable to update discovery state."
+    );
+  }
 
-  session.updatedAt = Date.now();
-
-  sessions.set(sessionId, session);
-
-  return session;
+  return data;
 }
 
 
 // --------------------------------------------------
 // Update Participant Profile
 // --------------------------------------------------
-export function updateParticipantProfile(
+export async function updateParticipantProfile(
   sessionId,
   updates = {}
 ) {
 
-  const session = getOrCreateSession(sessionId);
+  const session =
+    await getOrCreateSession(sessionId);
 
-  session.participantProfile = {
-    ...session.participantProfile,
+  const updatedProfile = {
+    ...(session.participant_profile || {}),
     ...updates
   };
 
-  session.updatedAt = Date.now();
+  const { data, error } = await supabase
+    .from("sessions")
+    .update({
+      participant_profile: updatedProfile,
+      updated_at: new Date().toISOString()
+    })
+    .eq("session_id", sessionId)
+    .select()
+    .single();
 
-  sessions.set(sessionId, session);
+  if (error) {
+    throw new Error(
+      "Unable to update participant profile."
+    );
+  }
 
-  return session;
+  return data;
 }
 
 
 // --------------------------------------------------
-// Add Conversation Entry
+// Add Conversation History
 // --------------------------------------------------
-export function addToHistory(
+export async function addToHistory({
   sessionId,
-  entry = {}
-) {
+  role,
+  content
+}) {
 
-  const session = getOrCreateSession(sessionId);
+  const { error } = await supabase
+    .from("session_history")
+    .insert({
+      session_id: sessionId,
+      role,
+      content
+    });
 
-  session.history.push({
-    timestamp: Date.now(),
-    ...entry
-  });
-
-  // ------------------------------------------
-  // Prevent runaway memory growth
-  // ------------------------------------------
-  const MAX_HISTORY = 25;
-
-  if (session.history.length > MAX_HISTORY) {
-    session.history =
-      session.history.slice(-MAX_HISTORY);
+  if (error) {
+    throw new Error(
+      "Unable to save conversation history."
+    );
   }
 
-  session.updatedAt = Date.now();
+  return true;
+}
 
-  sessions.set(sessionId, session);
 
-  return session.history;
+// --------------------------------------------------
+// Get Recent History
+// --------------------------------------------------
+export async function getRecentHistory(
+  sessionId,
+  limit = 12
+) {
+
+  const { data, error } = await supabase
+    .from("session_history")
+    .select("*")
+    .eq("session_id", sessionId)
+    .order("created_at", {
+      ascending: false
+    })
+    .limit(limit);
+
+  if (error) {
+    return [];
+  }
+
+  return data.reverse();
 }
 
 
 // --------------------------------------------------
 // Update Metadata
 // --------------------------------------------------
-export function updateMetadata(
+export async function updateMetadata(
   sessionId,
   metadata = {}
 ) {
 
-  const session = getOrCreateSession(sessionId);
+  const session =
+    await getOrCreateSession(sessionId);
 
-  session.metadata = {
-    ...session.metadata,
+  const updatedMetadata = {
+    ...(session.metadata || {}),
     ...metadata
   };
 
-  session.updatedAt = Date.now();
+  const { data, error } = await supabase
+    .from("sessions")
+    .update({
+      metadata: updatedMetadata,
+      updated_at: new Date().toISOString()
+    })
+    .eq("session_id", sessionId)
+    .select()
+    .single();
 
-  sessions.set(sessionId, session);
-
-  return session;
-}
-
-
-// --------------------------------------------------
-// Clear Session
-// --------------------------------------------------
-export function clearSession(sessionId) {
-
-  if (!sessionId) return false;
-
-  return sessions.delete(sessionId);
-}
-
-
-// --------------------------------------------------
-// Session Snapshot
-// --------------------------------------------------
-export function getSessionSnapshot(sessionId) {
-
-  const session = getSession(sessionId);
-
-  if (!session) {
-    return null;
+  if (error) {
+    throw new Error(
+      "Unable to update metadata."
+    );
   }
 
-  return {
-    id: session.id,
-
-    discoveryState: session.discoveryState,
-
-    participantProfile: session.participantProfile,
-
-    metadata: session.metadata,
-
-    historyCount: session.history.length,
-
-    updatedAt: session.updatedAt
-  };
+  return data;
 }
