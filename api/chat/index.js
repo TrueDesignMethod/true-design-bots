@@ -1,24 +1,26 @@
 // api/chat/index.js
-// TRUE V3 — Chat Entry Point (Vercel-safe, ESM)
+// TRUE AI — Discovery Entry Point (Vercel-safe, ESM)
 
-import { detectIntent, selectModule, decideModel } from "../../lib/router.js";
-import { callLLM, MODELS } from "../../lib/llm.js";
+import { resolveDiscoveryState } from "../../core/governance/resolveDiscoveryState.js";
+
+import { runDiscovery } from "../discovery/runDiscovery.js";
+
+import { callLLM, MODELS } from "./llm.js";
 
 
-
-// Translate frontend stages to backend stages
-function normalizeStage(stage) {
-  if (stage === "planning") return "sustainment";
-  return stage || "discovery";
-}
-
+// -----------------------------
 // Safe body parser for Vercel
+// -----------------------------
 async function parseBody(req) {
   if (req.body) return req.body;
 
   return new Promise((resolve) => {
     let data = "";
-    req.on("data", (chunk) => (data += chunk));
+
+    req.on("data", (chunk) => {
+      data += chunk;
+    });
+
     req.on("end", () => {
       try {
         resolve(JSON.parse(data || "{}"));
@@ -29,56 +31,108 @@ async function parseBody(req) {
   });
 }
 
+
+// -----------------------------
+// POST handler
+// -----------------------------
 async function handlePost(req, res) {
-console.log("🔥 /api/chat handler reached");
+  console.log("TRUE AI /api/chat reached");
 
   try {
     const body = await parseBody(req);
-    const { input = "", declaredStage = "discovery" } = body;
 
-    const currentStage = normalizeStage(declaredStage);
-    const intent = detectIntent(input);
-    const module = selectModule(currentStage, intent);
+    const {
+      input = "",
+      sessionState = {},
+      participantProfile = {}
+    } = body;
 
-    if (!module) {
-      throw new Error("No module selected");
-    }
-
-    const model =
-      decideModel(module) === "PRO"
-        ? MODELS.DEPTH
-        : MODELS.STANDARD;
-
-    const reply = await callLLM({
-      model,
-      userPrompt: input,
-      maxTokens: 300
+    // -----------------------------
+    // Determine Discovery phase
+    // -----------------------------
+    const discoveryState = resolveDiscoveryState({
+      input,
+      sessionState,
+      participantProfile
     });
 
+    // -----------------------------
+    // Run Discovery orchestration
+    // -----------------------------
+    const result = await runDiscovery({
+      input,
+      discoveryState,
+      participantProfile,
+      llm: async ({ prompt, maxTokens = 500 }) => {
+        return callLLM({
+          model: MODELS.STANDARD,
+          userPrompt: prompt,
+          maxTokens
+        });
+      }
+    });
+
+    // -----------------------------
+    // Response
+    // -----------------------------
     return res.status(200).json({
-      reply,
-      stage: currentStage,
-      module: module.name || "unknown"
+      success: true,
+
+      discoveryState,
+
+      response: result.response,
+
+      lifeprint: result.lifeprint || null,
+
+      metadata: {
+        strengthsDetected: result.strengthsDetected || [],
+        frictionDetected: result.frictionDetected || [],
+        readinessLevel: result.readinessLevel || "emerging"
+      }
     });
 
   } catch (err) {
-    console.error("TRUE chat error:", err);
-    return res.status(500).json({ error: err.message });
+    console.error("TRUE AI Error:", err);
+
+    return res.status(500).json({
+      success: false,
+      error: err.message || "Internal server error"
+    });
   }
 }
 
-export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
+// -----------------------------
+// Main Vercel handler
+// -----------------------------
+export default async function handler(req, res) {
+
+  // CORS
+  res.setHeader("Access-Control-Allow-Origin", "*");
+
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "POST, OPTIONS"
+  );
+
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type"
+  );
+
+  // OPTIONS
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
 
+  // POST
   if (req.method === "POST") {
     return handlePost(req, res);
   }
 
-  return res.status(405).json({ error: "Method not allowed" });
+  // Unsupported
+  return res.status(405).json({
+    success: false,
+    error: "Method not allowed"
+  });
 }
