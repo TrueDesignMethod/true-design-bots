@@ -20,68 +20,127 @@ export async function analyzeStrengths({
 
   const scores = {};
 
+  const matchedSignals = {};
+
 
   // ----------------------------------------------
-  // Score strength categories
+  // Process Categories
   // ----------------------------------------------
   for (
-    const [strength, config]
-    of Object.entries(strengthsWeights)
+    const [categoryName, category]
+    of Object.entries(
+      strengthsWeights.categories
+    )
   ) {
 
-    let score = 0;
+    let categoryScore =
+      category.baseWeight || 1;
+
+    const categoryMatches = [];
 
 
+    // ------------------------------------------
+    // Process Signals
+    // ------------------------------------------
     for (
-      const keyword
-      of config.keywords
+      const signal
+      of category.signals
     ) {
 
-      if (
-        text.includes(
-          keyword.toLowerCase()
-        )
+      let signalMatched = false;
+
+
+      // ----------------------------------------
+      // Check Example Matches
+      // ----------------------------------------
+      for (
+        const example
+        of signal.examples
       ) {
 
-        score += (
-          config.weight || 1
-        );
+        if (
+          text.includes(
+            example.toLowerCase()
+          )
+        ) {
+
+          signalMatched = true;
+
+          categoryScore +=
+            signal.weight || 1;
+
+          categoryMatches.push({
+
+            signal:
+              signal.name,
+
+            matchedExample:
+              example
+          });
+        }
+      }
+
+
+      // ----------------------------------------
+      // Multi-signal support
+      // ----------------------------------------
+      if (
+        signalMatched
+      ) {
+
+        matchedSignals[
+          signal.name
+        ] = true;
       }
     }
 
 
-    if (score > 0) {
+    // ------------------------------------------
+    // Threshold Filtering
+    // ------------------------------------------
+    if (
+      categoryMatches.length >=
+      (
+        strengthsWeights
+          .strength_constraints
+          ?.minimum_signal_threshold
+        || 1
+      )
+    ) {
 
-      scores[strength] = score;
+      detected.push(categoryName);
 
-      detected.push(strength);
+      scores[categoryName] =
+        categoryScore;
     }
   }
 
 
   // ----------------------------------------------
-  // Normalize
+  // Ranked Output
   // ----------------------------------------------
-  const ranked =
+  const rankedStrengths =
     Object.entries(scores)
 
-      .sort((a, b) => b[1] - a[1])
+      .sort(
+        (a, b) => b[1] - a[1]
+      )
 
       .map(([name]) => name);
 
 
   // ----------------------------------------------
-  // Return structured result
+  // Return Structured Result
   // ----------------------------------------------
   return {
 
     detected:
-      ranked.slice(0, 5),
+      rankedStrengths,
 
     scores,
 
     confidence:
-      ranked.length >= 3
+      rankedStrengths.length >= 3
         ? "moderate"
         : "emerging"
   };
