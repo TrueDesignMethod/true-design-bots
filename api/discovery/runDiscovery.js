@@ -159,71 +159,83 @@ export async function runDiscovery({
   // ----------------------------------------------
   const [
 
-    alignment,
+  alignment,
 
-    strengths,
+  strengths,
 
-    friction,
+  friction,
 
-    capacity,
+  capacity,
 
-    contradictions
+  contradictions
 
-  ] = await Promise.all([
+] = await Promise.all([
 
-    analyzeAlignment({
+  analyzeAlignment({
 
-      input,
+    input,
 
-      participantProfile
-    }),
+    participantProfile,
 
-    analyzeStrengths({
+    llm
+  }),
 
-      input,
+  analyzeStrengths({
 
-      participantProfile
-    }),
+    input,
 
-    analyzeFriction({
+    participantProfile,
 
-      input,
+    llm
+  }),
 
-      participantProfile
-    }),
+  analyzeFriction({
 
-    analyzeCapacity({
+    input,
 
-      input,
+    participantProfile,
 
-      participantProfile
-    }),
+    llm
+  }),
 
-    detectContradictions({
+  analyzeCapacity({
 
-      input,
+    input,
 
-      participantProfile
-    })
-  ]);
+    participantProfile,
+
+    llm
+  }),
+
+  detectContradictions({
+
+    input,
+
+    participantProfile,
+
+    llm
+  })
+]);
 
 
   // ----------------------------------------------
   // Upgrade Areas
   // ----------------------------------------------
   const upgrades =
-    await analyzeUpgradeAreas({
+  await analyzeUpgradeAreas({
 
-      input,
+    input,
 
-      participantProfile,
+    participantProfile,
 
-      strengths,
+    strengths,
 
-      friction,
+    friction,
 
-      contradictions
-    });
+    contradictions,
+
+    llm
+  });
 
 
   // ----------------------------------------------
@@ -245,7 +257,9 @@ export async function runDiscovery({
 
       contradictions,
 
-      upgrades
+      upgrades,
+
+      llm
     });
 
 
