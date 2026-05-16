@@ -23,7 +23,7 @@
 
 import {
   createSession
-} from "./sessions.js";
+} from "/js/sessions.js";
 
 
 // --------------------------------------------------
