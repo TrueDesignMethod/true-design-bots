@@ -7,7 +7,7 @@ import { runDiscovery } from "../discovery/runDiscovery.js";
 
 import { callLLM, MODELS } from "./llm.js";
 
-import { llm } from "../../lib/llm.js";
+
 
 // -----------------------------
 // Safe body parser for Vercel
@@ -61,17 +61,34 @@ async function handlePost(req, res) {
     // Run Discovery orchestration
     // -----------------------------
     const result = await runDiscovery({
-      input,
-      discoveryState,
-      participantProfile,
-      llm: async ({ prompt, maxTokens = 500 }) => {
-        return callLLM({
-          model: MODELS.STANDARD,
-          userPrompt: prompt,
-          maxTokens
-        });
-      }
+
+  input,
+
+  discoveryState,
+
+  participantProfile,
+
+  llm: async ({
+
+    prompt,
+
+    model = MODELS.STANDARD,
+
+    maxTokens = 500
+
+  }) => {
+
+    return callLLM({
+
+      model,
+
+      userPrompt: prompt,
+
+      maxTokens
     });
+  }
+});
+     
 
     // -----------------------------
     // Response
