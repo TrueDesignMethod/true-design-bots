@@ -1,261 +1,88 @@
 // core/interpreter/strengthsAnalyzer.js
-// TRUE AI — Strengths Analyzer
 
-// --------------------------------------------------
-// STRENGTHS ANALYZER
-// --------------------------------------------------
-// Purpose:
-// Identify:
-//
-// - existing strengths
-// - resilience patterns
-// - adaptive capacities
-// - supportive traits
-// - sustainable advantages
-//
-// This analyzer is intentionally:
-// - reflective
-// - non-performative
-// - non-diagnostic
-// - non-hierarchical
-//
-// Strengths are NOT treated as:
-// - superiority
-// - fixed identity
-// - productivity assets only
-//
-// The goal is to help participants
-// recognize qualities that may support
-// aligned and sustainable growth.
-// --------------------------------------------------
+import strengthsWeights
+  from "../../data/scoring/strengthsWeights.json"
+  assert { type: "json" };
 
 
-// --------------------------------------------------
-// Main Strength Analysis
-// --------------------------------------------------
 export async function analyzeStrengths({
 
-  input = "",
+  input,
 
-  participantProfile = {},
-
-  llm
+  participantProfile = {}
 
 }) {
 
-  // ----------------------------------------------
-  // Extract context
-  // ----------------------------------------------
-  const {
+  const text =
+    input.toLowerCase();
 
-    values = [],
+  const detected = [];
 
-    goals = [],
-
-    frictionThemes = [],
-
-    previousStrengths = []
-
-  } = participantProfile;
+  const scores = {};
 
 
   // ----------------------------------------------
-  // Build prompt
+  // Score strength categories
   // ----------------------------------------------
-  const prompt = buildStrengthsPrompt({
+  for (
+    const [strength, config]
+    of Object.entries(strengthsWeights)
+  ) {
 
-    input,
+    let score = 0;
 
-    values,
 
-    goals,
+    for (
+      const keyword
+      of config.keywords
+    ) {
 
-    frictionThemes,
+      if (
+        text.includes(
+          keyword.toLowerCase()
+        )
+      ) {
 
-    previousStrengths
-  });
+        score += (
+          config.weight || 1
+        );
+      }
+    }
+
+
+    if (score > 0) {
+
+      scores[strength] = score;
+
+      detected.push(strength);
+    }
+  }
 
 
   // ----------------------------------------------
-  // Run LLM analysis
+  // Normalize
   // ----------------------------------------------
-  const response = await llm({
+  const ranked =
+    Object.entries(scores)
 
-    prompt,
+      .sort((a, b) => b[1] - a[1])
 
-    maxTokens: 550
-  });
-
-
-  // ----------------------------------------------
-  // Parse structured output
-  // ----------------------------------------------
-  const parsed =
-    safelyParseStrengths(response);
+      .map(([name]) => name);
 
 
   // ----------------------------------------------
-  // Return structured strengths
+  // Return structured result
   // ----------------------------------------------
   return {
 
     detected:
-      parsed.detected || [],
+      ranked.slice(0, 5),
 
-    resiliencePatterns:
-      parsed.resiliencePatterns || [],
+    scores,
 
-    supportiveQualities:
-      parsed.supportiveQualities || [],
-
-    growthAssets:
-      parsed.growthAssets || [],
-
-    overextendedStrengths:
-      parsed.overextendedStrengths || [],
-
-    reflectiveSummary:
-      parsed.reflectiveSummary || ""
+    confidence:
+      ranked.length >= 3
+        ? "moderate"
+        : "emerging"
   };
-}
-
-
-// --------------------------------------------------
-// Prompt Builder
-// --------------------------------------------------
-function buildStrengthsPrompt({
-
-  input,
-
-  values = [],
-
-  goals = [],
-
-  frictionThemes = [],
-
-  previousStrengths = []
-
-}) {
-
-  return `
-You are TRUE AI.
-
-You are analyzing participant strengths.
-
-Your role is to identify:
-- supportive qualities
-- resilience patterns
-- adaptive capacities
-- emotionally sustainable strengths
-- existing internal resources
-
-Do NOT:
-- exaggerate strengths
-- flatter participants
-- create personality labels
-- imply perfection
-- use corporate performance language
-
-Avoid:
-- productivity obsession
-- "high performer" language
-- superiority framing
-- motivational hype
-
-A strength may include:
-- emotional resilience
-- thoughtfulness
-- adaptability
-- persistence
-- compassion
-- curiosity
-- self-awareness
-- creativity
-- relational capacity
-- groundedness
-
-Also identify:
-- strengths that may become harmful
-  when overextended.
-
-Return ONLY valid JSON.
-
-Required JSON structure:
-
-{
-  "detected": [
-    "string"
-  ],
-
-  "resiliencePatterns": [
-    "string"
-  ],
-
-  "supportiveQualities": [
-    "string"
-  ],
-
-  "growthAssets": [
-    "string"
-  ],
-
-  "overextendedStrengths": [
-    "string"
-  ],
-
-  "reflectiveSummary": "string"
-}
-
-Participant Values:
-${JSON.stringify(values)}
-
-Participant Goals:
-${JSON.stringify(goals)}
-
-Known Friction Themes:
-${JSON.stringify(frictionThemes)}
-
-Previously Identified Strengths:
-${JSON.stringify(previousStrengths)}
-
-Participant Input:
-"""
-${input}
-"""
-`;
-}
-
-
-// --------------------------------------------------
-// Safe JSON Parsing
-// --------------------------------------------------
-function safelyParseStrengths(response) {
-
-  try {
-
-    return JSON.parse(response);
-
-  } catch (err) {
-
-    console.error(
-      "Strengths parsing error:",
-      err
-    );
-
-    return {
-
-      detected: [],
-
-      resiliencePatterns: [],
-
-      supportiveQualities: [],
-
-      growthAssets: [],
-
-      overextendedStrengths: [],
-
-      reflectiveSummary:
-        "Several supportive qualities may be present, though additional reflection may help clarify them more fully."
-    };
-  }
 }
