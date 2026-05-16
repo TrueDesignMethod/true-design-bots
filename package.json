@@ -4,18 +4,27 @@
   "type": "module",
   "description": "TRUE AI — A reflective intelligence system for Discovery and LifePrint generation within the True Design Method.",
   "main": "api/chat/index.js",
+
   "scripts": {
     "dev": "vercel dev",
     "start": "node api/chat/index.js",
     "test": "node --test"
   },
+
   "author": "Atyia Police",
+
   "license": "MIT",
+
   "engines": {
     "node": ">=18.0.0"
   },
+
   "dependencies": {
-    "openai": "^4.9.0",
+
+    "@supabase/supabase-js": "^2.49.8",
+
+    "openai": "^4.52.7",
+
     "node-fetch": "^3.3.2"
   }
 }
