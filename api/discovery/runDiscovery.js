@@ -1,13 +1,40 @@
 // api/discovery/runDiscovery.js
-// TRUE AI — Discovery Orchestrator
+// TRUE AI — Optimized Discovery Orchestrator
+//
+// ARCHITECTURE GOALS
+// --------------------------------------------------
+// FAST conversational interaction
+// lightweight local analysis
+// deferred LifePrint generation
+// minimal LLM usage
+//
+// LLM is ONLY used for:
+// - conversational reflection
+// - optional final LifePrint generation
+//
+// All analyzers should ideally become:
+// - local scoring systems
+// - heuristic interpreters
+// - weighted pattern detectors
+// --------------------------------------------------
 
-import { STATES } from "../chat/router.js";
+import { STATES }
+  from "../chat/router.js";
 
 import {
+
   addToHistory,
+
   updateDiscoveryState,
+
   updateParticipantProfile
+
 } from "../chat/sessionManager.js";
+
+
+// --------------------------------------------------
+// Lightweight Local Analyzers
+// --------------------------------------------------
 
 import { analyzeAlignment }
   from "../../core/interpreter/alignmentAnalyzer.js";
@@ -30,6 +57,11 @@ import { analyzeUpgradeAreas }
 import { synthesizeDiscovery }
   from "../../core/interpreter/synthesisEngine.js";
 
+
+// --------------------------------------------------
+// Deferred LifePrint Generation
+// --------------------------------------------------
+
 import { generateSummary }
   from "../../core/lifeprint/generateSummary.js";
 
@@ -50,7 +82,7 @@ import { narrativeAssembler }
 
 
 // --------------------------------------------------
-// Main Discovery Orchestrator
+// Main Discovery Runner
 // --------------------------------------------------
 export async function runDiscovery({
 
@@ -95,26 +127,35 @@ export async function runDiscovery({
 
       input,
 
-      discoveryState
+      discoveryState,
+
+      participantProfile
     });
 
 
   // ----------------------------------------------
-  // Conversational Reflection
+  // SINGLE Conversational LLM Call
   // ----------------------------------------------
   const response =
     await llm({
 
+      model: "gpt-4o-mini",
+
       prompt: reflectivePrompt,
 
-      maxTokens: 250,
-
-      model: "gpt-4o-mini"
+      maxTokens: 220
     });
 
 
   // ----------------------------------------------
-  // Lightweight Parallel Analysis
+  // Lightweight Local Analysis
+  // ----------------------------------------------
+  // These analyzers should NOT
+  // make additional LLM calls.
+  // They should rely on:
+  // - heuristics
+  // - scoring
+  // - local interpretation
   // ----------------------------------------------
   const [
 
@@ -131,39 +172,44 @@ export async function runDiscovery({
   ] = await Promise.all([
 
     analyzeAlignment({
+
       input,
-      participantProfile,
-      llm
+
+      participantProfile
     }),
 
     analyzeStrengths({
+
       input,
-      participantProfile,
-      llm
+
+      participantProfile
     }),
 
     analyzeFriction({
+
       input,
-      participantProfile,
-      llm
+
+      participantProfile
     }),
 
     analyzeCapacity({
+
       input,
-      participantProfile,
-      llm
+
+      participantProfile
     }),
 
     detectContradictions({
+
       input,
-      participantProfile,
-      llm
+
+      participantProfile
     })
   ]);
 
 
   // ----------------------------------------------
-  // Upgrade Analysis
+  // Upgrade Areas
   // ----------------------------------------------
   const upgrades =
     await analyzeUpgradeAreas({
@@ -176,14 +222,15 @@ export async function runDiscovery({
 
       friction,
 
-      contradictions,
-
-      llm
+      contradictions
     });
 
 
   // ----------------------------------------------
   // Discovery Synthesis
+  // ----------------------------------------------
+  // This should ALSO become
+  // mostly local logic over time.
   // ----------------------------------------------
   const synthesis =
     await synthesizeDiscovery({
@@ -198,36 +245,37 @@ export async function runDiscovery({
 
       contradictions,
 
-      upgrades,
-
-      llm
+      upgrades
     });
 
 
   // ----------------------------------------------
-  // Determine LifePrint Readiness
+  // Determine Readiness
   // ----------------------------------------------
   const shouldGenerateLifeprint =
     evaluateLifeprintReadiness({
 
       synthesis,
 
-      participantProfile,
+      discoveryState,
 
-      discoveryState
+      participantProfile
     });
 
 
   // ----------------------------------------------
-  // Deferred LifePrint Generation
+  // Deferred LifePrint
   // ----------------------------------------------
   let lifeprint = null;
 
 
+  // ----------------------------------------------
+  // Generate ONLY at milestone readiness
+  // ----------------------------------------------
   if (shouldGenerateLifeprint) {
 
     // ------------------------------------------
-    // Generate Sections In Parallel
+    // Parallel Narrative Generation
     // ------------------------------------------
     const [
 
@@ -244,29 +292,41 @@ export async function runDiscovery({
     ] = await Promise.all([
 
       generateSummary({
+
         synthesis,
+
         llm
       }),
 
       generateStrengths({
+
         strengths,
+
         llm
       }),
 
       generateFriction({
+
         friction,
+
         contradictions,
+
         llm
       }),
 
       generateUpgradePath({
+
         upgrades,
+
         llm
       }),
 
       generateMomentumSteps({
+
         synthesis,
+
         upgrades,
+
         llm
       })
     ]);
@@ -307,6 +367,9 @@ export async function runDiscovery({
     contradictionThemes:
       contradictions?.themes || [],
 
+    readinessLevel:
+      synthesis?.readinessLevel || "emerging",
+
     lastDiscoveryState:
       discoveryState
   };
@@ -318,7 +381,9 @@ export async function runDiscovery({
   if (sessionId) {
 
     await updateParticipantProfile(
+
       sessionId,
+
       updatedProfile
     );
 
@@ -363,37 +428,42 @@ function evaluateLifeprintReadiness({
 
   synthesis,
 
-  participantProfile,
+  discoveryState,
 
-  discoveryState
+  participantProfile
 
 }) {
 
   // ----------------------------------------------
   // Require Upgrade Phase
   // ----------------------------------------------
-  if (discoveryState !== STATES.UPGRADE) {
+  if (
+    discoveryState !== STATES.UPGRADE
+  ) {
+
     return false;
   }
 
 
   // ----------------------------------------------
-  // Require Meaningful Synthesis
+  // Require Readiness
   // ----------------------------------------------
   if (
     synthesis?.readinessLevel !== "ready"
   ) {
+
     return false;
   }
 
 
   // ----------------------------------------------
-  // Require Sufficient Reflection
+  // Require Reflection Depth
   // ----------------------------------------------
   const strengths =
     participantProfile?.strengths || [];
 
   if (strengths.length < 3) {
+
     return false;
   }
 
@@ -409,48 +479,57 @@ function buildReflectivePrompt({
 
   input,
 
-  discoveryState
+  discoveryState,
+
+  participantProfile
 
 }) {
 
   const basePrompt = `
 You are TRUE AI.
 
-You are a reflective intelligence system designed to help participants better understand themselves with clarity, emotional safety, and agency.
+You are a calm reflective intelligence system.
 
-Do not diagnose.
-Do not pressure.
-Do not over-motivate.
-Do not use exaggerated self-help language.
+Your purpose is to help participants:
+- better understand themselves
+- notice patterns
+- identify tension
+- clarify values
+- explore sustainable movement
 
-Respond calmly, thoughtfully, and reflectively.
+Avoid:
+- diagnosis
+- coaching hype
+- forced positivity
+- urgency
+- optimization language
+- exaggerated self-help tone
 
-Focus on helping the participant notice:
-- patterns
-- tensions
-- values
-- possibilities
-- emotional themes
-- internal contradictions
-
-Keep responses conversational, grounded, and emotionally steady.
+Respond conversationally.
+Respond thoughtfully.
+Respond clearly.
+Keep responses emotionally grounded.
 `;
 
 
+  // ----------------------------------------------
   // TARGET
-  if (discoveryState === STATES.TARGET) {
+  // ----------------------------------------------
+  if (
+    discoveryState === STATES.TARGET
+  ) {
 
     return `
 ${basePrompt}
 
-The participant is currently in the TARGET phase.
+The participant is currently in TARGET exploration.
 
-Help clarify:
+Help them reflect on:
 - values
+- desires
 - fulfillment
 - direction
 - priorities
-- desires
 - meaningful goals
 
 Participant Input:
@@ -459,22 +538,26 @@ Participant Input:
   }
 
 
+  // ----------------------------------------------
   // UPGRADE
-  if (discoveryState === STATES.UPGRADE) {
+  // ----------------------------------------------
+  if (
+    discoveryState === STATES.UPGRADE
+  ) {
 
     return `
 ${basePrompt}
 
-The participant is currently in the UPGRADE phase.
+The participant is currently exploring sustainable growth.
 
-Help identify:
-- sustainable next steps
-- growth opportunities
-- supportive adjustments
-- strengths already present
-- possible friction patterns
+Help them reflect on:
+- small adjustments
+- sustainable movement
+- existing strengths
+- emotional readiness
+- realistic next steps
 
-Avoid urgency and optimization framing.
+Avoid optimization framing.
 
 Participant Input:
 "${input}"
@@ -482,21 +565,23 @@ Participant Input:
   }
 
 
+  // ----------------------------------------------
   // REFLECT
+  // ----------------------------------------------
   return `
 ${basePrompt}
 
-The participant is currently in the REFLECT phase.
+The participant is currently in reflective exploration.
 
-Help explore:
+Help them examine:
 - emotional patterns
-- overwhelm
-- friction
+- recurring friction
 - contradictions
-- recurring experiences
+- overwhelm
 - alignment
+- emotional needs
 
-Respond with curiosity and steadiness.
+Respond with steadiness and curiosity.
 
 Participant Input:
 "${input}"
