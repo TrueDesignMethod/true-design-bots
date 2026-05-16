@@ -2,11 +2,11 @@
 // TRUE AI — Discovery Session Manager
 
 import { supabase }
-  from "./supabase.js";
+  from "/js/supabase.js";
 
 import {
   getCurrentUser
-} from "./auth.js";
+} from "/js/auth.js";
 
 
 // --------------------------------------------------
