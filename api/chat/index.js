@@ -7,6 +7,7 @@ import { runDiscovery } from "../discovery/runDiscovery.js";
 
 import { callLLM, MODELS } from "./llm.js";
 
+import { llm } from "../../lib/llm.js";
 
 // -----------------------------
 // Safe body parser for Vercel
