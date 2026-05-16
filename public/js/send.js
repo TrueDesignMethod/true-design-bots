@@ -90,7 +90,7 @@ Please try again in a moment.`,
     // ----------------------------------------------
     // Validate Reply
     // ----------------------------------------------
-    if (!data.reply) {
+    if (!data.response) {
 
       return {
 
