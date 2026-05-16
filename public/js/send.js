@@ -108,7 +108,7 @@ Please try again in a moment.`,
     return {
 
       reply:
-        data.reply,
+        data.response,
 
       phase:
         data.phase || phase,
