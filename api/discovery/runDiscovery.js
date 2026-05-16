@@ -53,20 +53,30 @@ import { narrativeAssembler }
 // Main Discovery Orchestrator
 // --------------------------------------------------
 export async function runDiscovery({
+
   input,
+
   discoveryState,
+
   participantProfile = {},
+
   sessionId,
+
   llm
+
 }) {
 
   // ----------------------------------------------
-  // Persist user message
+  // Persist User Message
   // ----------------------------------------------
   if (sessionId) {
+
     await addToHistory({
+
       sessionId,
+
       role: "user",
+
       content: input
     });
 
@@ -78,146 +88,214 @@ export async function runDiscovery({
 
 
   // ----------------------------------------------
-  // Phase-specific reflection prompt
+  // Build Reflective Prompt
   // ----------------------------------------------
   const reflectivePrompt =
     buildReflectivePrompt({
+
       input,
+
       discoveryState
     });
 
 
   // ----------------------------------------------
-  // Generate reflective conversational response
+  // Conversational Reflection
   // ----------------------------------------------
-  const response = await llm({
-    prompt: reflectivePrompt,
-    maxTokens: 350
-  });
+  const response =
+    await llm({
+
+      prompt: reflectivePrompt,
+
+      maxTokens: 250,
+
+      model: "gpt-4o-mini"
+    });
 
 
   // ----------------------------------------------
-  // Run analyzers
+  // Lightweight Parallel Analysis
   // ----------------------------------------------
-  const alignment =
-    await analyzeAlignment({
+  const [
+
+    alignment,
+
+    strengths,
+
+    friction,
+
+    capacity,
+
+    contradictions
+
+  ] = await Promise.all([
+
+    analyzeAlignment({
       input,
       participantProfile,
       llm
-    });
+    }),
 
-  const strengths =
-    await analyzeStrengths({
+    analyzeStrengths({
       input,
       participantProfile,
       llm
-    });
+    }),
 
-  const friction =
-    await analyzeFriction({
+    analyzeFriction({
       input,
       participantProfile,
       llm
-    });
+    }),
 
-  const capacity =
-    await analyzeCapacity({
+    analyzeCapacity({
       input,
       participantProfile,
       llm
-    });
+    }),
 
-  const contradictions =
-    await detectContradictions({
+    detectContradictions({
       input,
       participantProfile,
       llm
-    });
+    })
+  ]);
 
+
+  // ----------------------------------------------
+  // Upgrade Analysis
+  // ----------------------------------------------
   const upgrades =
     await analyzeUpgradeAreas({
+
       input,
+
       participantProfile,
+
       strengths,
+
       friction,
+
       contradictions,
+
       llm
     });
 
 
   // ----------------------------------------------
-  // Synthesize overall discovery state
+  // Discovery Synthesis
   // ----------------------------------------------
   const synthesis =
     await synthesizeDiscovery({
+
       alignment,
+
       strengths,
+
       friction,
+
       capacity,
+
       contradictions,
+
       upgrades,
+
       llm
     });
 
 
   // ----------------------------------------------
-  // Generate LifePrint sections
+  // Determine LifePrint Readiness
   // ----------------------------------------------
-  const summary =
-    await generateSummary({
+  const shouldGenerateLifeprint =
+    evaluateLifeprintReadiness({
+
       synthesis,
-      llm
-    });
 
-  const strengthsSection =
-    await generateStrengths({
-      strengths,
-      llm
-    });
+      participantProfile,
 
-  const frictionSection =
-    await generateFriction({
-      friction,
-      contradictions,
-      llm
-    });
-
-  const upgradePath =
-    await generateUpgradePath({
-      upgrades,
-      llm
-    });
-
-  const momentumSteps =
-    await generateMomentumSteps({
-      synthesis,
-      upgrades,
-      llm
+      discoveryState
     });
 
 
   // ----------------------------------------------
-  // Assemble LifePrint
+  // Deferred LifePrint Generation
   // ----------------------------------------------
-  const lifeprint =
-    await narrativeAssembler({
+  let lifeprint = null;
+
+
+  if (shouldGenerateLifeprint) {
+
+    // ------------------------------------------
+    // Generate Sections In Parallel
+    // ------------------------------------------
+    const [
 
       summary,
 
-      strengths: strengthsSection,
+      strengthsSection,
 
-      friction: frictionSection,
+      frictionSection,
 
-      upgrades: upgradePath,
+      upgradePath,
 
-      momentum: momentumSteps
-    });
+      momentumSteps
+
+    ] = await Promise.all([
+
+      generateSummary({
+        synthesis,
+        llm
+      }),
+
+      generateStrengths({
+        strengths,
+        llm
+      }),
+
+      generateFriction({
+        friction,
+        contradictions,
+        llm
+      }),
+
+      generateUpgradePath({
+        upgrades,
+        llm
+      }),
+
+      generateMomentumSteps({
+        synthesis,
+        upgrades,
+        llm
+      })
+    ]);
+
+
+    // ------------------------------------------
+    // Assemble Narrative
+    // ------------------------------------------
+    lifeprint =
+      await narrativeAssembler({
+
+        summary,
+
+        strengths: strengthsSection,
+
+        friction: frictionSection,
+
+        upgrades: upgradePath,
+
+        momentum: momentumSteps
+      });
+  }
 
 
   // ----------------------------------------------
-  // Update participant profile
+  // Update Participant Profile
   // ----------------------------------------------
   const updatedProfile = {
+
     ...participantProfile,
 
     strengths:
@@ -234,6 +312,9 @@ export async function runDiscovery({
   };
 
 
+  // ----------------------------------------------
+  // Persist Assistant Response
+  // ----------------------------------------------
   if (sessionId) {
 
     await updateParticipantProfile(
@@ -242,15 +323,18 @@ export async function runDiscovery({
     );
 
     await addToHistory({
+
       sessionId,
+
       role: "assistant",
+
       content: response
     });
   }
 
 
   // ----------------------------------------------
-  // Return structured output
+  // Return Structured Result
   // ----------------------------------------------
   return {
 
@@ -273,11 +357,60 @@ export async function runDiscovery({
 
 
 // --------------------------------------------------
+// LifePrint Readiness Evaluation
+// --------------------------------------------------
+function evaluateLifeprintReadiness({
+
+  synthesis,
+
+  participantProfile,
+
+  discoveryState
+
+}) {
+
+  // ----------------------------------------------
+  // Require Upgrade Phase
+  // ----------------------------------------------
+  if (discoveryState !== STATES.UPGRADE) {
+    return false;
+  }
+
+
+  // ----------------------------------------------
+  // Require Meaningful Synthesis
+  // ----------------------------------------------
+  if (
+    synthesis?.readinessLevel !== "ready"
+  ) {
+    return false;
+  }
+
+
+  // ----------------------------------------------
+  // Require Sufficient Reflection
+  // ----------------------------------------------
+  const strengths =
+    participantProfile?.strengths || [];
+
+  if (strengths.length < 3) {
+    return false;
+  }
+
+
+  return true;
+}
+
+
+// --------------------------------------------------
 // Reflective Prompt Builder
 // --------------------------------------------------
 function buildReflectivePrompt({
+
   input,
+
   discoveryState
+
 }) {
 
   const basePrompt = `
@@ -291,13 +424,20 @@ Do not over-motivate.
 Do not use exaggerated self-help language.
 
 Respond calmly, thoughtfully, and reflectively.
-Focus on helping the participant notice patterns, tensions, values, or possibilities.
+
+Focus on helping the participant notice:
+- patterns
+- tensions
+- values
+- possibilities
+- emotional themes
+- internal contradictions
+
+Keep responses conversational, grounded, and emotionally steady.
 `;
 
 
-  // ----------------------------------------------
   // TARGET
-  // ----------------------------------------------
   if (discoveryState === STATES.TARGET) {
 
     return `
@@ -305,15 +445,13 @@ ${basePrompt}
 
 The participant is currently in the TARGET phase.
 
-Help them clarify:
+Help clarify:
 - values
-- desires
-- direction
 - fulfillment
-- goals
+- direction
 - priorities
-
-Encourage specificity and reflection without forcing certainty.
+- desires
+- meaningful goals
 
 Participant Input:
 "${input}"
@@ -321,9 +459,7 @@ Participant Input:
   }
 
 
-  // ----------------------------------------------
   // UPGRADE
-  // ----------------------------------------------
   if (discoveryState === STATES.UPGRADE) {
 
     return `
@@ -331,14 +467,14 @@ ${basePrompt}
 
 The participant is currently in the UPGRADE phase.
 
-Help them identify:
-- possible growth areas
-- mindset shifts
+Help identify:
 - sustainable next steps
-- strengths they may already possess
-- patterns that may require attention
+- growth opportunities
+- supportive adjustments
+- strengths already present
+- possible friction patterns
 
-Avoid urgency or optimization language.
+Avoid urgency and optimization framing.
 
 Participant Input:
 "${input}"
@@ -346,23 +482,21 @@ Participant Input:
   }
 
 
-  // ----------------------------------------------
-  // REFLECT (default)
-  // ----------------------------------------------
+  // REFLECT
   return `
 ${basePrompt}
 
 The participant is currently in the REFLECT phase.
 
-Help them examine:
+Help explore:
 - emotional patterns
-- friction
 - overwhelm
+- friction
 - contradictions
 - recurring experiences
-- current life alignment
+- alignment
 
-Respond with curiosity and emotional steadiness.
+Respond with curiosity and steadiness.
 
 Participant Input:
 "${input}"
