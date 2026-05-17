@@ -10,7 +10,7 @@ import {
 
   updateDiscoveryState,
 
-  updateParticipantProfile
+  updateparticipantState
 
 } from "../chat/sessionManager.js";
 
@@ -73,7 +73,7 @@ export async function runDiscovery({
 
   discoveryState,
 
-  participantProfile = {},
+  participantState = {},
 
   sessionId,
 
@@ -128,35 +128,35 @@ export async function runDiscovery({
 
       input,
 
-      participantProfile
+      participantState
     }),
 
     analyzeStrengths({
 
       input,
 
-      participantProfile
+      participantState
     }),
 
     analyzeFriction({
 
       input,
 
-      participantProfile
+      participantState
     }),
 
     analyzeCapacity({
 
       input,
 
-      participantProfile
+      participantState
     }),
 
     detectContradictions({
 
       input,
 
-      participantProfile
+      participantState
     })
   ]);
 
@@ -170,7 +170,7 @@ export async function runDiscovery({
 
       input,
 
-      participantProfile,
+      participantState,
 
       strengths,
 
@@ -216,12 +216,15 @@ export async function runDiscovery({
   const reflectivePrompt =
     buildReflectivePrompt({
 
-      input,
+  input,
 
-      discoveryState,
+  discoveryState,
 
-      synthesis
-    });
+  synthesis,
+
+  participantState:
+    updatedParticipantState
+});
 
 
   // ------------------------------------------------
@@ -250,7 +253,8 @@ export async function runDiscovery({
 
       discoveryState,
 
-      participantProfile
+      participantState:
+        updatedParticipantState
     });
 
 
@@ -342,29 +346,179 @@ export async function runDiscovery({
   // Update Participant State
   // ------------------------------------------------
 
-  const updatedProfile = {
+  // ------------------------------------------------
+// Evolving Symbolic Participant State
+// ------------------------------------------------
 
-    ...participantProfile,
+const previousState =
+  participantState || {};
 
-    strengths:
-      strengths?.detected || [],
 
-    frictionThemes:
-      friction?.themes || [],
+// ------------------------------------------------
+// Temporal History Tracking
+// ------------------------------------------------
+const historyPatterns = {
 
-    contradictionThemes:
-      contradictions?.themes || [],
+  recurringThemes:
 
-    readinessLevel:
-      synthesis?.readinessLevel || "emerging",
+    mergeUnique([
 
-    synthesisState:
-      synthesis,
+      ...(previousState
+        ?.historyPatterns
+        ?.recurringThemes || []),
 
-    lastDiscoveryState:
-      discoveryState
-  };
+      ...(synthesis
+        ?.dominantThemes || [])
+    ]),
 
+  recurringContradictions:
+
+    mergeUnique([
+
+      ...(previousState
+        ?.historyPatterns
+        ?.recurringContradictions || []),
+
+      ...(contradictions
+        ?.themes || [])
+    ]),
+
+  recurringFriction:
+
+    mergeUnique([
+
+      ...(previousState
+        ?.historyPatterns
+        ?.recurringFriction || []),
+
+      ...(friction
+        ?.themes || [])
+    ]),
+
+  overloadTrend:
+  limitHistory([
+
+    ...(previousState
+      ?.historyPatterns
+      ?.overloadTrend || []),
+
+    {
+      timestamp:
+        Date.now(),
+
+      level:
+        friction?.overloadLevel
+        || "moderate"
+    }
+
+  ], 50)
+};
+
+
+// ------------------------------------------------
+// Longitudinal Readiness
+// ------------------------------------------------
+const readinessState = {
+
+  current:
+    synthesis?.readinessLevel
+    || "emerging",
+
+  historical: [
+
+    ...(previousState
+      ?.readinessState
+      ?.historical || []),
+
+    {
+      timestamp:
+        Date.now(),
+
+      level:
+        synthesis?.readinessLevel
+        || "emerging"
+    }
+  ]
+};
+
+
+// ------------------------------------------------
+// Narrative State
+// ------------------------------------------------
+const narrativeState = {
+
+  lifeprintGenerated:
+    shouldGenerateLifeprint,
+
+  lastGenerationTimestamp:
+
+    shouldGenerateLifeprint
+
+      ? Date.now()
+
+      : previousState
+          ?.narrativeState
+          ?.lastGenerationTimestamp
+          || null,
+
+  lastThemes:
+
+    synthesis?.dominantThemes || []
+};
+
+
+// ------------------------------------------------
+// Updated Symbolic State
+// ------------------------------------------------
+const updatedParticipantState = {
+
+  ...previousState,
+
+
+  // ----------------------------------------------
+  // Symbolic Analyzer States
+  // ----------------------------------------------
+  strengthsState:
+    strengths,
+
+  frictionState:
+    friction,
+
+  contradictionState:
+    contradictions,
+
+  alignmentState:
+    alignment,
+
+  capacityState:
+    capacity,
+
+  upgradeState:
+    upgrades,
+
+  synthesisState:
+    synthesis,
+
+
+  // ----------------------------------------------
+  // Longitudinal Structures
+  // ----------------------------------------------
+  readinessState,
+
+  historyPatterns,
+
+  narrativeState,
+
+
+  // ----------------------------------------------
+  // Session Metadata
+  // ----------------------------------------------
+  lastDiscoveryState:
+    discoveryState,
+
+  lastUpdated:
+    Date.now()
+};
 
   // ------------------------------------------------
   // Persist Assistant Response
@@ -372,11 +526,12 @@ export async function runDiscovery({
 
   if (sessionId) {
 
-    await updateParticipantProfile(
+    await updateparticipantState(
 
       sessionId,
 
-      updatedProfile
+      updatedParticipantState
+
     );
 
     await addToHistory({
@@ -415,7 +570,19 @@ export async function runDiscovery({
   };
 }
 
+// --------------------------------------------------
+// Utility — Limit History
+// --------------------------------------------------
+function limitHistory(
 
+  arr = [],
+
+  limit = 50
+
+) {
+
+  return arr.slice(-limit);
+}
 // --------------------------------------------------
 // LifePrint Readiness Evaluation
 // --------------------------------------------------
@@ -425,10 +592,13 @@ function evaluateLifeprintReadiness({
 
   discoveryState,
 
-  participantProfile
+  participantState
 
 }) {
 
+  // ----------------------------------------------
+  // Must be in Upgrade phase
+  // ----------------------------------------------
   if (
     discoveryState !== STATES.UPGRADE
   ) {
@@ -437,6 +607,9 @@ function evaluateLifeprintReadiness({
   }
 
 
+  // ----------------------------------------------
+  // Readiness threshold
+  // ----------------------------------------------
   if (
     synthesis?.readinessLevel !== "ready"
   ) {
@@ -445,8 +618,14 @@ function evaluateLifeprintReadiness({
   }
 
 
+  // ----------------------------------------------
+  // Require sufficient symbolic signal density
+  // ----------------------------------------------
   const strengths =
-    participantProfile?.strengths || [];
+
+    participantState
+      ?.strengthsState
+      ?.detected || [];
 
 
   if (strengths.length < 3) {
@@ -498,6 +677,16 @@ Avoid:
 - self-help rhetoric
 
 Current Symbolic State:
+Recurring Patterns:
+${JSON.stringify(
+
+  participantState
+    ?.historyPatterns || {},
+
+  null,
+
+  2
+)}
 ${JSON.stringify(synthesis, null, 2)}
 
 Participant Input:
