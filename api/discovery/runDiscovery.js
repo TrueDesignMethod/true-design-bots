@@ -481,8 +481,14 @@ const updatedParticipantState = {
   strengthsState:
     strengths,
 
-  frictionState:
-    friction,
+ frictionState: {
+
+  active: [],
+
+  recurring: [],
+
+  resolved: []
+},
 
   contradictionState:
     contradictions,
@@ -637,7 +643,7 @@ function evaluateLifeprintReadiness({
   // Readiness threshold
   // ----------------------------------------------
   if (
-    synthesis?.readinessLevel !== "ready"
+    synthesis?.readinessLevel !== ["stabilizing", "ready"]
   ) {
 
     return false;
@@ -679,6 +685,34 @@ function buildReflectivePrompt({
 
 }) {
 
+  // ----------------------------------------------
+  // Curated Reflection Context
+  // ----------------------------------------------
+  const reflectionContext = {
+
+    readinessLevel:
+      synthesis?.readinessLevel,
+
+    dominantThemes:
+      synthesis?.dominantThemes || [],
+
+    dominantStrengths:
+      synthesis?.dominantStrengths || [],
+
+    dominantFriction:
+      synthesis?.dominantFriction || [],
+
+    alignmentState:
+      synthesis?.alignmentState || "mixed",
+
+    sustainabilityRisk:
+      synthesis?.sustainabilityRisk || "moderate",
+
+    primaryTensions:
+      synthesis?.primaryTensions || []
+  };
+
+
   return `
 You are TRUE AI.
 
@@ -706,7 +740,7 @@ Avoid:
 
 Current Symbolic State:
 ${JSON.stringify(
-  synthesis,
+  reflectionContext,
   null,
   2
 )}
