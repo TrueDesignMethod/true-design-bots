@@ -1,39 +1,33 @@
 // core/interpreter/contradictionDetector.js
-// TRUE AI — Contradiction Detector
-
-// --------------------------------------------------
-// CONTRADICTION DETECTOR
-// --------------------------------------------------
-// Purpose:
-// Identify:
+// TRUE AI — Relational Symbolic Tension Detector
 //
-// - internal contradictions
+// PURPOSE
+// --------------------------------------------------
+// Detect:
+// - competing needs
 // - value-behavior tension
 // - goal-capacity mismatch
-// - identity-environment conflict
-// - competing priorities
+// - internal conflict
+// - identity-environment strain
 // - unsustainable expectations
 //
-// This detector is intentionally:
-// - reflective
-// - non-judgmental
-// - emotionally safe
-// - non-diagnostic
+// WITHOUT LLM DEPENDENCE.
 //
-// Contradictions are NOT treated as:
-// - hypocrisy
-// - failure
-// - dishonesty
+// This detector is NOT:
+// - psychoanalysis
+// - diagnosis
+// - moral judgment
+// - hypocrisy detection
 //
-// Human beings naturally hold:
-// - conflicting needs
-// - competing values
-// - survival adaptations
-// - emotional tensions
+// Contradictions are treated as:
+// - human complexity
+// - adaptive tension
+// - competing realities
+// - relational strain
 //
-// The goal is to surface these
-// patterns gently so participants
-// can better understand themselves.
+// The goal is to surface:
+// symbolic tension patterns
+// gently and transparently.
 // --------------------------------------------------
 
 
@@ -44,14 +38,16 @@ export async function detectContradictions({
 
   input = "",
 
-  participantProfile = {},
-
-  llm
+  participantProfile = {}
 
 }) {
 
+  const text =
+    input.toLowerCase();
+
+
   // ----------------------------------------------
-  // Extract participant context
+  // Extract Participant Context
   // ----------------------------------------------
   const {
 
@@ -67,215 +63,488 @@ export async function detectContradictions({
 
 
   // ----------------------------------------------
-  // Build analysis prompt
+  // State Containers
   // ----------------------------------------------
-  const prompt =
-    buildContradictionPrompt({
+  const themes = [];
 
-      input,
+  const valueBehaviorTension = [];
 
-      values,
+  const goalCapacityMismatch = [];
 
-      goals,
+  const identityEnvironmentConflict = [];
 
-      strengths,
+  const competingPriorities = [];
 
-      frictionThemes
+  const hiddenPressures = [];
+
+  const unresolvedTensions = [];
+
+  const detectedContradictions = [];
+
+
+  // ------------------------------------------------
+  // CONTRADICTION RULE SETS
+  // ------------------------------------------------
+
+  const contradictionRules = [
+
+    // --------------------------------------------
+    // Peace vs Overwork
+    // --------------------------------------------
+    {
+      name:
+        "peace_vs_overwork",
+
+      desires: [
+
+        "peace",
+
+        "rest",
+
+        "balance",
+
+        "slow down"
+      ],
+
+      behaviors: [
+
+        "always working",
+
+        "never stop",
+
+        "constantly busy",
+
+        "too much",
+
+        "can't keep up"
+      ],
+
+      tension:
+        "desire for peace conflicting with chronic overextension",
+
+      category:
+        "goalCapacityMismatch"
+    },
+
+
+    // --------------------------------------------
+    // Boundaries vs Overcommitment
+    // --------------------------------------------
+    {
+      name:
+        "boundaries_vs_overcommitment",
+
+      desires: [
+
+        "need boundaries",
+
+        "need space",
+
+        "need rest"
+      ],
+
+      behaviors: [
+
+        "say yes too often",
+
+        "overcommit",
+
+        "carry too much",
+
+        "take on everything"
+      ],
+
+      tension:
+        "boundary needs conflicting with overextension patterns",
+
+      category:
+        "valueBehaviorTension"
+    },
+
+
+    // --------------------------------------------
+    // Authenticity vs External Expectations
+    // --------------------------------------------
+    {
+      name:
+        "authenticity_vs_expectation",
+
+      desires: [
+
+        "be myself",
+
+        "feel authentic",
+
+        "want meaning"
+      ],
+
+      behaviors: [
+
+        "what people expect",
+
+        "supposed to",
+
+        "family expectations",
+
+        "need to prove myself"
+      ],
+
+      tension:
+        "internal authenticity conflicting with external pressure",
+
+      category:
+        "identityEnvironmentConflict"
+    },
+
+
+    // --------------------------------------------
+    // Recovery vs Performance Pressure
+    // --------------------------------------------
+    {
+      name:
+        "recovery_vs_performance",
+
+      desires: [
+
+        "need recovery",
+
+        "need rest",
+
+        "emotionally exhausted"
+      ],
+
+      behaviors: [
+
+        "can't slow down",
+
+        "always performing",
+
+        "people depend on me",
+
+        "can't fail"
+      ],
+
+      tension:
+        "recovery needs conflicting with performance pressure",
+
+      category:
+        "goalCapacityMismatch"
+    },
+
+
+    // --------------------------------------------
+    // Direction vs Fear
+    // --------------------------------------------
+    {
+      name:
+        "direction_vs_fear",
+
+      desires: [
+
+        "want to move forward",
+
+        "want change",
+
+        "want growth"
+      ],
+
+      behaviors: [
+
+        "stuck",
+
+        "conflicted",
+
+        "uncertain",
+
+        "torn between"
+      ],
+
+      tension:
+        "desire for movement conflicting with uncertainty or fear",
+
+      category:
+        "competingPriorities"
+    }
+  ];
+
+
+  // ------------------------------------------------
+  // Evaluate Rules
+  // ------------------------------------------------
+  for (
+    const rule
+    of contradictionRules
+  ) {
+
+    const desireMatched =
+      containsAny(
+        text,
+        rule.desires
+      );
+
+    const behaviorMatched =
+      containsAny(
+        text,
+        rule.behaviors
+      );
+
+
+    // --------------------------------------------
+    // Contradiction Detected
+    // --------------------------------------------
+    if (
+      desireMatched &&
+      behaviorMatched
+    ) {
+
+      detectedContradictions.push(
+        rule.name
+      );
+
+      themes.push(
+        rule.name.replaceAll(
+          "_",
+          " "
+        )
+      );
+
+      unresolvedTensions.push(
+        rule.tension
+      );
+
+
+      // ------------------------------------------
+      // Route Categories
+      // ------------------------------------------
+      routeContradiction({
+
+        category:
+          rule.category,
+
+        tension:
+          rule.tension,
+
+        valueBehaviorTension,
+
+        goalCapacityMismatch,
+
+        identityEnvironmentConflict,
+
+        competingPriorities
+      });
+    }
+  }
+
+
+  // ----------------------------------------------
+  // Friction Integration
+  // ----------------------------------------------
+  if (
+    frictionThemes.length >= 3
+  ) {
+
+    hiddenPressures.push(
+      "multiple simultaneous pressures"
+    );
+  }
+
+
+  // ----------------------------------------------
+  // Strength-Based Mitigation
+  // ----------------------------------------------
+  if (
+    strengths.length >= 3
+  ) {
+
+    hiddenPressures.push(
+      "existing reflective capacity present"
+    );
+  }
+
+
+  // ----------------------------------------------
+  // Build Reflective Summary
+  // ----------------------------------------------
+  const reflectiveSummary =
+    buildReflectiveSummary({
+
+      detectedContradictions,
+
+      unresolvedTensions
     });
 
 
   // ----------------------------------------------
-  // Run LLM analysis
-  // ----------------------------------------------
-  const response = await llm({
-
-    prompt,
-
-    maxTokens: 700
-  });
-
-
-  // ----------------------------------------------
-  // Parse structured response
-  // ----------------------------------------------
-  const parsed =
-    safelyParseContradictions(response);
-
-
-  // ----------------------------------------------
-  // Return structured contradictions
+  // Return Structured Contradictions
   // ----------------------------------------------
   return {
 
     themes:
-      parsed.themes || [],
+      unique(themes),
 
     valueBehaviorTension:
-      parsed.valueBehaviorTension || [],
+      unique(valueBehaviorTension),
 
     goalCapacityMismatch:
-      parsed.goalCapacityMismatch || [],
+      unique(goalCapacityMismatch),
 
     identityEnvironmentConflict:
-      parsed.identityEnvironmentConflict || [],
+      unique(identityEnvironmentConflict),
 
     competingPriorities:
-      parsed.competingPriorities || [],
+      unique(competingPriorities),
 
     hiddenPressures:
-      parsed.hiddenPressures || [],
+      unique(hiddenPressures),
 
     unresolvedTensions:
-      parsed.unresolvedTensions || [],
+      unique(unresolvedTensions),
 
-    reflectiveSummary:
-      parsed.reflectiveSummary || ""
+    reflectiveSummary
   };
 }
 
 
 // --------------------------------------------------
-// Prompt Builder
+// Route Contradictions
 // --------------------------------------------------
-function buildContradictionPrompt({
+function routeContradiction({
 
-  input,
+  category,
 
-  values = [],
+  tension,
 
-  goals = [],
+  valueBehaviorTension,
 
-  strengths = [],
+  goalCapacityMismatch,
 
-  frictionThemes = []
+  identityEnvironmentConflict,
+
+  competingPriorities
 
 }) {
 
-  return `
-You are TRUE AI.
+  // ----------------------------------------------
+  // Value vs Behavior
+  // ----------------------------------------------
+  if (
+    category === "valueBehaviorTension"
+  ) {
 
-You are identifying internal contradictions and tensions within a participant's life.
-
-Your role is to gently surface:
-- conflicting priorities
-- competing values
-- mismatches between goals and capacity
-- identity tension
-- environmental conflict
-- unsustainable expectations
-
-Do NOT:
-- shame participants
-- accuse participants
-- imply hypocrisy
-- over-pathologize
-- force certainty
-
-Recognize that contradictions are:
-- normal
-- human
-- often adaptive
-- frequently unconscious
-
-Use calm, reflective language.
-
-Avoid:
-- harsh language
-- self-help hype
-- productivity framing
-- black-and-white thinking
-
-Return ONLY valid JSON.
-
-Required JSON structure:
-
-{
-  "themes": [
-    "string"
-  ],
-
-  "valueBehaviorTension": [
-    "string"
-  ],
-
-  "goalCapacityMismatch": [
-    "string"
-  ],
-
-  "identityEnvironmentConflict": [
-    "string"
-  ],
-
-  "competingPriorities": [
-    "string"
-  ],
-
-  "hiddenPressures": [
-    "string"
-  ],
-
-  "unresolvedTensions": [
-    "string"
-  ],
-
-  "reflectiveSummary":
-    "string"
-}
-
-Participant Values:
-${JSON.stringify(values)}
-
-Participant Goals:
-${JSON.stringify(goals)}
-
-Known Strengths:
-${JSON.stringify(strengths)}
-
-Known Friction Themes:
-${JSON.stringify(frictionThemes)}
-
-Participant Input:
-"""
-${input}
-"""
-`;
-}
-
-
-// --------------------------------------------------
-// Safe JSON Parsing
-// --------------------------------------------------
-function safelyParseContradictions(response) {
-
-  try {
-
-    return JSON.parse(response);
-
-  } catch (err) {
-
-    console.error(
-      "Contradiction parsing error:",
-      err
+    valueBehaviorTension.push(
+      tension
     );
-
-    return {
-
-      themes: [],
-
-      valueBehaviorTension: [],
-
-      goalCapacityMismatch: [],
-
-      identityEnvironmentConflict: [],
-
-      competingPriorities: [],
-
-      hiddenPressures: [],
-
-      unresolvedTensions: [],
-
-      reflectiveSummary:
-        "Some internal tensions or competing pressures may be present, though additional reflection may help clarify them more fully."
-    };
   }
+
+
+  // ----------------------------------------------
+  // Goal vs Capacity
+  // ----------------------------------------------
+  if (
+    category === "goalCapacityMismatch"
+  ) {
+
+    goalCapacityMismatch.push(
+      tension
+    );
+  }
+
+
+  // ----------------------------------------------
+  // Identity vs Environment
+  // ----------------------------------------------
+  if (
+    category === "identityEnvironmentConflict"
+  ) {
+
+    identityEnvironmentConflict.push(
+      tension
+    );
+  }
+
+
+  // ----------------------------------------------
+  // Competing Priorities
+  // ----------------------------------------------
+  if (
+    category === "competingPriorities"
+  ) {
+
+    competingPriorities.push(
+      tension
+    );
+  }
+}
+
+
+// --------------------------------------------------
+// Reflective Summary Builder
+// --------------------------------------------------
+function buildReflectiveSummary({
+
+  detectedContradictions = [],
+
+  unresolvedTensions = []
+
+}) {
+
+  // ----------------------------------------------
+  // No Significant Tension
+  // ----------------------------------------------
+  if (
+    detectedContradictions.length === 0
+  ) {
+
+    return `
+Some competing needs or internal tensions may still be emerging, though no major contradiction patterns were strongly detected yet.
+`.trim();
+  }
+
+
+  // ----------------------------------------------
+  // Construct Summary
+  // ----------------------------------------------
+  return `
+Current reflection patterns suggest the presence of competing needs, pressures, or directional tensions.
+
+This does not imply hypocrisy or failure.
+
+Human beings frequently hold:
+- conflicting responsibilities
+- competing emotional needs
+- survival adaptations
+- overlapping priorities
+
+These tensions may simply indicate areas where additional clarity, recovery, boundaries, or sustainable restructuring could be supportive.
+`.trim();
+}
+
+
+// --------------------------------------------------
+// Utility — Contains Any
+// --------------------------------------------------
+function containsAny(
+
+  text = "",
+
+  phrases = []
+
+) {
+
+  return phrases.some(
+
+    phrase =>
+      text.includes(
+        phrase.toLowerCase()
+      )
+  );
+}
+
+
+// --------------------------------------------------
+// Utility — Unique Values
+// --------------------------------------------------
+function unique(arr = []) {
+
+  return [...new Set(arr)];
 }
