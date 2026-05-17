@@ -1,34 +1,32 @@
 // core/interpreter/upgradeAnalyzer.js
-// TRUE AI — Upgrade Analyzer
-
+// TRUE AI — Symbolic Upgrade Inference Engine
+//
+// PURPOSE
 // --------------------------------------------------
-// UPGRADE ANALYZER
-// --------------------------------------------------
-// Purpose:
-// Identify:
+// Infer:
+// - realistic upgrades
+// - sustainable movement
+// - supportive adjustments
+// - boundary reinforcement
+// - pacing support
+// - strength-leveraged movement
 //
-// - realistic growth priorities
-// - sustainable shifts
-// - mindset reframes
-// - boundary needs
-// - capacity-supportive adjustments
-// - strengths to leverage
-// - low-friction development paths
+// WITHOUT LLM DEPENDENCE.
 //
-// This analyzer is intentionally:
-// - reflective
-// - grounded
-// - non-performative
-// - sustainability-oriented
-//
-// Upgrades are NOT treated as:
-// - self-reinvention
-// - endless optimization
+// This is NOT:
+// - optimization coaching
+// - transformation pressure
 // - productivity escalation
 //
-// The goal is to help participants
-// identify realistic and aligned
-// next areas of growth.
+// Upgrades are treated as:
+// - sustainable adaptation
+// - supportive restructuring
+// - aligned movement
+// - low-friction evolution
+//
+// The goal is to infer:
+// realistic next-step possibilities
+// from symbolic state patterns.
 // --------------------------------------------------
 
 
@@ -45,14 +43,12 @@ export async function analyzeUpgradeAreas({
 
   friction = {},
 
-  contradictions = {},
-
-  llm
+  contradictions = {}
 
 }) {
 
   // ----------------------------------------------
-  // Extract participant context
+  // Extract Context
   // ----------------------------------------------
   const {
 
@@ -64,224 +60,377 @@ export async function analyzeUpgradeAreas({
 
 
   // ----------------------------------------------
-  // Build analysis prompt
+  // State Containers
   // ----------------------------------------------
-  const prompt =
-    buildUpgradePrompt({
+  const priorities = [];
 
-      input,
+  const mindsetShifts = [];
 
-      values,
+  const boundaryNeeds = [];
 
-      goals,
+  const sustainableAdjustments = [];
 
-      strengths,
+  const strengthsToLeverage = [];
 
-      friction,
+  const supportiveExperiments = [];
 
-      contradictions
+  const pacingRecommendations = [];
+
+
+  // ----------------------------------------------
+  // Extract Analyzer Outputs
+  // ----------------------------------------------
+  const detectedStrengths =
+    strengths?.detected || [];
+
+  const frictionThemes =
+    friction?.themes || [];
+
+  const contradictionThemes =
+    contradictions?.themes || [];
+
+  const overloadLevel =
+    friction?.overloadLevel || "moderate";
+
+
+  // ------------------------------------------------
+  // STRENGTH-LEVERAGED MOVEMENT
+  // ------------------------------------------------
+
+  if (
+    detectedStrengths.includes(
+      "self_awareness"
+    )
+  ) {
+
+    strengthsToLeverage.push(
+      "existing reflective awareness"
+    );
+
+    supportiveExperiments.push(
+      "structured self-reflection"
+    );
+  }
+
+
+  if (
+    detectedStrengths.includes(
+      "adaptability"
+    )
+  ) {
+
+    strengthsToLeverage.push(
+      "willingness to adjust"
+    );
+
+    supportiveExperiments.push(
+      "small sustainable changes"
+    );
+  }
+
+
+  if (
+    detectedStrengths.includes(
+      "relational_awareness"
+    )
+  ) {
+
+    strengthsToLeverage.push(
+      "interpersonal insight"
+    );
+
+    boundaryNeeds.push(
+      "relational boundary reinforcement"
+    );
+  }
+
+
+  // ------------------------------------------------
+  // FRICTION-INFORMED UPGRADES
+  // ------------------------------------------------
+
+  if (
+    frictionThemes.includes(
+      "overload"
+    )
+  ) {
+
+    priorities.push(
+      "capacity stabilization"
+    );
+
+    sustainableAdjustments.push(
+      "reduce chronic overextension"
+    );
+
+    pacingRecommendations.push(
+      "slower sustainable pacing"
+    );
+  }
+
+
+  if (
+    frictionThemes.includes(
+      "boundary_erosion"
+    )
+  ) {
+
+    priorities.push(
+      "boundary restoration"
+    );
+
+    boundaryNeeds.push(
+      "reduce emotional overextension"
+    );
+
+    supportiveExperiments.push(
+      "practice lower-stakes boundary setting"
+    );
+  }
+
+
+  if (
+    frictionThemes.includes(
+      "misalignment"
+    )
+  ) {
+
+    priorities.push(
+      "value realignment"
+    );
+
+    mindsetShifts.push(
+      "permission to reassess existing structures"
+    );
+  }
+
+
+  if (
+    frictionThemes.includes(
+      "uncertainty"
+    )
+  ) {
+
+    pacingRecommendations.push(
+      "avoid forced certainty"
+    );
+
+    supportiveExperiments.push(
+      "small exploratory movement"
+    );
+  }
+
+
+  // ------------------------------------------------
+  // CONTRADICTION-INFORMED INFERENCE
+  // ------------------------------------------------
+
+  if (
+    contradictionThemes.some(
+      theme =>
+        theme.includes("peace")
+    )
+  ) {
+
+    mindsetShifts.push(
+      "rest may be necessary rather than earned"
+    );
+
+    sustainableAdjustments.push(
+      "reduce unnecessary urgency"
+    );
+  }
+
+
+  if (
+    contradictionThemes.some(
+      theme =>
+        theme.includes("boundaries")
+    )
+  ) {
+
+    boundaryNeeds.push(
+      "greater protection of emotional capacity"
+    );
+  }
+
+
+  if (
+    contradictionThemes.some(
+      theme =>
+        theme.includes("authenticity")
+    )
+  ) {
+
+    mindsetShifts.push(
+      "external expectations may deserve reevaluation"
+    );
+  }
+
+
+  if (
+    contradictionThemes.some(
+      theme =>
+        theme.includes("recovery")
+    )
+  ) {
+
+    pacingRecommendations.push(
+      "recovery may need structural protection"
+    );
+  }
+
+
+  // ------------------------------------------------
+  // OVERLOAD ADJUSTMENTS
+  // ------------------------------------------------
+
+  if (
+    overloadLevel === "high"
+  ) {
+
+    priorities.unshift(
+      "capacity recovery"
+    );
+
+    pacingRecommendations.unshift(
+      "avoid escalation"
+    );
+
+    sustainableAdjustments.push(
+      "increase recovery space"
+    );
+  }
+
+
+  // ------------------------------------------------
+  // Goal-Based Support
+  // ------------------------------------------------
+
+  if (
+    goals.length >= 3
+  ) {
+
+    supportiveExperiments.push(
+      "prioritize fewer simultaneous goals"
+    );
+  }
+
+
+  // ------------------------------------------------
+  // Value-Based Support
+  // ------------------------------------------------
+
+  if (
+    values.length >= 3
+  ) {
+
+    mindsetShifts.push(
+      "alignment may matter more than optimization"
+    );
+  }
+
+
+  // ------------------------------------------------
+  // Build Reflective Summary
+  // ------------------------------------------------
+  const reflectiveSummary =
+    buildReflectiveSummary({
+
+      priorities,
+
+      overloadLevel,
+
+      strengthsToLeverage
     });
 
 
-  // ----------------------------------------------
-  // Run LLM analysis
-  // ----------------------------------------------
-  const response = await llm({
-
-    prompt,
-
-    maxTokens: 750
-  });
-
-
-  // ----------------------------------------------
-  // Parse structured response
-  // ----------------------------------------------
-  const parsed =
-    safelyParseUpgrades(response);
-
-
-  // ----------------------------------------------
-  // Return structured upgrade analysis
-  // ----------------------------------------------
+  // ------------------------------------------------
+  // Return Structured Upgrade Inference
+  // ------------------------------------------------
   return {
 
     priorities:
-      parsed.priorities || [],
+      unique(priorities),
 
     mindsetShifts:
-      parsed.mindsetShifts || [],
+      unique(mindsetShifts),
 
     boundaryNeeds:
-      parsed.boundaryNeeds || [],
+      unique(boundaryNeeds),
 
     sustainableAdjustments:
-      parsed.sustainableAdjustments || [],
+      unique(sustainableAdjustments),
 
     strengthsToLeverage:
-      parsed.strengthsToLeverage || [],
+      unique(strengthsToLeverage),
 
     supportiveExperiments:
-      parsed.supportiveExperiments || [],
+      unique(supportiveExperiments),
 
     pacingRecommendations:
-      parsed.pacingRecommendations || [],
+      unique(pacingRecommendations),
 
-    reflectiveSummary:
-      parsed.reflectiveSummary || ""
+    reflectiveSummary
   };
 }
 
 
 // --------------------------------------------------
-// Prompt Builder
+// Reflective Summary Builder
 // --------------------------------------------------
-function buildUpgradePrompt({
+function buildReflectiveSummary({
 
-  input,
+  priorities = [],
 
-  values = [],
+  overloadLevel = "moderate",
 
-  goals = [],
-
-  strengths = {},
-
-  friction = {},
-
-  contradictions = {}
+  strengthsToLeverage = []
 
 }) {
 
-  return `
-You are TRUE AI.
+  // ----------------------------------------------
+  // Low Directionality
+  // ----------------------------------------------
+  if (
+    priorities.length === 0
+  ) {
 
-You are identifying potential upgrade areas within a participant's life.
+    return `
+Some possible areas for sustainable adjustment or reflection may still be emerging.
 
-Your role is to gently identify:
-- realistic growth priorities
-- sustainable behavioral shifts
-- mindset reframes
-- boundary development
-- supportive adjustments
-- strengths that may support growth
-- low-friction next steps
-
-Do NOT:
-- pressure transformation
-- encourage over-optimization
-- imply participants must reinvent themselves
-- use hustle culture language
-- generate aggressive action plans
-
-Recognize that:
-- sustainable growth matters
-- pacing matters
-- capacity matters
-- rest matters
-- small shifts can be meaningful
-
-Use calm, grounded, reflective language.
-
-Avoid:
-- productivity obsession
-- exaggerated positivity
-- rigid self-help framing
-- perfectionistic expectations
-
-Return ONLY valid JSON.
-
-Required JSON structure:
-
-{
-  "priorities": [
-    "string"
-  ],
-
-  "mindsetShifts": [
-    "string"
-  ],
-
-  "boundaryNeeds": [
-    "string"
-  ],
-
-  "sustainableAdjustments": [
-    "string"
-  ],
-
-  "strengthsToLeverage": [
-    "string"
-  ],
-
-  "supportiveExperiments": [
-    "string"
-  ],
-
-  "pacingRecommendations": [
-    "string"
-  ],
-
-  "reflectiveSummary":
-    "string"
-}
-
-Participant Values:
-${JSON.stringify(values)}
-
-Participant Goals:
-${JSON.stringify(goals)}
-
-Strength Analysis:
-${JSON.stringify(strengths)}
-
-Friction Analysis:
-${JSON.stringify(friction)}
-
-Contradiction Analysis:
-${JSON.stringify(contradictions)}
-
-Participant Input:
-"""
-${input}
-"""
-`;
-}
-
-
-// --------------------------------------------------
-// Safe JSON Parsing
-// --------------------------------------------------
-function safelyParseUpgrades(response) {
-
-  try {
-
-    return JSON.parse(response);
-
-  } catch (err) {
-
-    console.error(
-      "Upgrade parsing error:",
-      err
-    );
-
-    return {
-
-      priorities: [],
-
-      mindsetShifts: [],
-
-      boundaryNeeds: [],
-
-      sustainableAdjustments: [],
-
-      strengthsToLeverage: [],
-
-      supportiveExperiments: [],
-
-      pacingRecommendations: [],
-
-      reflectiveSummary:
-        "Several possible growth areas may be emerging, though additional reflection may help clarify what feels most aligned and sustainable."
-    };
+Meaningful growth does not always require immediate action or major reinvention.
+`.trim();
   }
+
+
+  // ----------------------------------------------
+  // Construct Reflective Summary
+  // ----------------------------------------------
+  return `
+Current reflection patterns suggest several possible opportunities for more sustainable movement and supportive adjustment.
+
+These are not prescriptions or requirements.
+
+Instead, they may represent areas where:
+- pacing
+- boundaries
+- recovery
+- alignment
+- realistic expectations
+- existing strengths
+
+could be leveraged more intentionally.
+
+Current overload level appears ${overloadLevel}, which may influence what feels sustainably manageable right now.
+`.trim();
+}
+
+
+// --------------------------------------------------
+// Utility — Unique Values
+// --------------------------------------------------
+function unique(arr = []) {
+
+  return [...new Set(arr)];
 }
