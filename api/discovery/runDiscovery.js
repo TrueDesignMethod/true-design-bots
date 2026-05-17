@@ -481,28 +481,28 @@ const updatedParticipantState = {
   strengthsState:
     strengths,
 
- frictionState: {
+   frictionState: {
 
-  active:
-    friction?.themes || [],
+    active:
+      friction?.themes || [],
 
-  recurring:
+    recurring:
 
-    mergeUnique([
+      mergeUnique([
 
-      ...(previousState
+        ...(previousState
+          ?.frictionState
+          ?.recurring || []),
+
+        ...(friction?.themes || [])
+      ]),
+
+    resolved:
+
+      previousState
         ?.frictionState
-        ?.recurring || []),
-
-      ...(friction?.themes || [])
-    ]),
-
-  resolved:
-
-    previousState
-      ?.frictionState
-      ?.resolved || []
-},
+        ?.resolved || []
+  },
 
   contradictionState:
     contradictions,
@@ -534,10 +534,9 @@ const updatedParticipantState = {
           Date.now(),
 
         synthesis
-      }
-
+      }    
     ], 25)
-},
+  },
 
   // ----------------------------------------------
   // Longitudinal Structures
