@@ -1,43 +1,44 @@
 // core/interpreter/capacityAnalyzer.js
-// TRUE AI — Capacity Analyzer
-
-// --------------------------------------------------
-// CAPACITY ANALYZER
-// --------------------------------------------------
-// Purpose:
-// Identify:
+// TRUE AI — Symbolic Capacity Analyzer
 //
+// PURPOSE
+// --------------------------------------------------
+// Estimate:
 // - emotional bandwidth
 // - cognitive load
 // - recovery capacity
+// - sustainability pressure
 // - environmental strain
-// - support availability
-// - sustainability limits
-// - pacing concerns
+// - pacing needs
 //
-// This analyzer is intentionally:
-// - reflective
-// - non-shaming
-// - non-diagnostic
-// - sustainability-oriented
+// WITHOUT LLM DEPENDENCE.
 //
-// Capacity is NOT treated as:
-// - worth
-// - ambition
-// - intelligence
-// - moral discipline
+// This analyzer functions as a:
+// symbolic state estimator
 //
-// Human capacity changes across:
-// - seasons
-// - environments
-// - responsibilities
-// - emotional conditions
+// using:
+// - overload language
+// - exhaustion indicators
+// - pacing signals
+// - fragmentation patterns
+// - recovery awareness
 //
-// The goal is to help participants
-// realistically understand what
-// their current life structure
-// can sustainably support.
+// Capacity is treated as:
+// contextual
+// dynamic
+// human
+// environmentally influenced
+//
+// NOT:
+// moral worth
+// productivity
+// discipline
+// ambition
 // --------------------------------------------------
+
+import frictionWeights
+  from "../../data/scoring/frictionWeights.json"
+  assert { type: "json" };
 
 
 // --------------------------------------------------
@@ -47,20 +48,18 @@ export async function analyzeCapacity({
 
   input = "",
 
-  participantProfile = {},
-
-  llm
+  participantProfile = {}
 
 }) {
 
+  const text =
+    input.toLowerCase();
+
+
   // ----------------------------------------------
-  // Extract participant context
+  // Extract Participant Context
   // ----------------------------------------------
   const {
-
-    values = [],
-
-    goals = [],
 
     frictionThemes = [],
 
@@ -70,225 +69,449 @@ export async function analyzeCapacity({
 
 
   // ----------------------------------------------
-  // Build analysis prompt
+  // State Containers
   // ----------------------------------------------
-  const prompt =
-    buildCapacityPrompt({
+  let capacityScore = 0;
 
-      input,
+  const emotionalBandwidth = [];
 
-      values,
+  const cognitiveLoad = [];
 
-      goals,
+  const environmentalStrain = [];
 
-      frictionThemes,
+  const recoveryChallenges = [];
 
-      strengths
-    });
+  const supportFactors = [];
+
+  const sustainabilityConcerns = [];
+
+  const pacingConsiderations = [];
+
+  const detectedSignals = [];
 
 
   // ----------------------------------------------
-  // Run LLM analysis
+  // Detect Overload Signals
   // ----------------------------------------------
-  const response = await llm({
+  processCategory({
 
-    prompt,
+    text,
 
-    maxTokens: 700
+    category:
+      frictionWeights.categories.overload,
+
+    categoryName:
+      "overload",
+
+    detectedSignals,
+
+    onMatch: () => {
+
+      capacityScore += 3;
+
+      emotionalBandwidth.push(
+        "reduced emotional reserve"
+      );
+
+      cognitiveLoad.push(
+        "ongoing pressure accumulation"
+      );
+
+      sustainabilityConcerns.push(
+        "extended overload exposure"
+      );
+    }
   });
 
 
   // ----------------------------------------------
-  // Parse structured response
+  // Detect Emotional Fatigue
   // ----------------------------------------------
-  const parsed =
-    safelyParseCapacity(response);
+  processCategory({
+
+    text,
+
+    category:
+      frictionWeights.categories.emotional_fatigue,
+
+    categoryName:
+      "emotional_fatigue",
+
+    detectedSignals,
+
+    onMatch: () => {
+
+      capacityScore += 4;
+
+      emotionalBandwidth.push(
+        "emotional depletion"
+      );
+
+      recoveryChallenges.push(
+        "insufficient emotional recovery"
+      );
+
+      pacingConsiderations.push(
+        "slower pacing may be supportive"
+      );
+    }
+  });
 
 
   // ----------------------------------------------
-  // Return structured capacity
+  // Detect Boundary Erosion
+  // ----------------------------------------------
+  processCategory({
+
+    text,
+
+    category:
+      frictionWeights.categories.boundary_erosion,
+
+    categoryName:
+      "boundary_erosion",
+
+    detectedSignals,
+
+    onMatch: () => {
+
+      capacityScore += 2;
+
+      sustainabilityConcerns.push(
+        "overextension risk"
+      );
+
+      pacingConsiderations.push(
+        "boundary reinforcement may help"
+      );
+    }
+  });
+
+
+  // ----------------------------------------------
+  // Detect Identity Pressure
+  // ----------------------------------------------
+  processCategory({
+
+    text,
+
+    category:
+      frictionWeights.categories.identity_pressure,
+
+    categoryName:
+      "identity_pressure",
+
+    detectedSignals,
+
+    onMatch: () => {
+
+      capacityScore += 2;
+
+      cognitiveLoad.push(
+        "performance-related strain"
+      );
+
+      emotionalBandwidth.push(
+        "persistent internal pressure"
+      );
+    }
+  });
+
+
+  // ----------------------------------------------
+  // Detect Environmental Strain
+  // ----------------------------------------------
+  if (
+    frictionThemes.length >= 3
+  ) {
+
+    environmentalStrain.push(
+      "multiple active pressure sources"
+    );
+
+    capacityScore += 2;
+  }
+
+
+  // ----------------------------------------------
+  // Detect Existing Strengths
+  // ----------------------------------------------
+  if (
+    strengths.length >= 3
+  ) {
+
+    supportFactors.push(
+      "existing internal resilience"
+    );
+
+    supportFactors.push(
+      "reflective self-awareness"
+    );
+  }
+
+
+  // ----------------------------------------------
+  // Recovery Language Detection
+  // ----------------------------------------------
+  const recoveryIndicators = [
+
+    "rest",
+
+    "recover",
+
+    "slow down",
+
+    "space",
+
+    "balance",
+
+    "pause"
+  ];
+
+
+  for (
+    const term
+    of recoveryIndicators
+  ) {
+
+    if (
+      text.includes(term)
+    ) {
+
+      recoveryChallenges.push(
+        "recovery needs acknowledged"
+      );
+
+      pacingConsiderations.push(
+        "restorative pacing awareness"
+      );
+
+      break;
+    }
+  }
+
+
+  // ----------------------------------------------
+  // Determine Overall Capacity
+  // ----------------------------------------------
+  let overallCapacity =
+    "stable";
+
+
+  if (capacityScore >= 10) {
+
+    overallCapacity =
+      "low";
+
+  } else if (capacityScore >= 6) {
+
+    overallCapacity =
+      "moderate";
+
+  } else if (
+
+    supportFactors.length >= 2
+
+  ) {
+
+    overallCapacity =
+      "supported";
+  }
+
+
+  // ----------------------------------------------
+  // Build Reflective Summary
+  // ----------------------------------------------
+  const reflectiveSummary =
+    buildReflectiveSummary({
+
+      overallCapacity,
+
+      detectedSignals,
+
+      sustainabilityConcerns
+    });
+
+
+  // ----------------------------------------------
+  // Return Structured Capacity
   // ----------------------------------------------
   return {
 
-    overallCapacity:
-      parsed.overallCapacity || "moderate",
+    overallCapacity,
 
     emotionalBandwidth:
-      parsed.emotionalBandwidth || [],
+      unique(emotionalBandwidth),
 
     cognitiveLoad:
-      parsed.cognitiveLoad || [],
+      unique(cognitiveLoad),
 
     environmentalStrain:
-      parsed.environmentalStrain || [],
+      unique(environmentalStrain),
 
     recoveryChallenges:
-      parsed.recoveryChallenges || [],
+      unique(recoveryChallenges),
 
     supportFactors:
-      parsed.supportFactors || [],
+      unique(supportFactors),
 
     sustainabilityConcerns:
-      parsed.sustainabilityConcerns || [],
+      unique(sustainabilityConcerns),
 
     pacingConsiderations:
-      parsed.pacingConsiderations || [],
+      unique(pacingConsiderations),
 
-    reflectiveSummary:
-      parsed.reflectiveSummary || ""
+    reflectiveSummary,
+
+    capacityScore
   };
 }
 
 
 // --------------------------------------------------
-// Prompt Builder
+// Process Category
 // --------------------------------------------------
-function buildCapacityPrompt({
+function processCategory({
 
-  input,
+  text,
 
-  values = [],
+  category,
 
-  goals = [],
+  categoryName,
 
-  frictionThemes = [],
+  detectedSignals,
 
-  strengths = []
+  onMatch
 
 }) {
 
-  return `
-You are TRUE AI.
-
-You are analyzing participant capacity.
-
-Your role is to gently identify:
-- emotional bandwidth
-- cognitive load
-- environmental strain
-- recovery limitations
-- support systems
-- sustainability concerns
-- pacing considerations
-
-Do NOT:
-- shame participants
-- imply laziness
-- frame exhaustion as failure
-- glorify overwork
-- encourage over-optimization
-
-Recognize that:
-- capacity fluctuates
-- overload is often contextual
-- sustainable pacing matters
-- recovery is important
-- environmental pressure is real
-
-Use calm, grounded language.
-
-Avoid:
-- hustle culture language
-- productivity obsession
-- rigid motivational framing
-- exaggerated positivity
-
-Return ONLY valid JSON.
-
-Required JSON structure:
-
-{
-  "overallCapacity":
-    "low | moderate | stable | supported",
-
-  "emotionalBandwidth": [
-    "string"
-  ],
-
-  "cognitiveLoad": [
-    "string"
-  ],
-
-  "environmentalStrain": [
-    "string"
-  ],
-
-  "recoveryChallenges": [
-    "string"
-  ],
-
-  "supportFactors": [
-    "string"
-  ],
-
-  "sustainabilityConcerns": [
-    "string"
-  ],
-
-  "pacingConsiderations": [
-    "string"
-  ],
-
-  "reflectiveSummary":
-    "string"
-}
-
-Participant Values:
-${JSON.stringify(values)}
-
-Participant Goals:
-${JSON.stringify(goals)}
-
-Known Friction Themes:
-${JSON.stringify(frictionThemes)}
-
-Known Strengths:
-${JSON.stringify(strengths)}
-
-Participant Input:
-"""
-${input}
-"""
-`;
-}
-
-
-// --------------------------------------------------
-// Safe JSON Parsing
-// --------------------------------------------------
-function safelyParseCapacity(response) {
-
-  try {
-
-    return JSON.parse(response);
-
-  } catch (err) {
-
-    console.error(
-      "Capacity parsing error:",
-      err
-    );
-
-    return {
-
-      overallCapacity: "moderate",
-
-      emotionalBandwidth: [],
-
-      cognitiveLoad: [],
-
-      environmentalStrain: [],
-
-      recoveryChallenges: [],
-
-      supportFactors: [],
-
-      sustainabilityConcerns: [],
-
-      pacingConsiderations: [],
-
-      reflectiveSummary:
-        "Some capacity pressures or sustainability considerations may be present, though additional reflection may help clarify them further."
-    };
+  if (!category) {
+    return;
   }
+
+
+  let matchedCount = 0;
+
+
+  for (
+    const signal
+    of category.signals
+  ) {
+
+    for (
+      const example
+      of signal.examples
+    ) {
+
+      if (
+        text.includes(
+          example.toLowerCase()
+        )
+      ) {
+
+        matchedCount++;
+
+        detectedSignals.push({
+
+          category:
+            categoryName,
+
+          signal:
+            signal.name,
+
+          matchedExample:
+            example
+        });
+      }
+    }
+  }
+
+
+  // ----------------------------------------------
+  // Minimum Threshold
+  // ----------------------------------------------
+  if (matchedCount >= 1) {
+
+    onMatch();
+  }
+}
+
+
+// --------------------------------------------------
+// Reflective Summary Builder
+// --------------------------------------------------
+function buildReflectiveSummary({
+
+  overallCapacity,
+
+  detectedSignals = [],
+
+  sustainabilityConcerns = []
+
+}) {
+
+  // ----------------------------------------------
+  // Supported
+  // ----------------------------------------------
+  if (
+    overallCapacity === "supported"
+  ) {
+
+    return `
+Current reflection patterns suggest the presence of several supportive internal resources and some awareness of sustainable pacing.
+
+This does not eliminate challenge or strain, though it may indicate that meaningful support structures or adaptive capacities are present.
+`.trim();
+  }
+
+
+  // ----------------------------------------------
+  // Low Capacity
+  // ----------------------------------------------
+  if (
+    overallCapacity === "low"
+  ) {
+
+    return `
+Current reflection patterns suggest significant pressure on emotional or cognitive capacity.
+
+This does not imply weakness or failure.
+
+Instead, it may indicate that current responsibilities, emotional demands, or environmental pressures are exceeding what feels sustainably manageable right now.
+`.trim();
+  }
+
+
+  // ----------------------------------------------
+  // Moderate Capacity
+  // ----------------------------------------------
+  if (
+    overallCapacity === "moderate"
+  ) {
+
+    return `
+Current reflection patterns suggest a mixture of functioning capacity and ongoing strain.
+
+Some areas may still feel manageable, while others may benefit from additional recovery, pacing, support, or boundary protection.
+`.trim();
+  }
+
+
+  // ----------------------------------------------
+  // Stable Capacity
+  // ----------------------------------------------
+  return `
+Current reflection patterns suggest relatively stable capacity overall, though some sustainability considerations or pressure points may still be present.
+
+Human capacity naturally fluctuates across seasons, environments, and responsibilities.
+`.trim();
+}
+
+
+// --------------------------------------------------
+// Utility — Unique Values
+// --------------------------------------------------
+function unique(arr = []) {
+
+  return [...new Set(arr)];
 }
