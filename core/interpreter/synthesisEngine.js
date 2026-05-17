@@ -1,36 +1,30 @@
 // core/interpreter/synthesisEngine.js
-// TRUE AI — Discovery Synthesis Engine
-
-// --------------------------------------------------
-// SYNTHESIS ENGINE
-// --------------------------------------------------
-// Purpose:
-// Integrate:
+// TRUE AI — Symbolic Discovery Synthesis Engine
 //
-// - alignment patterns
+// PURPOSE
+// --------------------------------------------------
+// Aggregate:
 // - strengths
 // - friction
 // - contradictions
-// - capacity realities
-// - upgrade opportunities
+// - alignment
+// - capacity
+// - upgrade signals
 //
-// into a coherent reflective synthesis.
+// into a coherent symbolic state.
 //
-// This engine is intentionally:
-// - integrative
-// - emotionally grounded
-// - non-diagnostic
-// - non-performative
+// WITHOUT LLM DEPENDENCE.
 //
-// The goal is NOT to:
-// - summarize mechanically
-// - flatten complexity
-// - create identity labels
+// This engine acts as:
+// - a state integrator
+// - readiness estimator
+// - sustainability synthesizer
+// - symbolic cognition layer
 //
-// The goal is to:
-// help participants feel more clearly
-// understood while preserving nuance,
-// agency, and emotional safety.
+// OUTPUT:
+// structured state JSON
+//
+// NOT prose.
 // --------------------------------------------------
 
 
@@ -49,19 +43,85 @@ export async function synthesizeDiscovery({
 
   contradictions = {},
 
-  upgrades = {},
-
-  llm
+  upgrades = {}
 
 }) {
 
   // ----------------------------------------------
-  // Build synthesis prompt
+  // Extract Core Signals
   // ----------------------------------------------
-  const prompt =
-    buildSynthesisPrompt({
+  const dominantStrengths =
+    strengths?.detected || [];
+
+  const dominantFriction =
+    friction?.themes || [];
+
+  const dominantContradictions =
+    contradictions?.themes || [];
+
+  const upgradePriorities =
+    upgrades?.priorities || [];
+
+
+  // ----------------------------------------------
+  // Aggregate Tensions
+  // ----------------------------------------------
+  const primaryTensions = [
+
+    ...(contradictions
+      ?.unresolvedTensions || []),
+
+    ...(alignment
+      ?.tensions || [])
+
+  ];
+
+
+  // ----------------------------------------------
+  // Aggregate Sustainability
+  // ----------------------------------------------
+  const sustainabilityConsiderations = [
+
+    ...(capacity
+      ?.sustainabilityConcerns || []),
+
+    ...(friction
+      ?.sustainabilityRisks || [])
+
+  ];
+
+
+  // ----------------------------------------------
+  // Determine Alignment State
+  // ----------------------------------------------
+  const alignmentState =
+    determineAlignmentState({
 
       alignment,
+
+      friction,
+
+      contradictions
+    });
+
+
+  // ----------------------------------------------
+  // Determine Sustainability Risk
+  // ----------------------------------------------
+  const sustainabilityRisk =
+    determineSustainabilityRisk({
+
+      friction,
+
+      capacity
+    });
+
+
+  // ----------------------------------------------
+  // Determine Readiness
+  // ----------------------------------------------
+  const readinessLevel =
+    determineReadiness({
 
       strengths,
 
@@ -71,205 +131,305 @@ export async function synthesizeDiscovery({
 
       contradictions,
 
-      upgrades
+      alignment
     });
 
 
   // ----------------------------------------------
-  // Run synthesis generation
+  // Determine Dominant Themes
   // ----------------------------------------------
-  const response = await llm({
+  const dominantThemes =
+    rankThemes([
 
-    prompt,
+      ...dominantStrengths,
 
-    maxTokens: 1000
-  });
+      ...dominantFriction,
 
+      ...dominantContradictions
 
-  // ----------------------------------------------
-  // Parse structured synthesis
-  // ----------------------------------------------
-  const parsed =
-    safelyParseSynthesis(response);
+    ]);
 
 
   // ----------------------------------------------
-  // Return structured synthesis
+  // Return Structured Synthesis
   // ----------------------------------------------
   return {
 
-    dominantThemes:
-      parsed.dominantThemes || [],
+    dominantThemes,
+
+    dominantStrengths,
+
+    dominantFriction,
+
+    dominantContradictions,
 
     primaryTensions:
-      parsed.primaryTensions || [],
+      unique(primaryTensions),
 
     supportiveStrengths:
-      parsed.supportiveStrengths || [],
+      dominantStrengths,
 
     sustainabilityConsiderations:
-      parsed.sustainabilityConsiderations || [],
+      unique(
+        sustainabilityConsiderations
+      ),
 
     upgradePriorities:
-      parsed.upgradePriorities || [],
+      unique(upgradePriorities),
 
-    readinessLevel:
-      parsed.readinessLevel || "emerging",
+    readinessLevel,
 
-    reflectiveNarrative:
-      parsed.reflectiveNarrative || ""
+    sustainabilityRisk,
+
+    alignmentState
   };
 }
 
 
 // --------------------------------------------------
-// Prompt Builder
+// Determine Alignment State
 // --------------------------------------------------
-function buildSynthesisPrompt({
+function determineAlignmentState({
 
-  alignment,
+  alignment = {},
 
-  strengths,
+  friction = {},
 
-  friction,
-
-  capacity,
-
-  contradictions,
-
-  upgrades
+  contradictions = {}
 
 }) {
 
-  return `
-You are TRUE AI.
+  const alignmentLevel =
+    alignment?.overallAlignment
+    || "mixed";
 
-You are synthesizing reflective insights into a coherent understanding of a participant's current state.
+  const contradictionCount =
+    contradictions?.themes
+      ?.length || 0;
 
-Your role is to integrate:
-- strengths
-- friction
-- contradictions
-- capacity realities
-- alignment patterns
-- growth priorities
-
-into a grounded, emotionally intelligent synthesis.
-
-Do NOT:
-- diagnose
-- reduce the participant to labels
-- over-simplify complexity
-- force certainty
-- exaggerate positivity
-- create dramatic transformation narratives
-
-Recognize that:
-- human beings are nuanced
-- tension is normal
-- contradictions are human
-- growth requires sustainability
-- clarity often emerges gradually
-
-Your tone should feel:
-- calm
-- thoughtful
-- emotionally safe
-- reflective
-- grounded
-
-Avoid:
-- corporate coaching language
-- hustle culture framing
-- pseudo-spiritual language
-- exaggerated encouragement
-- rigid self-help rhetoric
-
-Return ONLY valid JSON.
-
-Required JSON structure:
-
-{
-  "dominantThemes": [
-    "string"
-  ],
-
-  "primaryTensions": [
-    "string"
-  ],
-
-  "supportiveStrengths": [
-    "string"
-  ],
-
-  "sustainabilityConsiderations": [
-    "string"
-  ],
-
-  "upgradePriorities": [
-    "string"
-  ],
-
-  "readinessLevel":
-    "emerging | developing | stabilizing | ready",
-
-  "reflectiveNarrative":
-    "string"
-}
-
-Alignment Analysis:
-${JSON.stringify(alignment)}
-
-Strength Analysis:
-${JSON.stringify(strengths)}
-
-Friction Analysis:
-${JSON.stringify(friction)}
-
-Capacity Analysis:
-${JSON.stringify(capacity)}
-
-Contradiction Analysis:
-${JSON.stringify(contradictions)}
-
-Upgrade Analysis:
-${JSON.stringify(upgrades)}
-`;
-}
+  const frictionCount =
+    friction?.themes
+      ?.length || 0;
 
 
-// --------------------------------------------------
-// Safe JSON Parsing
-// --------------------------------------------------
-function safelyParseSynthesis(response) {
+  // ----------------------------------------------
+  // Strong Alignment
+  // ----------------------------------------------
+  if (
 
-  try {
+    alignmentLevel === "strong"
 
-    return JSON.parse(response);
+    && contradictionCount <= 1
 
-  } catch (err) {
+    && frictionCount <= 2
 
-    console.error(
-      "Synthesis parsing error:",
-      err
-    );
+  ) {
 
-    return {
-
-      dominantThemes: [],
-
-      primaryTensions: [],
-
-      supportiveStrengths: [],
-
-      sustainabilityConsiderations: [],
-
-      upgradePriorities: [],
-
-      readinessLevel: "emerging",
-
-      reflectiveNarrative:
-        "Several meaningful patterns may be emerging, though additional reflection may help bring greater clarity and coherence over time."
-    };
+    return "coherent";
   }
+
+
+  // ----------------------------------------------
+  // Fragmented
+  // ----------------------------------------------
+  if (
+
+    contradictionCount >= 3
+
+    || frictionCount >= 4
+
+  ) {
+
+    return "fragmented";
+  }
+
+
+  // ----------------------------------------------
+  // Transitional
+  // ----------------------------------------------
+  if (
+
+    alignmentLevel === "emerging"
+
+  ) {
+
+    return "transitional";
+  }
+
+
+  return "mixed";
+}
+
+
+// --------------------------------------------------
+// Determine Sustainability Risk
+// --------------------------------------------------
+function determineSustainabilityRisk({
+
+  friction = {},
+
+  capacity = {}
+
+}) {
+
+  const overloadLevel =
+    friction?.overloadLevel
+    || "moderate";
+
+  const overallCapacity =
+    capacity?.overallCapacity
+    || "moderate";
+
+
+  // ----------------------------------------------
+  // High Risk
+  // ----------------------------------------------
+  if (
+
+    overloadLevel === "high"
+
+    || overallCapacity === "low"
+
+  ) {
+
+    return "high";
+  }
+
+
+  // ----------------------------------------------
+  // Moderate Risk
+  // ----------------------------------------------
+  if (
+
+    overloadLevel === "moderate"
+
+    || overallCapacity === "moderate"
+
+  ) {
+
+    return "moderate";
+  }
+
+
+  return "stable";
+}
+
+
+// --------------------------------------------------
+// Determine Readiness
+// --------------------------------------------------
+function determineReadiness({
+
+  strengths = {},
+
+  friction = {},
+
+  capacity = {},
+
+  contradictions = {},
+
+  alignment = {}
+
+}) {
+
+  const strengthCount =
+    strengths?.detected
+      ?.length || 0;
+
+  const contradictionCount =
+    contradictions?.themes
+      ?.length || 0;
+
+  const alignmentLevel =
+    alignment?.overallAlignment
+    || "mixed";
+
+  const capacityLevel =
+    capacity?.overallCapacity
+    || "moderate";
+
+
+  // ----------------------------------------------
+  // Ready
+  // ----------------------------------------------
+  if (
+
+    strengthCount >= 4
+
+    && alignmentLevel === "strong"
+
+    && capacityLevel !== "low"
+
+    && contradictionCount <= 1
+
+  ) {
+
+    return "ready";
+  }
+
+
+  // ----------------------------------------------
+  // Stabilizing
+  // ----------------------------------------------
+  if (
+
+    strengthCount >= 3
+
+    && capacityLevel !== "low"
+
+  ) {
+
+    return "stabilizing";
+  }
+
+
+  // ----------------------------------------------
+  // Developing
+  // ----------------------------------------------
+  if (
+
+    strengthCount >= 2
+
+  ) {
+
+    return "developing";
+  }
+
+
+  return "emerging";
+}
+
+
+// --------------------------------------------------
+// Rank Themes
+// --------------------------------------------------
+function rankThemes(themes = []) {
+
+  const counts = {};
+
+
+  for (
+    const theme
+    of themes
+  ) {
+
+    counts[theme] =
+      (counts[theme] || 0) + 1;
+  }
+
+
+  return Object.entries(counts)
+
+    .sort((a, b) => b[1] - a[1])
+
+    .map(([theme]) => theme);
+}
+
+
+// --------------------------------------------------
+// Utility — Unique Values
+// --------------------------------------------------
+function unique(arr = []) {
+
+  return [...new Set(arr)];
 }
