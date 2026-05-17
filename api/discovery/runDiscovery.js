@@ -516,26 +516,26 @@ const updatedParticipantState = {
   upgradeState:
     upgrades,
 
-  synthesisState: {
+    synthesisState: {
 
-  current:
-    synthesis,
+    current:
+      synthesis,
 
-  historical:
-    limitHistory([
+    historical:
+      limitHistory([
 
-      ...(previousState
-        ?.synthesisState
-        ?.historical || []),
+        ...(previousState
+          ?.synthesisState
+          ?.historical || []),
 
-      {
+        {
+          timestamp:
+            Date.now(),
 
-        timestamp:
-          Date.now(),
+          synthesis
+        }
 
-        synthesis
-      }    
-    ], 25)
+      ], 25)
   },
 
   // ----------------------------------------------
