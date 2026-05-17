@@ -1,22 +1,5 @@
 // api/discovery/runDiscovery.js
-// TRUE AI — Optimized Discovery Orchestrator
-//
-// ARCHITECTURE GOALS
-// --------------------------------------------------
-// FAST conversational interaction
-// lightweight local analysis
-// deferred LifePrint generation
-// minimal LLM usage
-//
-// LLM is ONLY used for:
-// - conversational reflection
-// - optional final LifePrint generation
-//
-// All analyzers should ideally become:
-// - local scoring systems
-// - heuristic interpreters
-// - weighted pattern detectors
-// --------------------------------------------------
+// TRUE AI — Symbolic Discovery Orchestrator
 
 import { STATES }
   from "../chat/router.js";
@@ -33,7 +16,7 @@ import {
 
 
 // --------------------------------------------------
-// Lightweight Local Analyzers
+// Symbolic Interpreters
 // --------------------------------------------------
 
 import { analyzeAlignment }
@@ -59,7 +42,7 @@ import { synthesizeDiscovery }
 
 
 // --------------------------------------------------
-// Deferred LifePrint Generation
+// Narrative Generation
 // --------------------------------------------------
 
 import { generateSummary }
@@ -99,7 +82,7 @@ export async function runDiscovery({
 }) {
 
   // ----------------------------------------------
-  // Persist User Message
+  // Persist User Input
   // ----------------------------------------------
   if (sessionId) {
 
@@ -113,137 +96,94 @@ export async function runDiscovery({
     });
 
     await updateDiscoveryState(
+
       sessionId,
+
       discoveryState
     );
   }
 
 
-  // ----------------------------------------------
-  // Build Reflective Prompt
-  // ----------------------------------------------
-  const reflectivePrompt =
-    buildReflectivePrompt({
+  // ------------------------------------------------
+  // SYMBOLIC ANALYSIS
+  // ------------------------------------------------
+  // NO LLM CALLS HERE
+  // ------------------------------------------------
 
-      input,
-
-      discoveryState,
-
-      participantProfile
-    });
-
-
-  // ----------------------------------------------
-  // SINGLE Conversational LLM Call
-  // ----------------------------------------------
-  const response =
-    await llm({
-
-      model: "gpt-4o-mini",
-
-      prompt: reflectivePrompt,
-
-      maxTokens: 220
-    });
-
-
-  // ----------------------------------------------
-  // Lightweight Local Analysis
-  // ----------------------------------------------
-  // These analyzers should NOT
-  // make additional LLM calls.
-  // They should rely on:
-  // - heuristics
-  // - scoring
-  // - local interpretation
-  // ----------------------------------------------
   const [
 
-  alignment,
-
-  strengths,
-
-  friction,
-
-  capacity,
-
-  contradictions
-
-] = await Promise.all([
-
-  analyzeAlignment({
-
-    input,
-
-    participantProfile,
-
-    llm
-  }),
-
-  analyzeStrengths({
-
-    input,
-
-    participantProfile,
-
-    llm
-  }),
-
-  analyzeFriction({
-
-    input,
-
-    participantProfile,
-
-    llm
-  }),
-
-  analyzeCapacity({
-
-    input,
-
-    participantProfile,
-
-    llm
-  }),
-
-  detectContradictions({
-
-    input,
-
-    participantProfile,
-
-    llm
-  })
-]);
-
-
-  // ----------------------------------------------
-  // Upgrade Areas
-  // ----------------------------------------------
-  const upgrades =
-  await analyzeUpgradeAreas({
-
-    input,
-
-    participantProfile,
+    alignment,
 
     strengths,
 
     friction,
 
-    contradictions,
+    capacity,
 
-    llm
-  });
+    contradictions
+
+  ] = await Promise.all([
+
+    analyzeAlignment({
+
+      input,
+
+      participantProfile
+    }),
+
+    analyzeStrengths({
+
+      input,
+
+      participantProfile
+    }),
+
+    analyzeFriction({
+
+      input,
+
+      participantProfile
+    }),
+
+    analyzeCapacity({
+
+      input,
+
+      participantProfile
+    }),
+
+    detectContradictions({
+
+      input,
+
+      participantProfile
+    })
+  ]);
 
 
-  // ----------------------------------------------
-  // Discovery Synthesis
-  // ----------------------------------------------
-  // This should ALSO become
-  // mostly local logic over time.
-  // ----------------------------------------------
+  // ------------------------------------------------
+  // Upgrade Inference
+  // ------------------------------------------------
+
+  const upgrades =
+    await analyzeUpgradeAreas({
+
+      input,
+
+      participantProfile,
+
+      strengths,
+
+      friction,
+
+      contradictions
+    });
+
+
+  // ------------------------------------------------
+  // Symbolic Synthesis
+  // ------------------------------------------------
+
   const synthesis =
     await synthesizeDiscovery({
 
@@ -257,15 +197,52 @@ export async function runDiscovery({
 
       contradictions,
 
-      upgrades,
-
-      llm
+      upgrades
     });
 
 
-  // ----------------------------------------------
-  // Determine Readiness
-  // ----------------------------------------------
+  // ------------------------------------------------
+  // Build Reflective Prompt
+  // ------------------------------------------------
+  // IMPORTANT:
+  // LLM is now ONLY:
+  // - conversational
+  // - expressive
+  // - reflective
+  //
+  // NOT interpretive.
+  // ------------------------------------------------
+
+  const reflectivePrompt =
+    buildReflectivePrompt({
+
+      input,
+
+      discoveryState,
+
+      synthesis
+    });
+
+
+  // ------------------------------------------------
+  // Conversational Reflection
+  // ------------------------------------------------
+
+  const response =
+    await llm({
+
+      model: "gpt-4o-mini",
+
+      prompt: reflectivePrompt,
+
+      maxTokens: 220
+    });
+
+
+  // ------------------------------------------------
+  // Determine LifePrint Readiness
+  // ------------------------------------------------
+
   const shouldGenerateLifeprint =
     evaluateLifeprintReadiness({
 
@@ -277,20 +254,15 @@ export async function runDiscovery({
     });
 
 
-  // ----------------------------------------------
-  // Deferred LifePrint
-  // ----------------------------------------------
+  // ------------------------------------------------
+  // Deferred Narrative Generation
+  // ------------------------------------------------
+
   let lifeprint = null;
 
 
-  // ----------------------------------------------
-  // Generate ONLY at milestone readiness
-  // ----------------------------------------------
   if (shouldGenerateLifeprint) {
 
-    // ------------------------------------------
-    // Parallel Narrative Generation
-    // ------------------------------------------
     const [
 
       summary,
@@ -346,28 +318,30 @@ export async function runDiscovery({
     ]);
 
 
-    // ------------------------------------------
-    // Assemble Narrative
-    // ------------------------------------------
     lifeprint =
       await narrativeAssembler({
 
         summary,
 
-        strengths: strengthsSection,
+        strengths:
+          strengthsSection,
 
-        friction: frictionSection,
+        friction:
+          frictionSection,
 
-        upgrades: upgradePath,
+        upgrades:
+          upgradePath,
 
-        momentum: momentumSteps
+        momentum:
+          momentumSteps
       });
   }
 
 
-  // ----------------------------------------------
-  // Update Participant Profile
-  // ----------------------------------------------
+  // ------------------------------------------------
+  // Update Participant State
+  // ------------------------------------------------
+
   const updatedProfile = {
 
     ...participantProfile,
@@ -384,14 +358,18 @@ export async function runDiscovery({
     readinessLevel:
       synthesis?.readinessLevel || "emerging",
 
+    synthesisState:
+      synthesis,
+
     lastDiscoveryState:
       discoveryState
   };
 
 
-  // ----------------------------------------------
+  // ------------------------------------------------
   // Persist Assistant Response
-  // ----------------------------------------------
+  // ------------------------------------------------
+
   if (sessionId) {
 
     await updateParticipantProfile(
@@ -412,9 +390,10 @@ export async function runDiscovery({
   }
 
 
-  // ----------------------------------------------
-  // Return Structured Result
-  // ----------------------------------------------
+  // ------------------------------------------------
+  // Return Structured Output
+  // ------------------------------------------------
+
   return {
 
     response,
@@ -422,6 +401,8 @@ export async function runDiscovery({
     discoveryState,
 
     lifeprint,
+
+    synthesis,
 
     strengthsDetected:
       strengths?.detected || [],
@@ -448,9 +429,6 @@ function evaluateLifeprintReadiness({
 
 }) {
 
-  // ----------------------------------------------
-  // Require Upgrade Phase
-  // ----------------------------------------------
   if (
     discoveryState !== STATES.UPGRADE
   ) {
@@ -459,9 +437,6 @@ function evaluateLifeprintReadiness({
   }
 
 
-  // ----------------------------------------------
-  // Require Readiness
-  // ----------------------------------------------
   if (
     synthesis?.readinessLevel !== "ready"
   ) {
@@ -470,11 +445,9 @@ function evaluateLifeprintReadiness({
   }
 
 
-  // ----------------------------------------------
-  // Require Reflection Depth
-  // ----------------------------------------------
   const strengths =
     participantProfile?.strengths || [];
+
 
   if (strengths.length < 3) {
 
@@ -495,109 +468,41 @@ function buildReflectivePrompt({
 
   discoveryState,
 
-  participantProfile
+  synthesis
 
 }) {
 
-  const basePrompt = `
+  return `
 You are TRUE AI.
 
-You are a calm reflective intelligence system.
+You are NOT:
+- diagnosing
+- coaching
+- fixing
+- transforming
 
-Your purpose is to help participants:
-- better understand themselves
-- notice patterns
-- identify tension
-- clarify values
-- explore sustainable movement
+You are calmly reflecting
+the participant's symbolic state.
+
+Use:
+- grounded language
+- emotional steadiness
+- thoughtful reflection
+- conversational clarity
 
 Avoid:
-- diagnosis
-- coaching hype
-- forced positivity
+- hype
 - urgency
 - optimization language
-- exaggerated self-help tone
+- exaggerated positivity
+- self-help rhetoric
 
-Respond conversationally.
-Respond thoughtfully.
-Respond clearly.
-Keep responses emotionally grounded.
-`;
-
-
-  // ----------------------------------------------
-  // TARGET
-  // ----------------------------------------------
-  if (
-    discoveryState === STATES.TARGET
-  ) {
-
-    return `
-${basePrompt}
-
-The participant is currently in TARGET exploration.
-
-Help them reflect on:
-- values
-- desires
-- fulfillment
-- direction
-- priorities
-- meaningful goals
+Current Symbolic State:
+${JSON.stringify(synthesis, null, 2)}
 
 Participant Input:
 "${input}"
-`;
-  }
 
-
-  // ----------------------------------------------
-  // UPGRADE
-  // ----------------------------------------------
-  if (
-    discoveryState === STATES.UPGRADE
-  ) {
-
-    return `
-${basePrompt}
-
-The participant is currently exploring sustainable growth.
-
-Help them reflect on:
-- small adjustments
-- sustainable movement
-- existing strengths
-- emotional readiness
-- realistic next steps
-
-Avoid optimization framing.
-
-Participant Input:
-"${input}"
-`;
-  }
-
-
-  // ----------------------------------------------
-  // REFLECT
-  // ----------------------------------------------
-  return `
-${basePrompt}
-
-The participant is currently in reflective exploration.
-
-Help them examine:
-- emotional patterns
-- recurring friction
-- contradictions
-- overwhelm
-- alignment
-- emotional needs
-
-Respond with steadiness and curiosity.
-
-Participant Input:
-"${input}"
+Respond naturally in 1-3 short paragraphs.
 `;
 }
