@@ -1,32 +1,37 @@
 // core/interpreter/alignmentAnalyzer.js
-// TRUE AI — Alignment Analyzer
-
-// --------------------------------------------------
-// ALIGNMENT ANALYZER
-// --------------------------------------------------
-// Purpose:
-// Identify:
+// TRUE AI — Symbolic Alignment Analyzer
 //
-// - alignment between values and lifestyle
-// - alignment between goals and capacity
+// PURPOSE
+// --------------------------------------------------
+// Detect:
+// - alignment between values + behavior
+// - alignment between goals + capacity
 // - internal coherence
-// - major tension areas
-// - meaningful congruence
+// - tension patterns
+// - sustainable congruence
 //
-// This analyzer is intentionally:
-// - reflective
-// - non-diagnostic
-// - non-deterministic
-// - emotionally safe
+// WITHOUT LLM DEPENDENCE.
 //
-// It does NOT:
-// - define identity
-// - rank participants
-// - determine worth
+// This analyzer uses:
+// - symbolic scoring
+// - contextual pattern detection
+// - relational interpretation
+// - emotionally safe heuristics
 //
-// It helps surface:
-// alignment + friction.
+// Alignment is NOT:
+// - moral worth
+// - identity definition
+// - optimization status
+//
+// It is:
+// - directional coherence
+// - sustainable congruence
+// - relational harmony
 // --------------------------------------------------
+
+import alignmentWeights
+  from "../../data/scoring/alignmentWeights.json"
+  assert { type: "json" };
 
 
 // --------------------------------------------------
@@ -36,11 +41,13 @@ export async function analyzeAlignment({
 
   input = "",
 
-  participantProfile = {},
-
-  llm
+  participantProfile = {}
 
 }) {
+
+  const text =
+    input.toLowerCase();
+
 
   // ----------------------------------------------
   // Extract participant context
@@ -59,183 +66,427 @@ export async function analyzeAlignment({
 
 
   // ----------------------------------------------
-  // Build analysis prompt
+  // State Containers
   // ----------------------------------------------
-  const prompt = buildAlignmentPrompt({
+  const scores = {};
 
-    input,
+  const alignedAreas = [];
 
-    values,
+  const misalignedAreas = [];
 
-    goals,
+  const tensions = [];
 
-    frictionThemes,
+  const supportivePatterns = [];
 
-    strengths
-  });
-
-
-  // ----------------------------------------------
-  // LLM analysis
-  // ----------------------------------------------
-  const response = await llm({
-
-    prompt,
-
-    maxTokens: 500
-  });
+  const matchedSignals = {};
 
 
   // ----------------------------------------------
-  // Parse response
+  // Process Alignment Categories
   // ----------------------------------------------
-  const parsed =
-    safelyParseAlignment(response);
+  for (
+
+    const [
+
+      categoryName,
+
+      category
+
+    ] of Object.entries(
+      alignmentWeights.categories
+    )
+
+  ) {
+
+    let categoryScore =
+      category.baseWeight || 1;
+
+    const categoryMatches = [];
+
+
+    // --------------------------------------------
+    // Process Signals
+    // --------------------------------------------
+    for (
+      const signal
+      of category.signals
+    ) {
+
+      let signalMatched = false;
+
+
+      // ------------------------------------------
+      // Match Examples
+      // ------------------------------------------
+      for (
+        const example
+        of signal.examples
+      ) {
+
+        if (
+          text.includes(
+            example.toLowerCase()
+          )
+        ) {
+
+          signalMatched = true;
+
+          categoryScore +=
+            signal.weight || 1;
+
+          categoryMatches.push({
+
+            signal:
+              signal.name,
+
+            matchedExample:
+              example
+          });
+        }
+      }
+
+
+      // ------------------------------------------
+      // Track matched signals
+      // ------------------------------------------
+      if (
+        signalMatched
+      ) {
+
+        matchedSignals[
+          signal.name
+        ] = true;
+      }
+    }
+
+
+    // --------------------------------------------
+    // Threshold Filtering
+    // --------------------------------------------
+    const threshold =
+      alignmentWeights
+        ?.alignment_constraints
+        ?.minimum_signal_threshold
+      || 1;
+
+
+    if (
+      categoryMatches.length >= threshold
+    ) {
+
+      scores[categoryName] =
+        categoryScore;
+
+
+      // ------------------------------------------
+      // Categorize Alignment Themes
+      // ------------------------------------------
+      categorizeAlignment({
+
+        categoryName,
+
+        alignedAreas,
+
+        misalignedAreas,
+
+        tensions,
+
+        supportivePatterns
+      });
+    }
+  }
 
 
   // ----------------------------------------------
-  // Return structured alignment
+  // Integrate Known Friction
+  // ----------------------------------------------
+  if (
+    frictionThemes.length >= 3
+  ) {
+
+    tensions.push(
+      "multiple active friction patterns"
+    );
+  }
+
+
+  // ----------------------------------------------
+  // Integrate Known Strengths
+  // ----------------------------------------------
+  if (
+    strengths.length >= 3
+  ) {
+
+    supportivePatterns.push(
+      "existing internal resources"
+    );
+  }
+
+
+  // ----------------------------------------------
+  // Determine Overall Alignment
+  // ----------------------------------------------
+  const totalScore =
+    Object.values(scores)
+
+      .reduce(
+        (sum, score) => sum + score,
+        0
+      );
+
+
+  let overallAlignment =
+    "mixed";
+
+
+  if (totalScore >= 14) {
+
+    overallAlignment =
+      "strong";
+
+  } else if (totalScore >= 9) {
+
+    overallAlignment =
+      "emerging";
+
+  } else if (totalScore <= 4) {
+
+    overallAlignment =
+      "low";
+  }
+
+
+  // ----------------------------------------------
+  // Build Reflective Summary
+  // ----------------------------------------------
+  const reflectiveSummary =
+    buildReflectiveSummary({
+
+      overallAlignment,
+
+      alignedAreas,
+
+      tensions
+    });
+
+
+  // ----------------------------------------------
+  // Return Structured Alignment
   // ----------------------------------------------
   return {
 
-    overallAlignment:
-      parsed.overallAlignment || "mixed",
+    overallAlignment,
 
     alignedAreas:
-      parsed.alignedAreas || [],
+      unique(alignedAreas),
 
     misalignedAreas:
-      parsed.misalignedAreas || [],
+      unique(misalignedAreas),
 
     tensions:
-      parsed.tensions || [],
+      unique(tensions),
 
     supportivePatterns:
-      parsed.supportivePatterns || [],
+      unique(supportivePatterns),
 
-    reflectiveSummary:
-      parsed.reflectiveSummary || ""
+    reflectiveSummary,
+
+    scores
   };
 }
 
 
 // --------------------------------------------------
-// Build Alignment Prompt
+// Categorize Alignment
 // --------------------------------------------------
-function buildAlignmentPrompt({
+function categorizeAlignment({
 
-  input,
+  categoryName,
 
-  values = [],
+  alignedAreas,
 
-  goals = [],
+  misalignedAreas,
 
-  frictionThemes = [],
+  tensions,
 
-  strengths = []
+  supportivePatterns
 
 }) {
 
-  return `
-You are TRUE AI.
+  // ----------------------------------------------
+  // Value Congruence
+  // ----------------------------------------------
+  if (
+    categoryName === "value_congruence"
+  ) {
 
-You are analyzing alignment patterns within a participant's life.
-
-Your task is NOT to diagnose, judge, or define identity.
-
-Your role is to gently identify:
-- areas of alignment
-- areas of tension
-- value congruence
-- goal friction
-- emotional mismatch
-- supportive patterns
-
-Use calm, reflective language.
-
-Avoid:
-- harsh language
-- certainty
-- motivational coaching
-- optimization language
-- over-pathologizing
-
-Return ONLY valid JSON.
-
-Required JSON structure:
-
-{
-  "overallAlignment": "low | mixed | emerging | strong",
-
-  "alignedAreas": [
-    "string"
-  ],
-
-  "misalignedAreas": [
-    "string"
-  ],
-
-  "tensions": [
-    "string"
-  ],
-
-  "supportivePatterns": [
-    "string"
-  ],
-
-  "reflectiveSummary": "string"
-}
-
-Participant Values:
-${JSON.stringify(values)}
-
-Participant Goals:
-${JSON.stringify(goals)}
-
-Known Friction Themes:
-${JSON.stringify(frictionThemes)}
-
-Known Strengths:
-${JSON.stringify(strengths)}
-
-Participant Input:
-"""
-${input}
-"""
-`;
-}
-
-
-// --------------------------------------------------
-// Safe JSON Parsing
-// --------------------------------------------------
-function safelyParseAlignment(response) {
-
-  try {
-
-    return JSON.parse(response);
-
-  } catch (err) {
-
-    console.error(
-      "Alignment parsing error:",
-      err
+    alignedAreas.push(
+      "values and direction"
     );
 
-    return {
-
-      overallAlignment: "mixed",
-
-      alignedAreas: [],
-
-      misalignedAreas: [],
-
-      tensions: [],
-
-      supportivePatterns: [],
-
-      reflectiveSummary:
-        "Some alignment patterns were identified, though additional reflection may help clarify them further."
-    };
+    supportivePatterns.push(
+      "internal coherence"
+    );
   }
+
+
+  // ----------------------------------------------
+  // Sustainable Movement
+  // ----------------------------------------------
+  if (
+    categoryName === "sustainable_movement"
+  ) {
+
+    alignedAreas.push(
+      "capacity-aware pacing"
+    );
+
+    supportivePatterns.push(
+      "sustainable engagement"
+    );
+  }
+
+
+  // ----------------------------------------------
+  // Relational Alignment
+  // ----------------------------------------------
+  if (
+    categoryName === "relational_alignment"
+  ) {
+
+    alignedAreas.push(
+      "relational awareness"
+    );
+  }
+
+
+  // ----------------------------------------------
+  // Internal Conflict
+  // ----------------------------------------------
+  if (
+    categoryName === "internal_conflict"
+  ) {
+
+    tensions.push(
+      "competing internal needs"
+    );
+
+    misalignedAreas.push(
+      "directional coherence"
+    );
+  }
+
+
+  // ----------------------------------------------
+  // Overextension
+  // ----------------------------------------------
+  if (
+    categoryName === "overextension"
+  ) {
+
+    tensions.push(
+      "capacity strain"
+    );
+
+    misalignedAreas.push(
+      "sustainability"
+    );
+  }
+
+
+  // ----------------------------------------------
+  // Identity Pressure
+  // ----------------------------------------------
+  if (
+    categoryName === "identity_pressure"
+  ) {
+
+    tensions.push(
+      "conditional self-pressure"
+    );
+
+    misalignedAreas.push(
+      "self-worth stability"
+    );
+  }
+}
+
+
+// --------------------------------------------------
+// Reflective Summary Builder
+// --------------------------------------------------
+function buildReflectiveSummary({
+
+  overallAlignment,
+
+  alignedAreas = [],
+
+  tensions = []
+
+}) {
+
+  // ----------------------------------------------
+  // Strong Alignment
+  // ----------------------------------------------
+  if (
+    overallAlignment === "strong"
+  ) {
+
+    return `
+Current reflection patterns suggest a relatively strong degree of internal coherence between values, direction, and sustainable movement.
+
+This does not imply perfection or certainty, but it may indicate that several areas of life are currently moving in a direction that feels meaningful or supportive.
+`.trim();
+  }
+
+
+  // ----------------------------------------------
+  // Emerging Alignment
+  // ----------------------------------------------
+  if (
+    overallAlignment === "emerging"
+  ) {
+
+    return `
+Several reflective patterns suggest emerging alignment between personal values, emotional needs, and current direction.
+
+Some tension may still exist, though there are also indications of meaningful movement toward greater coherence and sustainability.
+`.trim();
+  }
+
+
+  // ----------------------------------------------
+  // Low Alignment
+  // ----------------------------------------------
+  if (
+    overallAlignment === "low"
+  ) {
+
+    return `
+Current reflection patterns suggest possible strain between internal needs, responsibilities, direction, or emotional capacity.
+
+This does not imply failure or dysfunction. Instead, it may indicate that additional reflection, recovery, or recalibration could be supportive.
+`.trim();
+  }
+
+
+  // ----------------------------------------------
+  // Mixed Alignment
+  // ----------------------------------------------
+  return `
+Current reflection patterns suggest a mixture of alignment and tension.
+
+Some areas may feel supportive or meaningful, while others may involve strain, uncertainty, or competing demands.
+
+This reflects normal human complexity rather than personal failure.
+`.trim();
+}
+
+
+// --------------------------------------------------
+// Utility — Unique Values
+// --------------------------------------------------
+function unique(arr = []) {
+
+  return [...new Set(arr)];
 }
