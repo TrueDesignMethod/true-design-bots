@@ -10,7 +10,7 @@ import {
 
   updateDiscoveryState,
 
-  updateparticipantState
+  updateParticipantState
 
 } from "../chat/sessionManager.js";
 
@@ -214,17 +214,16 @@ export async function runDiscovery({
   // ------------------------------------------------
 
   const reflectivePrompt =
-    buildReflectivePrompt({
+  buildReflectivePrompt({
 
-  input,
+    input,
 
-  discoveryState,
+    discoveryState,
 
-  synthesis,
+    synthesis,
 
-  participantState:
-    updatedParticipantState
-});
+    participantState
+  });
 
 
   // ------------------------------------------------
@@ -253,8 +252,7 @@ export async function runDiscovery({
 
       discoveryState,
 
-      participantState:
-        updatedParticipantState
+      participantState
     });
 
 
@@ -547,7 +545,7 @@ const updatedParticipantState = {
 
   if (sessionId) {
 
-    await updateparticipantState(
+    await updateParticipantState(
 
       sessionId,
 
@@ -591,6 +589,13 @@ const updatedParticipantState = {
   };
 }
 
+// --------------------------------------------------
+// Utility — Merge Unique
+// --------------------------------------------------
+function mergeUnique(arr = []) {
+
+  return [...new Set(arr)];
+}
 // --------------------------------------------------
 // Utility — Limit History
 // --------------------------------------------------
