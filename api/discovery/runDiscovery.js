@@ -473,13 +473,12 @@ const updatedParticipantState = {
 
   ...previousState,
 
-
   // ----------------------------------------------
   // Symbolic Analyzer States
   // ----------------------------------------------
   strengthsState:
-    strengths,  
-  
+    strengths,
+
   frictionState: {
 
     active:
@@ -499,7 +498,6 @@ const updatedParticipantState = {
       previousState
         ?.frictionState
         ?.resolved || []
-
   },
 
   contradictionState:
@@ -514,7 +512,7 @@ const updatedParticipantState = {
   upgradeState:
     upgrades,
 
-    synthesisState: {
+  synthesisState: {
 
     current:
       synthesis,
@@ -530,13 +528,14 @@ const updatedParticipantState = {
           timestamp:
             Date.now(),
 
-          synthesis
+          synthesis:
+            synthesis
         }
 
       ], 25)
   },
 
-    // ----------------------------------------------
+  // ----------------------------------------------
   // Longitudinal Structures
   // ----------------------------------------------
   readinessState,
@@ -554,7 +553,6 @@ const updatedParticipantState = {
   lastUpdated:
     Date.now()
 };
-
   // ------------------------------------------------
   // Persist Assistant Response
   // ------------------------------------------------
