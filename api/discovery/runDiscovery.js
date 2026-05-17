@@ -424,7 +424,8 @@ const readinessState = {
     synthesis?.readinessLevel
     || "emerging",
 
-  historical: [
+  historical:
+  limitHistory([
 
     ...(previousState
       ?.readinessState
@@ -438,7 +439,8 @@ const readinessState = {
         synthesis?.readinessLevel
         || "emerging"
     }
-  ]
+
+  ], 50)
 };
 
 
@@ -496,9 +498,28 @@ const updatedParticipantState = {
   upgradeState:
     upgrades,
 
-  synthesisState:
+  synthesisState: {
+
+  current:
     synthesis,
 
+  historical:
+    limitHistory([
+
+      ...(previousState
+        ?.synthesisState
+        ?.historical || []),
+
+      {
+
+        timestamp:
+          Date.now(),
+
+        synthesis
+      }
+
+    ], 25)
+},
 
   // ----------------------------------------------
   // Longitudinal Structures
