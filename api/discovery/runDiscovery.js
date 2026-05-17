@@ -668,7 +668,9 @@ function buildReflectivePrompt({
 
   discoveryState,
 
-  synthesis
+  synthesis,
+
+  participantState
 
 }) {
 
@@ -698,17 +700,18 @@ Avoid:
 - self-help rhetoric
 
 Current Symbolic State:
-Recurring Patterns:
 ${JSON.stringify(
-
-  participantState
-    ?.historyPatterns || {},
-
+  synthesis,
   null,
-
   2
 )}
-${JSON.stringify(synthesis, null, 2)}
+
+Recurring Patterns:
+${JSON.stringify(
+  participantState?.historyPatterns || {},
+  null,
+  2
+)}
 
 Participant Input:
 "${input}"
