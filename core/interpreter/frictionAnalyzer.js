@@ -1,36 +1,33 @@
 // core/interpreter/frictionAnalyzer.js
-// TRUE AI — Friction Analyzer
-
-// --------------------------------------------------
-// FRICTION ANALYZER
-// --------------------------------------------------
-// Purpose:
-// Identify:
+// TRUE AI — Symbolic Friction Analyzer
 //
-// - recurring friction patterns
-// - overload areas
+// PURPOSE
+// --------------------------------------------------
+// Detect:
+// - overload
 // - emotional strain
-// - environmental pressure
-// - behavioral resistance
-// - sustainability obstacles
+// - sustainability pressure
+// - misalignment
+// - boundary erosion
+// - uncertainty
 //
-// This analyzer is intentionally:
-// - reflective
-// - non-diagnostic
-// - non-shaming
-// - emotionally safe
+// WITHOUT LLM DEPENDENCE.
 //
-// Friction is NOT treated as:
-// - failure
-// - weakness
-// - laziness
-// - brokenness
+// This analyzer uses:
+// - weighted symbolic scoring
+// - contextual signal matching
+// - emotional safety constraints
+// - structured interpretation
 //
-// The goal is to help participants
-// recognize what may be interfering
-// with alignment, capacity, or
-// sustainable movement.
+// This is NOT:
+// - diagnosis
+// - pathology
+// - moral judgment
 // --------------------------------------------------
+
+import frictionWeights
+  from "../../data/scoring/frictionWeights.json"
+  assert { type: "json" };
 
 
 // --------------------------------------------------
@@ -40,238 +37,395 @@ export async function analyzeFriction({
 
   input = "",
 
-  participantProfile = {},
-
-  llm
+  participantProfile = {}
 
 }) {
 
-  // ----------------------------------------------
-  // Extract context
-  // ----------------------------------------------
-  const {
-
-    values = [],
-
-    goals = [],
-
-    strengths = [],
-
-    frictionThemes = []
-
-  } = participantProfile;
+  const text =
+    input.toLowerCase();
 
 
   // ----------------------------------------------
-  // Build analysis prompt
+  // State Containers
   // ----------------------------------------------
-  const prompt = buildFrictionPrompt({
+  const scores = {};
 
-    input,
+  const matchedSignals = {};
 
-    values,
+  const themes = [];
 
-    goals,
+  const overloadAreas = [];
 
-    strengths,
+  const behavioralFriction = [];
 
-    frictionThemes
-  });
+  const environmentalFriction = [];
 
+  const emotionalStrain = [];
 
-  // ----------------------------------------------
-  // Run LLM analysis
-  // ----------------------------------------------
-  const response = await llm({
-
-    prompt,
-
-    maxTokens: 650
-  });
+  const sustainabilityRisks = [];
 
 
   // ----------------------------------------------
-  // Parse structured output
+  // Process Categories
   // ----------------------------------------------
-  const parsed =
-    safelyParseFriction(response);
+  for (
+
+    const [
+
+      categoryName,
+
+      category
+
+    ] of Object.entries(
+      frictionWeights.categories
+    )
+
+  ) {
+
+    let categoryScore =
+      category.baseWeight || 1;
+
+    const categoryMatches = [];
+
+
+    // --------------------------------------------
+    // Process Signals
+    // --------------------------------------------
+    for (
+      const signal
+      of category.signals
+    ) {
+
+      let signalMatched = false;
+
+
+      // ------------------------------------------
+      // Match Examples
+      // ------------------------------------------
+      for (
+        const example
+        of signal.examples
+      ) {
+
+        if (
+          text.includes(
+            example.toLowerCase()
+          )
+        ) {
+
+          signalMatched = true;
+
+          categoryScore +=
+            signal.weight || 1;
+
+          categoryMatches.push({
+
+            signal:
+              signal.name,
+
+            matchedExample:
+              example
+          });
+        }
+      }
+
+
+      // ------------------------------------------
+      // Track matched signals
+      // ------------------------------------------
+      if (signalMatched) {
+
+        matchedSignals[
+          signal.name
+        ] = true;
+      }
+    }
+
+
+    // --------------------------------------------
+    // Threshold Requirement
+    // --------------------------------------------
+    const threshold =
+      frictionWeights
+        ?.friction_constraints
+        ?.minimum_signal_threshold
+      || 1;
+
+
+    if (
+      categoryMatches.length >= threshold
+    ) {
+
+      themes.push(categoryName);
+
+      scores[categoryName] =
+        categoryScore;
+
+
+      // ------------------------------------------
+      // Route themes into reflective groupings
+      // ------------------------------------------
+      categorizeFriction({
+
+        categoryName,
+
+        overloadAreas,
+
+        behavioralFriction,
+
+        environmentalFriction,
+
+        emotionalStrain,
+
+        sustainabilityRisks
+      });
+    }
+  }
 
 
   // ----------------------------------------------
-  // Return structured friction
+  // Determine Overload Level
+  // ----------------------------------------------
+  const totalScore =
+    Object.values(scores)
+
+      .reduce(
+        (sum, score) => sum + score,
+        0
+      );
+
+
+  let overloadLevel =
+    "low";
+
+  if (totalScore >= 12) {
+
+    overloadLevel = "high";
+
+  } else if (totalScore >= 6) {
+
+    overloadLevel = "moderate";
+  }
+
+
+  // ----------------------------------------------
+  // Ranked Themes
+  // ----------------------------------------------
+  const rankedThemes =
+    Object.entries(scores)
+
+      .sort(
+        (a, b) => b[1] - a[1]
+      )
+
+      .map(([name]) => name);
+
+
+  // ----------------------------------------------
+  // Reflective Summary
+  // ----------------------------------------------
+  const reflectiveSummary =
+    buildReflectiveSummary({
+
+      rankedThemes,
+
+      overloadLevel
+    });
+
+
+  // ----------------------------------------------
+  // Return Structured Output
   // ----------------------------------------------
   return {
 
     themes:
-      parsed.themes || [],
+      rankedThemes,
 
-    overloadAreas:
-      parsed.overloadAreas || [],
+    overloadAreas,
 
-    behavioralFriction:
-      parsed.behavioralFriction || [],
+    behavioralFriction,
 
-    environmentalFriction:
-      parsed.environmentalFriction || [],
+    environmentalFriction,
 
-    emotionalStrain:
-      parsed.emotionalStrain || [],
+    emotionalStrain,
 
-    sustainabilityRisks:
-      parsed.sustainabilityRisks || [],
+    sustainabilityRisks,
 
-    overloadLevel:
-      parsed.overloadLevel || "moderate",
+    overloadLevel,
 
-    reflectiveSummary:
-      parsed.reflectiveSummary || ""
+    reflectiveSummary,
+
+    scores
   };
 }
 
 
 // --------------------------------------------------
-// Prompt Builder
+// Categorize Friction
 // --------------------------------------------------
-function buildFrictionPrompt({
+function categorizeFriction({
 
-  input,
+  categoryName,
 
-  values = [],
+  overloadAreas,
 
-  goals = [],
+  behavioralFriction,
 
-  strengths = [],
+  environmentalFriction,
 
-  frictionThemes = []
+  emotionalStrain,
+
+  sustainabilityRisks
 
 }) {
 
-  return `
-You are TRUE AI.
+  // ----------------------------------------------
+  // Overload
+  // ----------------------------------------------
+  if (
+    categoryName === "overload"
+  ) {
 
-You are analyzing friction patterns within a participant's life.
-
-Your role is to gently identify:
-- recurring strain
-- overload
-- resistance patterns
-- environmental pressure
-- emotional tension
-- sustainability concerns
-
-Do NOT:
-- diagnose
-- shame
-- imply failure
-- pathologize normal human struggle
-- frame friction as weakness
-
-Avoid:
-- productivity language
-- harsh optimization framing
-- rigid self-help language
-- exaggerated certainty
-
-Recognize that friction may emerge from:
-- overload
-- conflicting values
-- insufficient recovery
-- environmental pressure
-- chronic responsibility
-- unclear boundaries
-- emotional depletion
-- unrealistic expectations
-
-Return ONLY valid JSON.
-
-Required JSON structure:
-
-{
-  "themes": [
-    "string"
-  ],
-
-  "overloadAreas": [
-    "string"
-  ],
-
-  "behavioralFriction": [
-    "string"
-  ],
-
-  "environmentalFriction": [
-    "string"
-  ],
-
-  "emotionalStrain": [
-    "string"
-  ],
-
-  "sustainabilityRisks": [
-    "string"
-  ],
-
-  "overloadLevel":
-    "low | moderate | high",
-
-  "reflectiveSummary":
-    "string"
-}
-
-Participant Values:
-${JSON.stringify(values)}
-
-Participant Goals:
-${JSON.stringify(goals)}
-
-Known Strengths:
-${JSON.stringify(strengths)}
-
-Existing Friction Themes:
-${JSON.stringify(frictionThemes)}
-
-Participant Input:
-"""
-${input}
-"""
-`;
-}
-
-
-// --------------------------------------------------
-// Safe JSON Parsing
-// --------------------------------------------------
-function safelyParseFriction(response) {
-
-  try {
-
-    return JSON.parse(response);
-
-  } catch (err) {
-
-    console.error(
-      "Friction parsing error:",
-      err
+    overloadAreas.push(
+      "capacity strain"
     );
 
-    return {
-
-      themes: [],
-
-      overloadAreas: [],
-
-      behavioralFriction: [],
-
-      environmentalFriction: [],
-
-      emotionalStrain: [],
-
-      sustainabilityRisks: [],
-
-      overloadLevel: "moderate",
-
-      reflectiveSummary:
-        "Some areas of strain or overload may be present, though additional reflection may help clarify them further."
-    };
+    sustainabilityRisks.push(
+      "insufficient recovery"
+    );
   }
+
+
+  // ----------------------------------------------
+  // Misalignment
+  // ----------------------------------------------
+  if (
+    categoryName === "misalignment"
+  ) {
+
+    behavioralFriction.push(
+      "directional tension"
+    );
+
+    sustainabilityRisks.push(
+      "value incongruence"
+    );
+  }
+
+
+  // ----------------------------------------------
+  // Boundary Erosion
+  // ----------------------------------------------
+  if (
+    categoryName === "boundary_erosion"
+  ) {
+
+    behavioralFriction.push(
+      "overextension"
+    );
+
+    emotionalStrain.push(
+      "emotional carrying"
+    );
+  }
+
+
+  // ----------------------------------------------
+  // Identity Pressure
+  // ----------------------------------------------
+  if (
+    categoryName === "identity_pressure"
+  ) {
+
+    emotionalStrain.push(
+      "performance pressure"
+    );
+
+    sustainabilityRisks.push(
+      "conditional self-worth"
+    );
+  }
+
+
+  // ----------------------------------------------
+  // Uncertainty
+  // ----------------------------------------------
+  if (
+    categoryName === "uncertainty"
+  ) {
+
+    behavioralFriction.push(
+      "internal conflict"
+    );
+  }
+
+
+  // ----------------------------------------------
+  // Emotional Fatigue
+  // ----------------------------------------------
+  if (
+    categoryName === "emotional_fatigue"
+  ) {
+
+    emotionalStrain.push(
+      "persistent depletion"
+    );
+
+    overloadAreas.push(
+      "emotional exhaustion"
+    );
+  }
+}
+
+
+// --------------------------------------------------
+// Reflective Summary Builder
+// --------------------------------------------------
+function buildReflectiveSummary({
+
+  rankedThemes = [],
+
+  overloadLevel = "moderate"
+
+}) {
+
+  // ----------------------------------------------
+  // No Significant Friction
+  // ----------------------------------------------
+  if (
+    rankedThemes.length === 0
+  ) {
+
+    return `
+Some areas of strain or tension may still be emerging, though no dominant friction patterns were strongly detected yet.
+`.trim();
+  }
+
+
+  // ----------------------------------------------
+  // Construct reflective summary
+  // ----------------------------------------------
+  const primaryTheme =
+    rankedThemes[0]
+
+      ?.replaceAll("_", " ");
+
+
+  return `
+Current reflection patterns suggest possible tension around ${primaryTheme}.
+
+This does not imply failure or dysfunction.
+
+Instead, it may indicate areas where:
+- recovery
+- boundaries
+- pacing
+- alignment
+- emotional support
+- sustainable structure
+
+could benefit from additional attention or reflection.
+
+Current overload level appears ${overloadLevel}.
+`.trim();
 }
