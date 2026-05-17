@@ -212,8 +212,7 @@ export async function runDiscovery({
   //
   // NOT interpretive.
   // ------------------------------------------------
-
-  const reflectivePrompt =
+const reflectivePrompt =
   buildReflectivePrompt({
 
     input,
@@ -479,15 +478,14 @@ const updatedParticipantState = {
   // Symbolic Analyzer States
   // ----------------------------------------------
   strengthsState:
-    strengths,
-
-   frictionState: {
+    strengths,  
+  
+  frictionState: {
 
     active:
       friction?.themes || [],
 
     recurring:
-
       mergeUnique([
 
         ...(previousState
@@ -498,10 +496,10 @@ const updatedParticipantState = {
       ]),
 
     resolved:
-
       previousState
         ?.frictionState
         ?.resolved || []
+
   },
 
   contradictionState:
@@ -538,7 +536,7 @@ const updatedParticipantState = {
       ], 25)
   },
 
-  // ----------------------------------------------
+    // ----------------------------------------------
   // Longitudinal Structures
   // ----------------------------------------------
   readinessState,
@@ -546,7 +544,6 @@ const updatedParticipantState = {
   historyPatterns,
 
   narrativeState,
-
 
   // ----------------------------------------------
   // Session Metadata
