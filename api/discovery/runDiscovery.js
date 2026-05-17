@@ -483,11 +483,25 @@ const updatedParticipantState = {
 
  frictionState: {
 
-  active: [],
+  active:
+    friction?.themes || [],
 
-  recurring: [],
+  recurring:
 
-  resolved: []
+    mergeUnique([
+
+      ...(previousState
+        ?.frictionState
+        ?.recurring || []),
+
+      ...(friction?.themes || [])
+    ]),
+
+  resolved:
+
+    previousState
+      ?.frictionState
+      ?.resolved || []
 },
 
   contradictionState:
@@ -642,12 +656,14 @@ function evaluateLifeprintReadiness({
   // ----------------------------------------------
   // Readiness threshold
   // ----------------------------------------------
-  if (
-    synthesis?.readinessLevel !== ["stabilizing", "ready"]
-  ) {
+ if (
+  !["stabilizing", "ready"].includes(
+    synthesis?.readinessLevel
+  )
+) {
 
-    return false;
-  }
+  return false;
+}
 
 
   // ----------------------------------------------
